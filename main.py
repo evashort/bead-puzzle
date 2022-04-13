@@ -81,7 +81,7 @@ def get_move_slices(n, i, j):
         i, j = j, i
 
     hole_slice = get_hole_slice(n, j)
-    moved_slice = get_moved_slice(n, i, j)
+    moved_slice = get_moved_slice(n, i, j) if i != j else hole_slice
     return (moved_slice, hole_slice) if swap else (hole_slice, moved_slice)
 
 graph = np.array(
@@ -104,6 +104,8 @@ graph = np.array(
     ],
     dtype=bool,
 )
+
+def 
 # rotation is the number of indices by which to shift all values to the right
 distinct_rotations = np.tile(graph, (2, 2))[1:, 1:]
 _, distinct_rotations = np.unique(
