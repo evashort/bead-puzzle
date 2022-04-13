@@ -104,6 +104,17 @@ graph = np.array(
     ],
     dtype=bool,
 )
+# rotation is the number of indices by which to shift all values to the right
+distinct_rotations = np.tile(graph, (2, 2))[1:, 1:]
+_, distinct_rotations = np.unique(
+    np.lib.stride_tricks.as_strided(
+        distinct_rotations,
+        (min(graph.shape),) + graph.shape,
+        (sum(distinct_rotations.strides),) + distinct_rotations.strides,
+    )[::-1],
+    axis=0,
+    return_index=True,
+)
 distances = np.full(
     2 * (math.factorial(len(graph)),),
     float('inf'),
@@ -204,7 +215,7 @@ def get_rotation_slice(n):
     result *= np.arange(n)
     return result
 
-rotation_slice = get_rotation_slice(len(graph))
+rotation_slice = get_rotation_slice(len(graph))[distinct_rotations]
 # we can require the final permutation to be a rotation of 0123...n without
 # losing generality
 distances = distances[:, rotation_slice]
@@ -213,7 +224,8 @@ max_distance = distances.max()
 print(max_distance)
 
 np.equal(distances, max_distance, out=distances)
-for start_index, rotation in zip(*np.nonzero(distances)):
+for start_index, rotation_index in zip(*np.nonzero(distances)):
+    rotation = distinct_rotations[rotation_index]
     start = tuple(index_to_permutation(len(graph), start_index))
     # shift everything right. greater rotation means greater right shift.
     # note that successive final permutations e.g. 0123, 1230, 2301... are
