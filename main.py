@@ -175,17 +175,16 @@ print(
 # 0 2 3 * 0 1 2 1 = 2 1 1 0
 #         2 0 0 2
 
-def indices_to_permutation(indices):
-    remaining = []
-    next = 0
-    for index in indices:
-        new_next = next + max(0, index + 1 - len(remaining))
-        remaining.extend(range(next, new_next))
+def index_to_permutation(n, i):
+    remaining = list(range(n))
+    nFactorial = np.product(np.arange(1, n + 1))
+    for n in range(n, 0, -1):
+        nFactorial //= n
+        index, i = divmod(i, nFactorial)
         yield remaining[index]
         del remaining[index]
-        next = new_next
 
-print(''.join(map(str, indices_to_permutation(map(int, '242010'))))) # 253041
+print(''.join(map(str, index_to_permutation(6, 349)))) # 253041
 
 out = np.ones_like(distances)
 temp = np.empty_like(distances)
@@ -213,15 +212,17 @@ np.nan_to_num(distances, copy=False, posinf=-1)
 max_distance = distances.max()
 print(max_distance)
 
-out = distances == max_distance
-out_view = out.reshape(tuple(range(len(graph), 0, -1)) + (len(graph),))
-for indices in zip(*np.nonzero(out_view)):
-    start_indices, rotation = indices[:-1], indices[-1]
-    start_permutation = tuple(indices_to_permutation(start_indices))
-    start_permutation \
-        = start_permutation[rotation:] + start_permutation[:rotation]
+np.equal(distances, max_distance, out=distances)
+for start_index, rotation in zip(*np.nonzero(distances)):
+    start = tuple(index_to_permutation(len(graph), start_index))
+    # shift everything right. greater rotation means greater right shift.
+    # note that successive final permutations e.g. 0123, 1230, 2301... are
+    # increasingly left shifted. the rightward shift cancels that out and puts
+    # the final permutation in standard position 0123
+    start = start[len(start) - rotation :] + start[: len(start) - rotation]
     print(
-        ''.join(map(str, start_permutation)),
+        rotation,
+        ''.join(map(str, start)),
         '->',
         ''.join(map(str, range(len(graph)))),
     )
