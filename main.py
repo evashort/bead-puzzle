@@ -105,7 +105,6 @@ graph = np.array(
     dtype=bool,
 )
 
-def 
 # rotation is the number of indices by which to shift all values to the right
 distinct_rotations = np.tile(graph, (2, 2))[1:, 1:]
 _, distinct_rotations = np.unique(
