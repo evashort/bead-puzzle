@@ -1,5 +1,4 @@
 import itertools
-import math
 import numpy as np
 
 def get_hole_slice(n, i):
@@ -84,6 +83,97 @@ def get_move_slices(n, i, j):
     moved_slice = get_moved_slice(n, i, j) if i != j else hole_slice
     return (moved_slice, hole_slice) if swap else (hole_slice, moved_slice)
 
+def to_bytes(arr):
+    if arr.dtype != np.bool8:
+        raise TypeError(f'dtype must be bool8, not {arr.dtype}')
+
+    return np.packbits(arr.view(np.uint8)).tobytes()
+
+print(
+    to_bytes(np.array([[0, 0, 0, 1, 0, 1], [0, 0, 0, 0, 1, 0]], dtype=bool)),
+) # 20,32 = b'\x14 '
+
+def all_binary_arrays(length):
+    arr = np.ones((2 ** length, length), dtype=bool)
+    power = 1
+    for place in range(length):
+        arr.reshape(-1, 2, power, length)[:, 0, :, place] = 0
+        power *= 2
+
+    return arr
+
+print(all_binary_arrays(4))
+
+def is_graph_contiguous(graph):
+    graph = np.asanyarray(graph)
+    if np.any(np.count_nonzero(graph, axis=1) <= 1):
+        return False
+
+    seen = set()
+    stack = [0]
+    while stack:
+        index = stack.pop()
+        if index not in seen:
+            stack.extend(np.nonzero(graph[index])[0])
+            seen.add(index)
+
+    return len(seen) == len(graph)
+
+print(is_graph_contiguous([
+    [0,1,1],
+    [1,0,1],
+    [1,1,0],
+])) # true
+print(is_graph_contiguous([
+    [0,1,0],
+    [1,0,1],
+    [0,1,0],
+])) # false
+print(is_graph_contiguous([
+    [0,1,1,0,0,0],
+    [1,0,1,0,0,0],
+    [1,1,0,0,0,0],
+    [0,0,0,0,1,1],
+    [0,0,0,1,0,1],
+    [0,0,0,1,1,0],
+])) # false
+
+def get_rotations(arr):
+    # returns an array where the element at index i is arr shifted in the
+    # positive direction by i indices on all axes, e.g. [0,1,2,3] -> [3,0,1,2]
+    arr = np.asanyarray(arr)
+    return np.moveaxis(
+        np.diagonal(
+            np.lib.stride_tricks.sliding_window_view(
+                np.tile(arr, (2,) * arr.ndim)[(np.s_[1:],) * arr.ndim],
+                arr.shape,
+            )[(np.s_[::-1],) * arr.ndim],
+        ),
+        -1,
+        0,
+    )
+
+print(get_rotations([[0, 1, 2], [3, 4, 5]])) # 012/345 534/201
+
+def get_distinct_rotations(arr):
+    _, indices = np.unique(get_rotations(arr), return_index=True, axis=0)
+    return indices
+
+def get_edge_lengths(nodes):
+    # get_edge_lengths(6) = [[0, 1, 2, 3, 2, 1],
+    #                        [1, 0, 1, 2, 3, 2],
+    #                        [2, 1, 0, 1, 2, 3],
+    #                        [3, 2, 1, 0, 1, 2],
+    #                        [2, 3, 2, 1, 0, 1],
+    #                        [1, 2, 3, 2, 1, 0]]
+    return np.lib.stride_tricks.sliding_window_view(
+        np.tile(
+            np.minimum(np.arange(nodes), np.arange(nodes, 0, -1)),
+            2,
+        )[1:],
+        nodes,
+    )[::-1]
+
 graph = np.array(
     [
         [0,1,1,0,0,1],
@@ -105,31 +195,49 @@ graph = np.array(
     dtype=bool,
 )
 
-# rotation is the number of indices by which to shift all values to the right
-distinct_rotations = np.tile(graph, (2, 2))[1:, 1:]
-_, distinct_rotations = np.unique(
-    np.lib.stride_tricks.as_strided(
-        distinct_rotations,
-        (min(graph.shape),) + graph.shape,
-        (sum(distinct_rotations.strides),) + distinct_rotations.strides,
-    )[::-1],
-    axis=0,
-    return_index=True,
-)
-distances = np.full(
-    2 * (math.factorial(len(graph)),),
-    float('inf'),
-    np.float16,
-)
-range_view = np.arange(len(distances)).reshape(range(len(graph), 0, -1))
-for i, j in zip(*np.nonzero(graph)):
-    i_slice, j_slice = get_move_slices(len(graph), i, j)
-    distances[
-        range_view[j_slice].flatten(),
-        range_view[i_slice].flatten(),
-    ] = 1
+def get_good_graphs(nodes):
+    base_graph = np.zeros((nodes, nodes), dtype=bool)
+    triu_indices = np.triu_indices(nodes, k=1)
+    seen = set()
+    edge_lengths = get_edge_lengths(nodes)
+    for triu_values in all_binary_arrays(len(triu_indices[0])):
+        base_graph[triu_indices] = triu_values
+        base_graph.T[triu_indices] = triu_values
+        if to_bytes(base_graph) in seen \
+            or not is_graph_contiguous(base_graph):
+            continue
 
-np.fill_diagonal(distances, 0)
+        best_total_edge_length = float('inf')
+        graph = base_graph
+        for permutation in map(list, itertools.permutations(range(nodes))):
+            permuted_graph = base_graph[permutation][:, permutation]
+            seen.add(to_bytes(permuted_graph))
+            total_edge_length = np.tensordot(permuted_graph, edge_lengths)
+            if total_edge_length < best_total_edge_length:
+                best_total_edge_length = total_edge_length
+                graph = permuted_graph
+
+        yield graph
+
+def get_initial_distances(graph, out=None):
+    graph = np.asanyarray(graph)
+    if out is None:
+        out = np.empty(
+            2 * (np.product(np.arange(1, len(graph) + 1)),),
+            dtype=np.float16,
+        )
+
+    out.fill(float('inf'))
+    range_view = np.arange(len(out)).reshape(range(len(graph), 0, -1))
+    for i, j in zip(*np.nonzero(graph)):
+        i_slice, j_slice = get_move_slices(len(graph), i, j)
+        out[
+            range_view[j_slice].flatten(),
+            range_view[i_slice].flatten(),
+        ] = 1
+
+    np.fill_diagonal(out, 0)
+    return out
 
 def get_swap_slices(n, i):
     if 0 <= i < n - 1:
@@ -198,13 +306,6 @@ def index_to_permutation(n, i):
 
 print(''.join(map(str, index_to_permutation(6, 349)))) # 253041
 
-out = np.ones_like(distances)
-temp = np.empty_like(distances)
-while out.any():
-    get_distance_product(distances, distances, out, temp)
-    distances, out = out, distances
-    np.not_equal(distances, out, out=out)
-
 def get_rotation_slice(n):
     # for n = 4, returns a slice that selects 0123, 1230, 2301, 3012 out of a
     # lexicographically ordered list of all permutations of 0, 1, 2, and 3
@@ -216,26 +317,56 @@ def get_rotation_slice(n):
     result *= np.arange(n)
     return result
 
-rotation_slice = get_rotation_slice(len(graph))[distinct_rotations]
-# we can require the final permutation to be a rotation of 0123...n without
-# losing generality
-distances = distances[:, rotation_slice]
-np.nan_to_num(distances, copy=False, posinf=-1)
-max_distance = distances.max()
-print(max_distance)
+def get_max_distance_and_puzzles(n, distances, distinct_rotations):
+    rotation_slice = get_rotation_slice(n)[distinct_rotations]
+    # we can require the final permutation to be a rotation of 0123...n
+    # without losing generality
+    distances = distances[:, rotation_slice]
+    np.nan_to_num(distances, copy=False, posinf=-1)
+    max_distance = int(distances.max())
+    np.equal(distances, max_distance, out=distances)
+    puzzles = []
+    for start_index, rotation_index in zip(*np.nonzero(distances)):
+        start = tuple(index_to_permutation(n, start_index))
+        rotation = distinct_rotations[rotation_index]
+        # shift everything right. greater rotation means greater right shift.
+        # note that successive final permutations e.g. 0123, 1230, 2301... are
+        # increasingly left shifted. the rightward shift cancels that out and
+        # puts the final permutation in standard position 0123
+        start = start[n - rotation :] + start[: n - rotation]
+        puzzles.append((start, rotation))
 
-np.equal(distances, max_distance, out=distances)
-for start_index, rotation_index in zip(*np.nonzero(distances)):
-    rotation = distinct_rotations[rotation_index]
-    start = tuple(index_to_permutation(len(graph), start_index))
-    # shift everything right. greater rotation means greater right shift.
-    # note that successive final permutations e.g. 0123, 1230, 2301... are
-    # increasingly left shifted. the rightward shift cancels that out and puts
-    # the final permutation in standard position 0123
-    start = start[len(start) - rotation :] + start[: len(start) - rotation]
-    print(
-        rotation,
-        ''.join(map(str, start)),
-        '->',
-        ''.join(map(str, range(len(graph)))),
-    )
+    return max_distance, puzzles
+
+def get_graphs_and_puzzles(nodes):
+    distances = None
+    out = None
+    temp = None
+    for graph in get_good_graphs(nodes):
+        distances = get_initial_distances(graph, out=distances)
+        if out is None:
+            out = np.empty_like(distances)
+
+        if temp is None:
+            temp = np.empty_like(distances)
+
+        out.reshape(-1)[0] = 1
+        while out.any():
+            get_distance_product(distances, distances, out, temp)
+            distances, out = out, distances
+            np.not_equal(distances, out, out=out)
+
+        max_distance, puzzles = get_max_distance_and_puzzles(
+            nodes,
+            distances,
+            get_distinct_rotations(graph),
+        )
+
+        yield graph, max_distance, puzzles
+
+if __name__ == '__main__':
+    for graph, max_distance, puzzles in get_graphs_and_puzzles(4):
+        print(graph)
+        print(max_distance)
+        for start, rotation in puzzles:
+            print(rotation, ''.join(map(str, start)), '-> 0123')
