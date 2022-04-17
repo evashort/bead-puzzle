@@ -1,9 +1,17 @@
 <script>
 export default {
   data() {
+    let graph = new Int8Array(
+      this.startingBeads.length * this.startingBeads.length
+    )
+    for (let edge of this.edges) {
+      graph[edge[0] + this.startingBeads.length * edge[1]] = 1
+      graph[edge[1] + this.startingBeads.length * edge[0]] = 1
+    }
+
     return {
       beads: [...this.startingBeads],
-      lastMove: 2
+      graph: graph
     }
   },
   props: {
@@ -36,49 +44,41 @@ export default {
   methods: {
     getBeadPosition(index) {
       return {
-        x: Math.sin(2 * Math.PI * index / this.beads.length) * (
-          this.beads[index] == 0 ? 0.3 : 1
-        ),
-        y: -Math.cos(2 * Math.PI * index / this.beads.length) * (
-          this.beads[index] == 0 ? 0.3 : 1
-        )
+        x: Math.sin(2 * Math.PI * index / this.beads.length),
+        y: -Math.cos(2 * Math.PI * index / this.beads.length)
       }
     },
     moveUp() {
       let dest = this.beads.indexOf(0)
-      this.beads[dest] = this.beads[2]
-      this.beads[2] = 0
-      this.lastMove = dest
+      let src = (dest + 2) % this.beads.length
+      if (this.graph[src + this.beads.length * dest]) {
+        this.beads[dest] = this.beads[src]
+        this.beads[src] = 0
+      }
     },
     moveDown() {
       let dest = this.beads.indexOf(0)
-      this.beads[dest] = this.beads[0]
-      this.beads[0] = 0
-      this.lastMove = dest
+      let src = (dest + this.beads.length - 2) % this.beads.length
+      if (this.graph[src + this.beads.length * dest]) {
+        this.beads[dest] = this.beads[src]
+        this.beads[src] = 0
+      }
     },
     moveLeft() {
       let dest = this.beads.indexOf(0)
-      if (dest == 3) {
-        this.beads[dest] = this.beads[this.lastMove]
-        this.beads[this.lastMove] = 0
-      } else {
-        this.beads[dest] = this.beads[1]
-        this.beads[1] = 0
+      let src = (dest + 1) % this.beads.length
+      if (this.graph[src + this.beads.length * dest]) {
+        this.beads[dest] = this.beads[src]
+        this.beads[src] = 0
       }
-
-      this.lastMove = dest
     },
     moveRight() {
       let dest = this.beads.indexOf(0)
-      if (dest == 1) {
-        this.beads[dest] = this.beads[this.lastMove]
-        this.beads[this.lastMove] = 0
-      } else {
-        this.beads[dest] = this.beads[3]
-        this.beads[3] = 0
+      let src = (dest + this.beads.length - 1) % this.beads.length
+      if (this.graph[src + this.beads.length * dest]) {
+        this.beads[dest] = this.beads[src]
+        this.beads[src] = 0
       }
-
-      this.lastMove = dest
     },
   }
 }
