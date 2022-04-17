@@ -365,7 +365,7 @@ def get_graphs_and_puzzles(nodes):
         yield graph, max_distance, puzzles
 
 if __name__ == '__main__':
-    for graph, max_distance, puzzles in get_graphs_and_puzzles(4):
+    for graph, max_distance, puzzles in get_graphs_and_puzzles(6):
         print(graph)
         print(max_distance)
         for start, rotation in puzzles:

@@ -11,12 +11,14 @@ export default {
 
     return {
       beads: [...this.startingBeads],
-      graph: graph
+      graph: graph,
+      loopIndex: 0
     }
   },
   props: {
     startingBeads: Array,
     edges: Array,
+    loops: Array
   },
   computed: {
     beadData() {
@@ -24,18 +26,25 @@ export default {
         (bead, index, beads) => {
           return {
             id: bead,
-            color: ['', 'red', 'green', 'blue'][bead],
+            color: ['', 'red', 'green', 'blue', 'indigo', 'pink'][bead],
             position: this.getBeadPosition(index)
           }
         }
       ).filter(x => x.id > 0)
     },
     edgeData() {
+      let loop = this.loops[this.loopIndex]
       return this.edges.map(
         (edge, index, edges) => {
+          let loopStart = loop.indexOf(edge[0])
           return {
             start: this.getBeadPosition(edge[0]),
-            stop: this.getBeadPosition(edge[1])
+            stop: this.getBeadPosition(edge[1]),
+            class: loopStart < 0 ? 'inactiveEdge' : (
+              this.loops[this.loopIndex][(loopStart + 1) % loop.length] == edge[1]
+              || this.loops[this.loopIndex][(loopStart + loop.length - 1) % loop.length] == edge[1]
+              ? 'activeEdge' : 'inactiveEdge'
+            )
           }
         }
       )
@@ -48,46 +57,42 @@ export default {
         y: -Math.cos(2 * Math.PI * index / this.beads.length)
       }
     },
-    moveUp() {
+    prevLoop() {
       let dest = this.beads.indexOf(0)
-      let src = (dest + 2) % this.beads.length
-      if (this.graph[src + this.beads.length * dest]) {
-        this.beads[dest] = this.beads[src]
-        this.beads[src] = 0
-      }
+      do {
+        this.loopIndex += this.loops.length - 1
+        this.loopIndex %= this.loops.length
+      } while (!this.loops[this.loopIndex].includes(dest))
     },
-    moveDown() {
+    nextLoop() {
       let dest = this.beads.indexOf(0)
-      let src = (dest + this.beads.length - 2) % this.beads.length
-      if (this.graph[src + this.beads.length * dest]) {
-        this.beads[dest] = this.beads[src]
-        this.beads[src] = 0
-      }
+      do {
+        this.loopIndex++
+        this.loopIndex %= this.loops.length
+      } while (!this.loops[this.loopIndex].includes(dest))
     },
-    moveLeft() {
+    counterclockwise() {
       let dest = this.beads.indexOf(0)
-      let src = (dest + 1) % this.beads.length
-      if (this.graph[src + this.beads.length * dest]) {
-        this.beads[dest] = this.beads[src]
-        this.beads[src] = 0
-      }
+      let loop = this.loops[this.loopIndex]
+      let src = loop[(loop.indexOf(dest) + 1) % loop.length]
+      this.beads[dest] = this.beads[src]
+      this.beads[src] = 0
     },
-    moveRight() {
+    clockwise() {
       let dest = this.beads.indexOf(0)
-      let src = (dest + this.beads.length - 1) % this.beads.length
-      if (this.graph[src + this.beads.length * dest]) {
-        this.beads[dest] = this.beads[src]
-        this.beads[src] = 0
-      }
-    },
+      let loop = this.loops[this.loopIndex]
+      let src = loop[(loop.indexOf(dest) + loop.length - 1) % loop.length]
+      this.beads[dest] = this.beads[src]
+      this.beads[src] = 0
+    }
   }
 }
 </script>
 
 <template>
-  <button class="tabStop" @keydown.up="moveUp()" @keydown.down="moveDown()" @keydown.left="moveLeft()" @keydown.right="moveRight()">
+  <button class="tabStop" @keydown.up="prevLoop()" @keydown.down="nextLoop()" @keydown.left="counterclockwise()" @keydown.right="clockwise()">
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
-      <line v-for="edge of edgeData" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" class="edge" />
+      <line v-for="edge of edgeData" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:class="edge.class" />
       <circle v-for="bead of beadData" v-bind:cx="1.1 * bead.position.x" v-bind:cy="1.1 * bead.position.y" r=".1" v-bind:fill="bead.color" />
     </svg>
   </button>
@@ -106,8 +111,13 @@ export default {
   height: 40rem;
 }
 
-.edge {
+.activeEdge {
   stroke: var(--color-text);
+  stroke-width: 0.05;
+}
+
+.inactiveEdge {
+  stroke: var(--color-border-hover);
   stroke-width: 0.05;
 }
 </style>
