@@ -1,3 +1,7 @@
+<script setup>
+import Edge from './Edge.vue'
+</script>
+
 <script>
 export default {
   data() {
@@ -40,10 +44,9 @@ export default {
           return {
             start: this.getBeadPosition(edge[0]),
             stop: this.getBeadPosition(edge[1]),
-            class: loopStart < 0 ? 'inactiveEdge' : (
+            active: loopStart >= 0 && (
               this.loops[this.loopIndex][(loopStart + 1) % loop.length] == edge[1]
               || this.loops[this.loopIndex][(loopStart + loop.length - 1) % loop.length] == edge[1]
-              ? 'activeEdge' : 'inactiveEdge'
             )
           }
         }
@@ -92,7 +95,7 @@ export default {
 <template>
   <button class="tabStop" @keydown.up="prevLoop()" @keydown.down="nextLoop()" @keydown.left="counterclockwise()" @keydown.right="clockwise()">
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
-      <line v-for="edge of edgeData" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:class="edge.class" />
+      <Edge v-for="edge of edgeData" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:active="edge.active" />
       <circle v-for="bead of beadData" v-bind:cx="1.1 * bead.position.x" v-bind:cy="1.1 * bead.position.y" r=".1" v-bind:fill="bead.color" />
     </svg>
   </button>
@@ -109,15 +112,5 @@ export default {
 .gameView {
   width: 40rem;
   height: 40rem;
-}
-
-.activeEdge {
-  stroke: var(--color-text);
-  stroke-width: 0.05;
-}
-
-.inactiveEdge {
-  stroke: var(--color-border-hover);
-  stroke-width: 0.05;
 }
 </style>
