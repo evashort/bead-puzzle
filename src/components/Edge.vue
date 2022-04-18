@@ -6,10 +6,8 @@ import cubicBezier from '../CubicBezier.js'
 <script>
 export default {
   data() {
-    let activeNow = this.active ? 1 : 0
     return {
-      activeNow: activeNow,
-      activeAnim: new AnimProp(activeNow, 150, this.setActive, cubicBezier(0, 0, 0.58, 1)),
+      activeAnim: new AnimProp(this.active ? 1 : 0, 150, this.setActive, cubicBezier(0, 0, 0.58, 1)),
     }
   },
   props: {
@@ -21,15 +19,10 @@ export default {
   },
   computed: {
     dashArray() {
-      return `${this.activeNow * 0.12} ${(1 - this.activeNow) * 0.12}`
+      return `${this.activeAnim.value * 0.12} ${(1 - this.activeAnim.value) * 0.12}`
     },
     dashOffset() {
-      return 0.06 * this.activeNow
-    },
-  },
-  methods: {
-    setActive(newActive) {
-      this.activeNow = newActive
+      return 0.06 * this.activeAnim.value
     },
   },
   watch: {

@@ -23,9 +23,8 @@ function noCurve(t) {
 }
 
 export default class AnimProp {
-  constructor(value, duration, callback, curve=noCurve, speed=0, max=Infinity) {
+  constructor(value, duration, curve=noCurve, speed=0, max=Infinity) {
     this.duration = duration
-    this.callback = callback
     this.curve = curve
     this.speed = speed
     this.max = max
@@ -39,8 +38,7 @@ export default class AnimProp {
 
   set(value) {
     let now = performance.now()
-    this.value = this.getValue(now)
-    this.initial = this.value
+    this.initial = this.getValue(now)
     this.final = value % this.max
     if (this.final + this.max - this.initial < this.initial - this.final) {
       this.final += this.max
@@ -64,17 +62,11 @@ export default class AnimProp {
       }
     } else {
       this.value = this.final
-      this.callback(this.final)
     }
   }
 
   tick(now) {
-    let oldValue = this.value
     this.value = this.getValue(now)
-    if (this.value != oldValue) {
-      this.callback(this.value)
-    }
-
     return now < this.stop
   }
 
