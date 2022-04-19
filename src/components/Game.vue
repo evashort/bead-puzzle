@@ -40,14 +40,28 @@ export default {
       let loop = this.loops[this.loopIndex]
       return this.edges.map(
         (edge, index, edges) => {
-          let loopStart = loop.indexOf(edge[0])
+          let offset = loop.indexOf(edge[0])
+          let prevBead = edge[0]
+          let nextBead = edge[1]
+          let active = false
+          if (offset >= 0) {
+            if (loop[(offset + 1) % loop.length] == edge[1]) {
+              prevBead = loop[(offset + loop.length - 1) % loop.length]
+              nextBead = loop[(offset + 2) % loop.length]
+              active = true
+            }
+            else if (loop[(offset + loop.length - 1) % loop.length] == edge[1]) {
+              prevBead = loop[(offset + 1) % loop.length]
+              nextBead = loop[(offset + loop.length - 2) % loop.length]
+              active = true
+            }
+          }
           return {
+            prev: this.getBeadPosition(prevBead),
             start: this.getBeadPosition(edge[0]),
             stop: this.getBeadPosition(edge[1]),
-            active: loopStart >= 0 && (
-              this.loops[this.loopIndex][(loopStart + 1) % loop.length] == edge[1]
-              || this.loops[this.loopIndex][(loopStart + loop.length - 1) % loop.length] == edge[1]
-            )
+            next: this.getBeadPosition(nextBead),
+            active: active,
           }
         }
       )
@@ -95,7 +109,7 @@ export default {
 <template>
   <button class="tabStop" @keydown.up="prevLoop()" @keydown.down="nextLoop()" @keydown.left="counterclockwise()" @keydown.right="clockwise()">
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
-      <Edge v-for="edge of edgeData" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:active="edge.active" />
+      <Edge v-for="edge of edgeData" :dLength="0.3" v-bind:x0="edge.prev.x" v-bind:y0="edge.prev.y" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:x3="edge.next.x" v-bind:y3="edge.next.y" v-bind:active="edge.active" />
       <circle v-for="bead of beadData" v-bind:cx="1.1 * bead.position.x" v-bind:cy="1.1 * bead.position.y" r=".1" v-bind:fill="bead.color" />
     </svg>
   </button>
