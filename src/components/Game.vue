@@ -1,5 +1,6 @@
 <script setup>
 import Edge from './Edge.vue'
+import Bead from './Bead.vue'
 </script>
 
 <script>
@@ -25,17 +26,6 @@ export default {
     loops: Array
   },
   computed: {
-    beadData() {
-      return this.beads.map(
-        (bead, index, beads) => {
-          return {
-            id: bead,
-            color: ['', 'red', 'green', 'blue', 'indigo', 'pink'][bead],
-            position: this.getBeadPosition(index)
-          }
-        }
-      ).filter(x => x.id > 0)
-    },
     edgeData() {
       let loop = this.loops[this.loopIndex]
       return this.edges.map(
@@ -110,7 +100,7 @@ export default {
   <button class="tabStop" @keydown.up.stop.prevent="prevLoop()" @keydown.down.stop.prevent="nextLoop()" @keydown.left.stop.prevent="counterclockwise()" @keydown.right.stop.prevent="clockwise()">
     <svg class="gameView" viewBox="-1.1 -1.1 2.2 2.2">
       <Edge v-for="edge of edgeData" :dLength="0.3" v-bind:x0="edge.prev.x" v-bind:y0="edge.prev.y" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:x3="edge.next.x" v-bind:y3="edge.next.y" v-bind:active="edge.active" />
-      <circle v-for="bead of beadData" v-bind:cx="bead.position.x" v-bind:cy="bead.position.y" r=".1" v-bind:fill="bead.color" />
+      <Bead v-for="(bead, index) of beads" v-bind:id="bead" v-bind:index="index" :beadCount="beads.length" />
     </svg>
   </button>
 </template>
