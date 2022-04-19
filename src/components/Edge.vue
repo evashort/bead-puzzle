@@ -1,33 +1,5 @@
-<script setup>
-import AnimProp from '../AnimProp.js'
-import cubicBezier from '../CubicBezier.js'
-</script>
-
 <script>
-const easeOut = cubicBezier(0, 0, 0.58, 1)
-
 export default {
-  data() {
-    let d1 = this.getD(
-      this.x2 - this.x1,
-      this.y2 - this.y1,
-      this.x0 - this.x1,
-      this.y0 - this.y1,
-    )
-    let d2 = this.getD(
-      this.x1 - this.x2,
-      this.y1 - this.y2,
-      this.x3 - this.x2,
-      this.y3 - this.y2,
-    )
-    return {
-      activeAnim: new AnimProp(this.active ? 1 : 0, 150, easeOut),
-      dx1Anim: new AnimProp(d1.x, 150, easeOut),
-      dy1Anim: new AnimProp(d1.y, 150, easeOut),
-      dx2Anim: new AnimProp(d2.x, 150, easeOut),
-      dy2Anim: new AnimProp(d2.y, 150, easeOut),
-    }
-  },
   props: {
     x0: Number,
     y0: Number,
@@ -41,12 +13,6 @@ export default {
     active: Boolean,
   },
   computed: {
-    dashArray() {
-      return `${this.activeAnim.value * 0.12} ${(1 - this.activeAnim.value) * 0.12}`
-    },
-    dashOffset() {
-      return 0.06 * this.activeAnim.value
-    },
     d1() {
       return this.getD(
         this.x2 - this.x1,
@@ -64,7 +30,7 @@ export default {
       )
     },
     path() {
-      return `M ${this.x1} ${this.y1} C ${this.x1 + this.dx1Anim.value} ${this.y1 + this.dy1Anim.value}, ${this.x2 + this.dx2Anim.value} ${this.y2 + this.dy2Anim.value}, ${this.x2} ${this.y2}`
+      return `M ${this.x1} ${this.y1} C ${this.x1 + this.d1.x} ${this.y1 + this.d1.y}, ${this.x2 + this.d2.x} ${this.y2 + this.d2.y}, ${this.x2} ${this.y2}`
     },
   },
   methods: {
@@ -78,24 +44,11 @@ export default {
       return {x: dx * factor, y: dy * factor}
     },
   },
-  watch: {
-    active(newActive, oldActive) {
-      this.activeAnim.set(newActive ? 1 : 0)
-    },
-    d1(newD1, oldD1) {
-      this.dx1Anim.set(newD1.x)
-      this.dy1Anim.set(newD1.y)
-    },
-    d2(newD2, oldD2) {
-      this.dx2Anim.set(newD2.x)
-      this.dy2Anim.set(newD2.y)
-    },
-  },
 }
 </script>
 
 <template>
-  <path class="edge" :d="path" :stroke-dasharray="dashArray" :stroke-dashoffset="dashOffset" fill="none" />
+  <path :class="{ edge: true, active: active }" :d="path" fill="none" />
 </template>
 
 <style scoped>
@@ -103,6 +56,10 @@ export default {
   stroke: var(--color-text);
   stroke-width: 0.05;
   stroke-linecap: round;
+  stroke-dasharray: 0 0.12;
+}
+.edge.active {
+  stroke-dasharray: none;
 }
 
 </style>
