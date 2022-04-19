@@ -6,17 +6,8 @@ import Bead from './Bead.vue'
 <script>
 export default {
   data() {
-    let graph = new Int8Array(
-      this.startingBeads.length * this.startingBeads.length
-    )
-    for (let edge of this.edges) {
-      graph[edge[0] + this.startingBeads.length * edge[1]] = 1
-      graph[edge[1] + this.startingBeads.length * edge[0]] = 1
-    }
-
     return {
       beads: [...this.startingBeads],
-      graph: graph,
       loopIndex: 0
     }
   },
@@ -55,42 +46,42 @@ export default {
           }
         }
       )
-    }
+    },
+    hole() {
+      let beadSet = new Set(this.beads)
+      let hole = 0
+      for (; hole <= beadSet.size && beadSet.has(hole); hole++) { }
+      return hole
+    },
   },
   methods: {
     getBeadPosition(index) {
       return {
-        x: Math.sin(2 * Math.PI * index / this.beads.length),
-        y: -Math.cos(2 * Math.PI * index / this.beads.length)
+        x: Math.sin(2 * Math.PI * index / (1 + this.beads.length)),
+        y: -Math.cos(2 * Math.PI * index / (1 + this.beads.length))
       }
     },
     prevLoop() {
-      let dest = this.beads.indexOf(0)
       do {
         this.loopIndex += this.loops.length - 1
         this.loopIndex %= this.loops.length
-      } while (!this.loops[this.loopIndex].includes(dest))
+      } while (!this.loops[this.loopIndex].includes(this.hole))
     },
     nextLoop() {
-      let dest = this.beads.indexOf(0)
       do {
         this.loopIndex++
         this.loopIndex %= this.loops.length
-      } while (!this.loops[this.loopIndex].includes(dest))
+      } while (!this.loops[this.loopIndex].includes(this.hole))
     },
     counterclockwise() {
-      let dest = this.beads.indexOf(0)
       let loop = this.loops[this.loopIndex]
-      let src = loop[(loop.indexOf(dest) + 1) % loop.length]
-      this.beads[dest] = this.beads[src]
-      this.beads[src] = 0
+      let src = loop[(loop.indexOf(this.hole) + 1) % loop.length]
+      this.beads[this.beads.indexOf(src)] = this.hole
     },
     clockwise() {
-      let dest = this.beads.indexOf(0)
       let loop = this.loops[this.loopIndex]
-      let src = loop[(loop.indexOf(dest) + loop.length - 1) % loop.length]
-      this.beads[dest] = this.beads[src]
-      this.beads[src] = 0
+      let src = loop[(loop.indexOf(this.hole) + loop.length - 1) % loop.length]
+      this.beads[this.beads.indexOf(src)] = this.hole
     }
   }
 }
@@ -100,7 +91,7 @@ export default {
   <button class="tabStop" @keydown.up.stop.prevent="prevLoop()" @keydown.down.stop.prevent="nextLoop()" @keydown.left.stop.prevent="counterclockwise()" @keydown.right.stop.prevent="clockwise()">
     <svg class="gameView" viewBox="-1.1 -1.1 2.2 2.2">
       <Edge v-for="edge of edgeData" :dLength="0.3" v-bind:x0="edge.prev.x" v-bind:y0="edge.prev.y" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:x3="edge.next.x" v-bind:y3="edge.next.y" v-bind:active="edge.active" />
-      <Bead v-for="(bead, index) of beads" v-bind:id="bead" v-bind:index="index" :beadCount="beads.length" />
+      <Bead v-for="(node, id) of beads" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" />
     </svg>
   </button>
 </template>

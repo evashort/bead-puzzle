@@ -1,17 +1,17 @@
 <script>
-const colors = ['', 'red', 'green', 'blue', 'indigo', 'pink']
+const colors = ['red', 'green', 'blue', 'indigo', 'pink']
 export default {
   props: {
     id: Number,
-    index: Number,
-    beadCount: Number,
+    node: Number,
+    nodeCount: Number,
   },
   computed: {
     x() {
-      return Math.sin(2 * Math.PI * this.index / this.beadCount)
+      return Math.sin(2 * Math.PI * this.node / this.nodeCount)
     },
     y() {
-      return -Math.cos(2 * Math.PI * this.index / this.beadCount)
+      return -Math.cos(2 * Math.PI * this.node / this.nodeCount)
     },
     color() {
       return colors[this.id]
@@ -21,5 +21,5 @@ export default {
 </script>
 
 <template>
-  <circle v-if="id > 0" :cx="x" :cy="y" r=".1" :fill="color" />
+  <circle :cx="x" :cy="y" r=".1" :fill="color" />
 </template>
