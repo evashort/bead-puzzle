@@ -1,3 +1,7 @@
+<script setup>
+import getControlVector from '../ControlVector.js'
+</script>
+
 <script>
 export default {
   props: {
@@ -14,34 +18,25 @@ export default {
   },
   computed: {
     d1() {
-      return this.getD(
+      return getControlVector(
         this.x2 - this.x1,
         this.y2 - this.y1,
         this.x0 - this.x1,
         this.y0 - this.y1,
+        this.dLength,
       )
     },
     d2() {
-      return this.getD(
+      return getControlVector(
         this.x1 - this.x2,
         this.y1 - this.y2,
         this.x3 - this.x2,
         this.y3 - this.y2,
+        this.dLength,
       )
     },
     path() {
       return `M ${this.x1} ${this.y1} C ${this.x1 + this.d1.x} ${this.y1 + this.d1.y}, ${this.x2 + this.d2.x} ${this.y2 + this.d2.y}, ${this.x2} ${this.y2}`
-    },
-  },
-  methods: {
-    getD(thisX, thisY, otherX, otherY) {
-      let otherLength = Math.sqrt(otherX * otherX + otherY * otherY)
-      let thisLength = Math.sqrt(thisX * thisX + thisY * thisY)
-      let dx = thisX * otherLength - otherX * thisLength
-      let dy = thisY * otherLength - otherY * thisLength
-      let oldLength = Math.sqrt(dx * dx + dy * dy)
-      let factor = oldLength > 0 ? this.dLength / oldLength : 0
-      return {x: dx * factor, y: dy * factor}
     },
   },
 }

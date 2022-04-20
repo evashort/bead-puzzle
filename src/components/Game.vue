@@ -91,7 +91,7 @@ export default {
   <button class="tabStop" @keydown.up.stop.prevent="prevLoop()" @keydown.down.stop.prevent="nextLoop()" @keydown.left.stop.prevent="counterclockwise()" @keydown.right.stop.prevent="clockwise()">
     <svg class="gameView" viewBox="-1.1 -1.1 2.2 2.2">
       <Edge v-for="edge of edgeData" :dLength="0.3" v-bind:x0="edge.prev.x" v-bind:y0="edge.prev.y" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:x3="edge.next.x" v-bind:y3="edge.next.y" v-bind:active="edge.active" />
-      <Bead v-for="(node, id) of beads" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" />
+      <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" :loop="this.loops[this.loopIndex]" />
     </svg>
   </button>
 </template>

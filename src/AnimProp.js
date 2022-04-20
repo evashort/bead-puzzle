@@ -36,7 +36,7 @@ export default class AnimProp {
     this.stop = 0
   }
 
-  set(value) {
+  set(value, duration=this.duration) {
     let now = performance.now()
     this.initial = this.getValue(now)
     this.final = value % this.max
@@ -47,8 +47,7 @@ export default class AnimProp {
     }
 
     let distance = Math.abs(this.final - this.initial)
-    let duration = this.duration
-    if (distance < this.speed * this.duration) {
+    if (distance < this.speed * duration) {
       duration = distance / this.speed
     }
 
