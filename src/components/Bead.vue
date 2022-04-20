@@ -109,8 +109,14 @@ export default {
   },
   watch: {
     node(newNode, oldNode) {
+      let reverse = newNode == this.oldNode
       this.oldNode = oldNode
-      this.phase.set(0, 0)
+      if (reverse) {
+        this.phase.set(1 - this.phase.value, 0)
+      } else {
+        this.phase.set(0, 0)
+      }
+
       this.phase.set(1)
     },
     loop(newLoop, oldLoop) {
