@@ -1,7 +1,7 @@
 <script setup>
 import AnimProp from '../AnimProp.js'
 import getControlVector from '../ControlVector.js'
-import cubicBezier from '../CubicBezier.js'
+import { cubicBezier, cubicBezierSlope } from '../CubicBezier.js'
 </script>
 
 <script>
@@ -25,12 +25,18 @@ export default {
   },
   computed: {
     transformation() {
-      return `translate(${this.x} ${this.y})`
+      return `translate(${this.x} ${this.y}) rotate(${this.angle * 180 / Math.PI})`
     },
     shape() {
       let radius = 0.1
       let yRadius = radius * Math.sqrt(0.75)
       return `M 0 ${-yRadius} L ${radius} ${yRadius} H ${-radius} Z`
+    },
+    angle() {
+      return (this.counterclockwise ? Math.PI : 0) + Math.atan2(
+        this.xBezierSlope(this.phase.value),
+        -this.yBezierSlope(this.phase.value),
+      )
     },
     x() {
       return this.xBezier(this.phase.value)
@@ -43,33 +49,49 @@ export default {
     },
     xBezier() {
       return cubicBezier(
-        this.oldNodeX,
-        this.oldNodeX + this.d1.x,
+        this.otherX,
+        this.otherX + this.d1.x,
         this.nodeX + this.d2.x,
         this.nodeX,
       )
     },
     yBezier() {
       return cubicBezier(
-        this.oldNodeY,
-        this.oldNodeY + this.d1.y,
+        this.otherY,
+        this.otherY + this.d1.y,
+        this.nodeY + this.d2.y,
+        this.nodeY,
+      )
+    },
+    xBezierSlope() {
+      return cubicBezierSlope(
+        this.otherX,
+        this.otherX + this.d1.x,
+        this.nodeX + this.d2.x,
+        this.nodeX,
+      )
+    },
+    yBezierSlope() {
+      return cubicBezierSlope(
+        this.otherY,
+        this.otherY + this.d1.y,
         this.nodeY + this.d2.y,
         this.nodeY,
       )
     },
     d1() {
       return getControlVector(
-        this.nodeX - this.oldNodeX,
-        this.nodeY - this.oldNodeY,
-        this.tailX - this.oldNodeX,
-        this.tailY - this.oldNodeY,
+        this.nodeX - this.otherX,
+        this.nodeY - this.otherY,
+        this.tailX - this.otherX,
+        this.tailY - this.otherY,
         this.dLength,
       )
     },
     d2() {
       return getControlVector(
-        this.oldNodeX - this.nodeX,
-        this.oldNodeY - this.nodeY,
+        this.otherX - this.nodeX,
+        this.otherY - this.nodeY,
         this.headX - this.nodeX,
         this.headY - this.nodeY,
         this.dLength,
@@ -79,24 +101,21 @@ export default {
     headY() { return this.getNodeY(this.head) },
     nodeX() { return this.getNodeX(this.node) },
     nodeY() { return this.getNodeY(this.node) },
-    oldNodeX() { return this.getNodeX(this.oldNode) },
-    oldNodeY() { return this.getNodeY(this.oldNode) },
+    otherX() { return this.getNodeX(this.other) },
+    otherY() { return this.getNodeY(this.other) },
     tailX() { return this.getNodeX(this.tail) },
     tailY() { return this.getNodeY(this.tail) },
     head() {
-      if (this.oldNode == this.node) {
-        return this.node
-      }
-
-      let minus1 = this.getNthNode(-1)
-      return this.oldNode == minus1 ? this.getNthNode(1) : minus1
+      return this.counterclockwise ? this.getNthNode(-1) : this.getNthNode(1)
+    },
+    other() {
+      return this.counterclockwise ? this.oldNode : this.getNthNode(-1)
     },
     tail() {
-      if (this.oldNode == this.node) {
-        return this.node
-      }
-
-      return this.oldNode == this.getNthNode(-1) ? this.getNthNode(-2) : this.getNthNode(2)
+      return this.counterclockwise ? this.getNthNode(2) : this.getNthNode(-2)
+    },
+    counterclockwise() {
+      return this.oldNode == this.getNthNode(1)
     },
   },
   methods: {
