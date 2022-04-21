@@ -24,6 +24,14 @@ export default {
     dLength: Number,
   },
   computed: {
+    transformation() {
+      return `translate(${this.x} ${this.y})`
+    },
+    shape() {
+      let radius = 0.1
+      let yRadius = radius * Math.sqrt(0.75)
+      return `M 0 ${-yRadius} L ${radius} ${yRadius} H ${-radius} Z`
+    },
     x() {
       return this.xBezier(this.phase.value)
     },
@@ -128,5 +136,7 @@ export default {
 </script>
 
 <template>
-  <circle :cx="x" :cy="y" r=".1" :fill="color" />
+  <g :transform="transformation">
+    <path :d="shape" :fill="color" />
+  </g>
 </template>
