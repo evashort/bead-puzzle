@@ -8,7 +8,8 @@ export default {
   data() {
     return {
       beads: [...this.startingBeads],
-      loopIndex: 0
+      loopIndex: 0,
+      spin: false
     }
   },
   props: {
@@ -75,20 +76,51 @@ export default {
     },
     counterclockwise() {
       let loop = this.loops[this.loopIndex]
-      let src = loop[(loop.indexOf(this.hole) + 1) % loop.length]
-      this.beads[this.beads.indexOf(src)] = this.hole
+      // important to cache this property so it doesn't change during the for loop
+      let hole = this.hole
+      if (this.spin) {
+        for (let i = 0; i < this.beads.length; i++) {
+          let loopIndex = loop.indexOf(this.beads[i])
+          if (loopIndex >= 0) {
+            this.beads[i] = loop[(loopIndex + loop.length - 1) % loop.length]
+            if (this.beads[i] == hole) {
+              this.beads[i] = loop[(loopIndex + loop.length - 2) % loop.length]
+            }
+          }
+        }
+      } else {
+        let src = loop[(loop.indexOf(hole) + 1) % loop.length]
+        this.beads[this.beads.indexOf(src)] = hole
+      }
     },
     clockwise() {
       let loop = this.loops[this.loopIndex]
-      let src = loop[(loop.indexOf(this.hole) + loop.length - 1) % loop.length]
-      this.beads[this.beads.indexOf(src)] = this.hole
+      // important to cache this property so it doesn't change during the for loop
+      let hole = this.hole
+      if (this.spin) {
+        for (let i = 0; i < this.beads.length; i++) {
+          let loopIndex = loop.indexOf(this.beads[i])
+          if (loopIndex >= 0) {
+            this.beads[i] = loop[(loopIndex + 1) % loop.length]
+            if (this.beads[i] == hole) {
+              this.beads[i] = loop[(loopIndex + 2) % loop.length]
+            }
+          }
+        }
+      } else {
+        let src = loop[(loop.indexOf(hole) + loop.length - 1) % loop.length]
+        this.beads[this.beads.indexOf(src)] = hole
+      }
+    },
+    toggleSpin() {
+      this.spin = !this.spin
     }
   }
 }
 </script>
 
 <template>
-  <button class="tabStop" @keydown.up.stop.prevent="prevLoop()" @keydown.down.stop.prevent="nextLoop()" @keydown.left.stop.prevent="counterclockwise()" @keydown.right.stop.prevent="clockwise()">
+  <button class="tabStop" @keydown.up.stop.prevent="prevLoop()" @keydown.down.stop.prevent="nextLoop()" @keydown.left.stop.prevent="counterclockwise()" @keydown.right.stop.prevent="clockwise()" @keydown.0.stop.prevent="toggleSpin()">
     <svg class="gameView" viewBox="-1.1 -1.1 2.2 2.2">
       <Edge v-for="edge of edgeData" :dLength="0.3" v-bind:x0="edge.prev.x" v-bind:y0="edge.prev.y" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:x3="edge.next.x" v-bind:y3="edge.next.y" v-bind:active="edge.active" />
       <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" :loop="this.loops[this.loopIndex]" />
