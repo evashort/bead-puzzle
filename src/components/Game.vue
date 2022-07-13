@@ -10,8 +10,6 @@ export default {
     let hole = 0
     for (; beadSet.has(hole); hole++) { }
     let count = this.startingBeads.length + 1
-    let inLowerHalf = 4 * hole > count && 4 * hole <= 3 * count
-    let sign = inLowerHalf ? 1 : -1
     let firstTail
     let firstScore = count
     for (let edge of this.edges) {
@@ -24,7 +22,7 @@ export default {
         continue
       }
 
-      let score = ((tail - hole) * sign + count) % count
+      let score = (tail - hole + count) % count
       if (score < firstScore) {
         firstScore = score
         firstTail = tail
@@ -126,10 +124,8 @@ export default {
     selectLeft() {
       let hole = this.history[this.history.length - 2]
       let count = this.beads.length + 1
-      let inLowerHalf = 4 * hole > count && 4 * hole <= 3 * count
-      let sign = inLowerHalf ? 1 : -1
       let oldTail = this.history[this.history.length - 1]
-      let oldScore = ((oldTail - hole) * sign + count) % count
+      let oldScore = (oldTail - hole + count) % count
       let newTail = oldTail
       let newScore = 0
       let maxTail
@@ -144,7 +140,7 @@ export default {
           continue
         }
 
-        let score = ((tail - hole) * sign + count) % count
+        let score = (tail - hole + count) % count
         if (score < oldScore && score > newScore) {
           newScore = score
           newTail = tail
@@ -159,10 +155,8 @@ export default {
     selectRight() {
       let hole = this.history[this.history.length - 2]
       let count = this.beads.length + 1
-      let inLowerHalf = 4 * hole > count && 4 * hole <= 3 * count
-      let sign = inLowerHalf ? 1 : -1
       let oldTail = this.history[this.history.length - 1]
-      let oldScore = ((oldTail - hole) * sign + count) % count
+      let oldScore = (oldTail - hole + count) % count
       let newTail = oldTail
       let newScore = count
       let minTail
@@ -177,7 +171,7 @@ export default {
           continue
         }
 
-        let score = ((tail - hole) * sign + count) % count
+        let score = (tail - hole + count) % count
         if (score > oldScore && score < newScore) {
           newScore = score
           newTail = tail
