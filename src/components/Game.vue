@@ -74,8 +74,32 @@ export default {
     goForward() {
       this.beads[this.beads.indexOf(this.tail)] = this.hole
 
-      // first choice: new tail continues the most recent loop
-      for (let offset = this.history.length - 2; offset >= 0; offset--) {
+      // first choice: go back instead
+      if (
+        this.history.length >= 3 &&
+        this.history[this.history.length - 3] == this.tail
+      ) {
+        this.history.pop()
+        if (this.history.length <= 2) {
+          // reached beginning, time to go forward again
+          this.history.pop()
+        } else if (this.history[0] == this.tail) {
+          // reverse the loop
+          this.history.pop()
+          this.history.reverse()
+          this.history.push(this.history[0])
+          this.history.push(this.history[1])
+          return
+        } else {
+          // default is to continue going back
+          this.history[this.history.length - 1] =
+            this.history[this.history.length - 3]
+          return
+        }
+      }
+
+      // second choice: new tail continues the most recent loop
+      for (let offset = this.history.length - 4; offset >= 0; offset--) {
         if (this.history[offset] == this.tail) {
           // remove history before the loop
           this.history = this.history.slice(offset)
@@ -84,19 +108,17 @@ export default {
         }
       }
 
-      // second choice: new tail creates the smallest possible loop
+      // third choice: new tail creates the smallest possible loop
+      // TODO: don't do this when new hole is outside loop
       for (let i = this.history.length - 3; i >= 0; i--) {
         let newTail = this.history[i]
-        if (
-          newTail != this.hole && // going back shouldn't be the default
-          this.matrix[this.tail * this.size + newTail]
-        ) {
+        if (this.matrix[this.tail * this.size + newTail]) {
           this.history.push(newTail)
           return
         }
       }
 
-      // third choice: iterate clockwise and choose the first edge
+      // fourth choice: iterate clockwise and choose the first edge
       for (let i = 1; i < this.size; i++) {
         let newTail = (this.tail + i) % this.size
         if (
