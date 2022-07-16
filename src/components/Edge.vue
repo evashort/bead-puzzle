@@ -13,11 +13,18 @@ export default {
     index: Number,
   },
   computed: {
+    node0() {
+      return this.index >= 2 ? this.history[this.index - 2] : this.node1
+    },
+    node3() {
+      return this.index > 0 && this.index < this.history.length - 1 ?
+        this.history[this.index + 1] : this.node2
+    },
     x0() {
-      return this.x1
+      return this.getX(this.node0)
     },
     y0() {
-      return this.y1
+      return this.getY(this.node0)
     },
     x1() {
       return this.getX(this.node1)
@@ -32,13 +39,13 @@ export default {
       return this.getY(this.node2)
     },
     x3() {
-      return this.x2
+      return this.getX(this.node3)
     },
     y3() {
-      return this.y2
+      return this.getY(this.node3)
     },
     active() {
-      return this.index >= this.history.length - 1
+      return this.index > 0
     },
     d1() {
       return getControlVector(

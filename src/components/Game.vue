@@ -55,7 +55,7 @@ export default {
     },
     historyIndices() {
       let result = new Uint16Array(this.size * this.size)
-      for (let i = 1; i < this.history.length; i++) {
+      for (let i = this.history.length - 1; i > 0; i--) {
         let a = this.history[i - 1]
         let b = this.history[i]
         result[a * this.size + b] = result[b * this.size + a] = i
