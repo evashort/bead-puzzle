@@ -9,30 +9,19 @@ export default {
     let beadSet = new Set(this.startingBeads)
     let hole = 0
     for (; beadSet.has(hole); hole++) { }
-    let count = this.startingBeads.length + 1
-    let firstTail
-    let firstScore = count
-    for (let edge of this.edges) {
-      let tail
-      if (edge[0] == hole) {
-        tail = edge[1]
-      } else if (edge[1] == hole) {
-        tail = edge[0]
-      } else {
-        continue
-      }
-
-      let score = (tail - hole + count) % count
-      if (score < firstScore) {
-        firstScore = score
-        firstTail = tail
+    let size = this.getSize()
+    let matrix = this.getMatrix()
+    // iterate clockwise and choose the first edge
+    for (let i = 1; i < size; i++) {
+      let tail = (hole + i) % size
+      if (matrix[hole * size + tail]) {
+        return {
+          beads: [...this.startingBeads],
+          history: [hole, tail]
+        }
       }
     }
 
-    return {
-      beads: [...this.startingBeads],
-      history: [hole, firstTail]
-    }
   },
   props: {
     startingBeads: Array,
@@ -40,8 +29,6 @@ export default {
   },
   computed: {
     edgeData() {
-      let hole = this.history[this.history.length - 2]
-      let tail = this.history[this.history.length - 1]
       return this.edges.map(
         (edge, index, edges) => {
           return {
@@ -49,13 +36,37 @@ export default {
             start: this.getBeadPosition(edge[0]),
             stop: this.getBeadPosition(edge[1]),
             next: this.getBeadPosition(edge[1]),
-            active: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole),
+            active: (edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole),
           }
         }
       )
     },
+    size() {
+      return this.getSize()
+    },
+    matrix() {
+      return this.getMatrix()
+    },
+    hole() {
+      return this.history[this.history.length - 2]
+    },
+    tail() {
+      return this.history[this.history.length - 1]
+    }
   },
   methods: {
+    getSize() {
+      return this.startingBeads.length + 1
+    },
+    getMatrix() {
+      let size = this.startingBeads.length + 1
+      let matrix = new Uint8Array(size * size)
+      for (let [a, b] of this.edges) {
+        matrix[a * size + b] = matrix[b * size + a] = 1
+      }
+
+      return matrix
+    },
     getBeadPosition(index) {
       return {
         x: Math.sin(2 * Math.PI * index / (1 + this.beads.length)),
@@ -63,125 +74,71 @@ export default {
       }
     },
     goForward() {
-      let hole = this.history[this.history.length - 2]
-      let tail = this.history[this.history.length - 1]
-      this.beads[this.beads.indexOf(tail)] = hole
-      let oldTail = hole
-      hole = tail
-      for (let removeCount = this.history.length - 2; removeCount >= 0; removeCount--) {
-        if (this.history[removeCount] == hole) {
-          this.history = this.history.slice(removeCount)
+      this.beads[this.beads.indexOf(this.tail)] = this.hole
+
+      // first choice: new tail continues the most recent loop
+      for (let offset = this.history.length - 2; offset >= 0; offset--) {
+        if (this.history[offset] == this.tail) {
+          // remove history before the loop
+          this.history = this.history.slice(offset)
           this.history.push(this.history[1])
           return
         }
       }
 
-      let possibleTails = new Set()
-      for (let edge of this.edges) {
-        if (edge[0] == hole) {
-          possibleTails.add(edge[1])
-        } else if (edge[1] == hole) {
-          possibleTails.add(edge[0])
-        }
-      }
-
-      possibleTails.delete(oldTail)
-
+      // second choice: new tail creates the smallest possible loop
       for (let i = this.history.length - 3; i >= 0; i--) {
-        if (possibleTails.has(this.history[i])) {
-          this.history.push(this.history[i])
+        let newTail = this.history[i]
+        if (
+          newTail != this.hole && // going back shouldn't be the default
+          this.matrix[this.tail * this.size + newTail]
+        ) {
+          this.history.push(newTail)
           return
         }
       }
 
-      let count = this.beads.length + 1
-      let inLowerHalf = 4 * hole > count && 4 * hole <= 3 * count
-      let sign = inLowerHalf ? 1 : -1
-      let firstTail = oldTail
-      let firstScore = count
-      for (let tail of possibleTails) {
-        let score = ((tail - hole) * sign + count) % count
-        if (score < firstScore) {
-          firstScore = score
-          firstTail = tail
+      // third choice: iterate clockwise and choose the first edge
+      for (let i = 1; i < this.size; i++) {
+        let newTail = (this.tail + i) % this.size
+        if (
+          newTail != this.hole && // going back shouldn't be the default
+          this.matrix[this.tail * this.size + newTail]
+        ) {
+          this.history.push(newTail)
+          return
         }
       }
-
-      this.history.push(firstTail)
     },
     goBack() {
       if (this.history.length > 2) {
         this.history.pop()
-        let hole = this.history[this.history.length - 2]
-        let tail = this.history[this.history.length - 1]
-        this.beads[this.beads.indexOf(hole)] = tail
-        if (this.history[0] == tail) {
+        this.beads[this.beads.indexOf(this.hole)] = this.tail
+        if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
-          this.history.unshift(hole)
+          this.history.unshift(this.hole)
         }
       }
     },
     selectLeft() {
-      let hole = this.history[this.history.length - 2]
-      let count = this.beads.length + 1
-      let oldTail = this.history[this.history.length - 1]
-      let oldScore = (oldTail - hole + count) % count
-      let newTail = oldTail
-      let newScore = 0
-      let maxTail
-      let maxScore = 0
-      for (let edge of this.edges) {
-        let tail
-        if (edge[0] == hole) {
-          tail = edge[1]
-        } else if (edge[1] == hole) {
-          tail = edge[0]
-        } else {
-          continue
-        }
-
-        let score = (tail - hole + count) % count
-        if (score < oldScore && score > newScore) {
-          newScore = score
-          newTail = tail
-        } else if (score > maxScore) {
-          maxScore = score
-          maxTail = tail
+      // iterate counterclockwise and choose the first edge
+      for (let i = this.size - 1; i >= 0; i--) {
+        let newTail = (this.tail + i) % this.size
+        if (this.matrix[this.hole * this.size + newTail]) {
+          this.history[this.history.length - 1] = newTail
+          return
         }
       }
-
-      this.history[this.history.length - 1] = newTail == oldTail ? maxTail : newTail
     },
     selectRight() {
-      let hole = this.history[this.history.length - 2]
-      let count = this.beads.length + 1
-      let oldTail = this.history[this.history.length - 1]
-      let oldScore = (oldTail - hole + count) % count
-      let newTail = oldTail
-      let newScore = count
-      let minTail
-      let minScore = count
-      for (let edge of this.edges) {
-        let tail
-        if (edge[0] == hole) {
-          tail = edge[1]
-        } else if (edge[1] == hole) {
-          tail = edge[0]
-        } else {
-          continue
-        }
-
-        let score = (tail - hole + count) % count
-        if (score > oldScore && score < newScore) {
-          newScore = score
-          newTail = tail
-        } else if (score < minScore) {
-          minScore = score
-          minTail = tail
+      // iterate counterclockwise and choose the first edge
+      for (let i = 1; i <= this.size; i++) {
+        let newTail = (this.tail + i) % this.size
+        if (this.matrix[this.hole * this.size + newTail]) {
+          this.history[this.history.length - 1] = newTail
+          return
         }
       }
-
-      this.history[this.history.length - 1] = newTail == oldTail ? minTail : newTail
     }
   }
 }
