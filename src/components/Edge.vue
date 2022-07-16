@@ -5,18 +5,41 @@ import getControlVector from '../ControlVector.js'
 <script>
 export default {
   props: {
-    x0: Number,
-    y0: Number,
-    x1: Number,
-    y1: Number,
-    x2: Number,
-    y2: Number,
-    x3: Number,
-    y3: Number,
     dLength: Number,
-    active: Boolean,
+    node1: Number,
+    node2: Number,
+    size: Number,
+    history: Array,
+    index: Number,
   },
   computed: {
+    x0() {
+      return this.x1
+    },
+    y0() {
+      return this.y1
+    },
+    x1() {
+      return this.getX(this.node1)
+    },
+    y1() {
+      return this.getY(this.node1)
+    },
+    x2() {
+      return this.getX(this.node2)
+    },
+    y2() {
+      return this.getY(this.node2)
+    },
+    x3() {
+      return this.x2
+    },
+    y3() {
+      return this.y2
+    },
+    active() {
+      return this.index >= this.history.length - 1
+    },
     d1() {
       return getControlVector(
         this.x2 - this.x1,
@@ -37,6 +60,14 @@ export default {
     },
     path() {
       return `M ${this.x1} ${this.y1} C ${this.x1 + this.d1.x} ${this.y1 + this.d1.y}, ${this.x2 + this.d2.x} ${this.y2 + this.d2.y}, ${this.x2} ${this.y2}`
+    },
+  },
+  methods: {
+    getX(node) {
+      return Math.sin(2 * Math.PI * node / this.size)
+    },
+    getY(node) {
+      return -Math.cos(2 * Math.PI * node / this.size)
     },
   },
 }

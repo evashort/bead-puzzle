@@ -9,64 +9,62 @@ export default {
     let beadSet = new Set(this.startingBeads)
     let hole = 0
     for (; beadSet.has(hole); hole++) { }
-    let size = this.getSize()
-    let matrix = this.getMatrix()
+
+    let size = this.startingBeads.length + 1
+    let holeRow = new Uint8Array(size)
+    for (let [a, b] of this.edges) {
+      if (a == hole) {
+        holeRow[b] = 1
+      } else if (b == hole) {
+        holeRow[a] = 1
+      }
+    }
+
     // iterate clockwise and choose the first edge
     for (let i = 1; i < size; i++) {
       let tail = (hole + i) % size
-      if (matrix[hole * size + tail]) {
+      if (holeRow[tail]) {
         return {
           beads: [...this.startingBeads],
           history: [hole, tail]
         }
       }
     }
-
   },
   props: {
     startingBeads: Array,
     edges: Array
   },
   computed: {
-    edgeData() {
-      return this.edges.map(
-        (edge, index, edges) => {
-          return {
-            prev: this.getBeadPosition(edge[0]),
-            start: this.getBeadPosition(edge[0]),
-            stop: this.getBeadPosition(edge[1]),
-            next: this.getBeadPosition(edge[1]),
-            active: (edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole),
-          }
-        }
-      )
-    },
     size() {
-      return this.getSize()
+      return this.startingBeads.length + 1
     },
     matrix() {
-      return this.getMatrix()
+      let matrix = new Uint8Array(this.size * this.size)
+      for (let [a, b] of this.edges) {
+        matrix[a * this.size + b] = matrix[b * this.size + a] = 1
+      }
+
+      return matrix
     },
     hole() {
       return this.history[this.history.length - 2]
     },
     tail() {
       return this.history[this.history.length - 1]
+    },
+    historyIndices() {
+      let result = new Uint16Array(this.size * this.size)
+      for (let i = 1; i < this.history.length; i++) {
+        let a = this.history[i - 1]
+        let b = this.history[i]
+        result[a * this.size + b] = result[b * this.size + a] = i
+      }
+
+      return result
     }
   },
   methods: {
-    getSize() {
-      return this.startingBeads.length + 1
-    },
-    getMatrix() {
-      let size = this.startingBeads.length + 1
-      let matrix = new Uint8Array(size * size)
-      for (let [a, b] of this.edges) {
-        matrix[a * size + b] = matrix[b * size + a] = 1
-      }
-
-      return matrix
-    },
     getBeadPosition(index) {
       return {
         x: Math.sin(2 * Math.PI * index / (1 + this.beads.length)),
@@ -147,7 +145,15 @@ export default {
 <template>
   <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()">
     <svg class="gameView" viewBox="-1.1 -1.1 2.2 2.2">
-      <Edge v-for="edge of edgeData" :dLength="0.3" v-bind:x0="edge.prev.x" v-bind:y0="edge.prev.y" v-bind:x1="edge.start.x" v-bind:y1="edge.start.y" v-bind:x2="edge.stop.x" v-bind:y2="edge.stop.y" v-bind:x3="edge.next.x" v-bind:y3="edge.next.y" v-bind:active="edge.active" />
+      <Edge
+      v-for="edge of edges"
+      :dLength="0.3"
+      v-bind:node1="edge[0]"
+      v-bind:node2="edge[1]"
+      v-bind:size="size"
+      v-bind:history="history"
+      v-bind:index="historyIndices[edge[0] * size + edge[1]]"
+      />
       <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" />
     </svg>
   </button>
