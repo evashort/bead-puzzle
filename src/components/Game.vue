@@ -173,8 +173,8 @@ export default {
       <Edge
       v-for="edge of edges"
       :dLength="0.3"
-      v-bind:node1="edge[0]"
-      v-bind:node2="edge[1]"
+      v-bind:nodeA="edge[0]"
+      v-bind:nodeB="edge[1]"
       v-bind:size="size"
       v-bind:history="history"
       v-bind:index="historyIndices[edge[0] * size + edge[1]]"

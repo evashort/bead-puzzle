@@ -6,8 +6,8 @@ import getControlVector from '../ControlVector.js'
 export default {
   props: {
     dLength: Number,
-    node1: Number,
-    node2: Number,
+    nodeA: Number,
+    nodeB: Number,
     size: Number,
     history: Array,
     index: Number,
@@ -15,6 +15,12 @@ export default {
   computed: {
     node0() {
       return this.index >= 2 ? this.history[this.index - 2] : this.node1
+    },
+    node1() {
+      return this.index > 0 ? this.history[this.index - 1] : this.nodeA
+    },
+    node2() {
+      return this.index > 0 ? this.history[this.index] : this.nodeB
     },
     node3() {
       return this.index > 0 && this.index < this.history.length - 1 ?
