@@ -109,10 +109,13 @@ export default {
       }
 
       // third choice: new tail creates the smallest possible loop
-      // TODO: don't do this when new hole is outside loop
       for (let i = this.history.length - 3; i >= 0; i--) {
         let newTail = this.history[i]
-        if (this.matrix[this.tail * this.size + newTail]) {
+        if (
+          newTail != this.hole && // going back shouldn't be the default.
+                                  // happens when old hole is start of loop.
+          this.matrix[this.tail * this.size + newTail]
+        ) {
           this.history.push(newTail)
           return
         }
