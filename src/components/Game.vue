@@ -62,6 +62,14 @@ export default {
       }
 
       return result
+    },
+    loopStart() {
+      if (this.history[0] == this.hole) {
+        return 0
+      }
+
+      let start = this.history.indexOf(this.tail)
+      return start <= this.history.length - 4 ? start : 0
     }
   },
   methods: {
@@ -178,6 +186,7 @@ export default {
       v-bind:size="size"
       v-bind:history="history"
       v-bind:index="historyIndices[edge[0] * size + edge[1]]"
+      v-bind:start="loopStart"
       />
       <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" />
     </svg>

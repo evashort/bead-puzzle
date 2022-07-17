@@ -11,6 +11,7 @@ export default {
     size: Number,
     history: Array,
     index: Number,
+    start: Number,
   },
   computed: {
     hole() {
@@ -20,18 +21,19 @@ export default {
       return this.history[this.history.length - 1]
     },
     node0() {
-      if (this.index <= 0) {
+      if (this.index <= this.start) {
         return this.node1
-      } else if (this.index <= 1) {
-        if (this.history[0] == this.tail) {
+      } else if (this.index <= this.start + 1) {
+        if (this.history[this.start] == this.tail) {
           return this.hole
         } else if (
-          this.history[0] == this.hole && this.history[1] == this.tail &&
+          this.history[this.start] == this.hole &&
+          this.history[this.start + 1] == this.tail &&
           this.history.length >= 3
         ) {
           return this.history[this.history.length - 3]
         } else {
-          return this.history[0]
+          return this.history[this.start]
         }
       } else {
         return this.history[this.index - 2]
@@ -44,12 +46,13 @@ export default {
       return this.index > 0 ? this.history[this.index] : this.nodeB
     },
     node3() {
-      if (this.index <= 0) {
+      if (this.index <= this.start) {
         return this.node2
       } else if (this.index < this.history.length - 1) {
         return this.history[this.index + 1]
       } else {
-        return this.tail == this.history[0] ? this.history[1] : this.tail
+        return this.tail == this.history[this.start] ?
+          this.history[this.start + 1] : this.tail
       }
     },
     x0() {
@@ -77,7 +80,7 @@ export default {
       return this.getY(this.node3)
     },
     active() {
-      return this.index > 0
+      return this.index > this.start
     },
     d1() {
       return getControlVector(
@@ -98,7 +101,7 @@ export default {
       )
     },
     path() {
-      return `M ${this.x1} ${this.y1} C ${this.x1 + this.d1.x} ${this.y1 + this.d1.y}, ${this.x2 + this.d2.x} ${this.y2 + this.d2.y}, ${this.x2} ${this.y2}`
+      return `M ${this.x2} ${this.y2} C ${this.x2 + this.d2.x} ${this.y2 + this.d2.y}, ${this.x1 + this.d1.x} ${this.y1 + this.d1.y}, ${this.x1} ${this.y1}`
     },
   },
   methods: {
@@ -124,7 +127,7 @@ export default {
   stroke-dasharray: 0 0.12;
 }
 .edge.active {
-  stroke-dasharray: none;
+  stroke-dasharray: 0 0.2 100;
 }
 
 </style>
