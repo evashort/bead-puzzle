@@ -57,10 +57,11 @@ export default {
       }
     },
     node1() {
-      return this.index > 0 ? this.history[this.index - 1] : this.nodeA
+      return this.index > this.start ?
+        this.history[this.index - 1] : this.nodeA
     },
     node2() {
-      return this.index > 0 ? this.history[this.index] : this.nodeB
+      return this.index > this.start ? this.history[this.index] : this.nodeB
     },
     node3() {
       if (this.index <= this.start) {
@@ -81,12 +82,12 @@ export default {
         (this.node2 == this.hole && this.node1 == this.tail)
     },
     reverse() {
-      return (
-        this.index == this.start + 1 &&
-        this.history.length >= 3 &&
-        this.hole == this.first &&
-        this.tail == this.history[this.history.length - 3]
-      ) || this.arrow < 0
+      return this.active && (
+        (this.arrow == 0 && this.node1 == this.hole) || this.arrow < 0
+      )
+    },
+    gap() {
+      return this.nodeA == this.hole || this.nodeB == this.hole
     },
     x0() {
       return this.getX(this.reverse ? this.node3 : this.node0)
@@ -173,7 +174,7 @@ export default {
 </script>
 
 <template>
-  <path :class="{ edge: true, active: active, arrow: arrow }" :d="path" fill="none" />
+  <path :class="{ edge: true, active: active, arrow: arrow, gap: gap }" :d="path" fill="none" />
   <path :class="{ head: true, arrow: arrow }" :d="headPath" fill="none" />
 </template>
 
@@ -185,12 +186,15 @@ export default {
   stroke-dasharray: 0 0.12;
 }
 .edge.active {
+  stroke: #bbb;
+  stroke-dasharray: none;
+}
+.edge.active.gap {
   stroke-dasharray: 0 0.2 100;
-  stroke: var(--color-border);
 }
 .edge.active.arrow {
-  stroke-dasharray: none;
   stroke: var(--color-text);
+  stroke-dasharray: none;
 }
 .head {
   stroke: var(--color-text);
