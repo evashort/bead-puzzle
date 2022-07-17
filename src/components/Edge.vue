@@ -74,29 +74,35 @@ export default {
         return this.tail == this.first ? this.second : this.tail
       }
     },
+    reverse() {
+      return this.index == this.start + 1 &&
+        this.history.length >= 3 &&
+        this.hole == this.first &&
+        this.tail == this.history[this.history.length - 3]
+    },
     x0() {
-      return this.getX(this.node0)
+      return this.getX(this.reverse ? this.node3 : this.node0)
     },
     y0() {
-      return this.getY(this.node0)
+      return this.getY(this.reverse ? this.node3 : this.node0)
     },
     x1() {
-      return this.getX(this.node1)
+      return this.getX(this.reverse ? this.node2 : this.node1)
     },
     y1() {
-      return this.getY(this.node1)
+      return this.getY(this.reverse ? this.node2 : this.node1)
     },
     x2() {
-      return this.getX(this.node2)
+      return this.getX(this.reverse ? this.node1 : this.node2)
     },
     y2() {
-      return this.getY(this.node2)
+      return this.getY(this.reverse ? this.node1 : this.node2)
     },
     x3() {
-      return this.getX(this.node3)
+      return this.getX(this.reverse ? this.node0 : this.node3)
     },
     y3() {
-      return this.getY(this.node3)
+      return this.getY(this.reverse ? this.node0 : this.node3)
     },
     active() {
       return this.index > this.start
