@@ -13,8 +13,29 @@ export default {
     index: Number,
   },
   computed: {
+    hole() {
+      return this.history[this.history.length - 2]
+    },
+    tail() {
+      return this.history[this.history.length - 1]
+    },
     node0() {
-      return this.index >= 2 ? this.history[this.index - 2] : this.node1
+      if (this.index <= 0) {
+        return this.node1
+      } else if (this.index <= 1) {
+        if (this.history[0] == this.tail) {
+          return this.hole
+        } else if (
+          this.history[0] == this.hole && this.history[1] == this.tail &&
+          this.history.length >= 3
+        ) {
+          return this.history[this.history.length - 3]
+        } else {
+          return this.history[0]
+        }
+      } else {
+        return this.history[this.index - 2]
+      }
     },
     node1() {
       return this.index > 0 ? this.history[this.index - 1] : this.nodeA
@@ -23,8 +44,13 @@ export default {
       return this.index > 0 ? this.history[this.index] : this.nodeB
     },
     node3() {
-      return this.index > 0 && this.index < this.history.length - 1 ?
-        this.history[this.index + 1] : this.node2
+      if (this.index <= 0) {
+        return this.node2
+      } else if (this.index < this.history.length - 1) {
+        return this.history[this.index + 1]
+      } else {
+        return this.tail == this.history[0] ? this.history[1] : this.tail
+      }
     },
     x0() {
       return this.getX(this.node0)
