@@ -64,12 +64,12 @@ export default {
       return result
     },
     loopStart() {
-      if (this.history[0] == this.hole) {
-        return 0
-      }
-
       for (let i = this.history.length - 4; i > 0; i--) {
         if (this.history[i] == this.tail) {
+          if (i == 1 && this.history[0] == this.hole) {
+            return 0
+          }
+
           return i
         }
       }
