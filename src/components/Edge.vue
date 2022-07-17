@@ -20,20 +20,35 @@ export default {
     tail() {
       return this.history[this.history.length - 1]
     },
+    first() {
+      return this.history[this.start]
+    },
+    second() {
+      return this.history[this.start + 1]
+    },
     node0() {
       if (this.index <= this.start) {
         return this.node1
       } else if (this.index <= this.start + 1) {
-        if (this.history[this.start] == this.tail) {
+        if (
+          this.first == this.tail &&
+          // going back is not a loop
+          this.history[this.history.length - 3] != this.tail
+        ) {
           return this.hole
         } else if (
-          this.history[this.start] == this.hole &&
-          this.history[this.start + 1] == this.tail &&
+          this.first == this.hole &&
+          this.second == this.tail &&
           this.history.length >= 3
         ) {
           return this.history[this.history.length - 3]
+        } else if (
+          this.history.length >= 3 &&
+          this.tail == this.history[this.history.length - 3]
+        ) {
+          return this.tail // reversing the loop
         } else {
-          return this.history[this.start]
+          return this.start
         }
       } else {
         return this.history[this.index - 2]
@@ -48,11 +63,15 @@ export default {
     node3() {
       if (this.index <= this.start) {
         return this.node2
+      } else if (
+        this.index == this.history.length - 2 && this.node1 == this.tail &&
+        this.first == this.hole
+      ) {
+        return this.second // reversing the loop
       } else if (this.index < this.history.length - 1) {
         return this.history[this.index + 1]
       } else {
-        return this.tail == this.history[this.start] ?
-          this.history[this.start + 1] : this.tail
+        return this.tail == this.first ? this.second : this.tail
       }
     },
     x0() {
