@@ -68,8 +68,13 @@ export default {
         return 0
       }
 
-      let start = this.history.indexOf(this.tail)
-      return start <= this.history.length - 4 ? start : 0
+      for (let i = this.history.length - 4; i > 0; i--) {
+        if (this.history[i] == this.tail) {
+          return i
+        }
+      }
+
+      return 0
     }
   },
   methods: {
