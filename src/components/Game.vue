@@ -186,6 +186,8 @@ export default {
       <Edge
       v-for="edge of edges"
       :dLength="0.3"
+      :headRadius="0.1 * Math.sqrt(0.75)"
+      :headLength="0.1"
       v-bind:nodeA="edge[0]"
       v-bind:nodeB="edge[1]"
       v-bind:size="size"

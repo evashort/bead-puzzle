@@ -6,6 +6,8 @@ import getControlVector from '../ControlVector.js'
 export default {
   props: {
     dLength: Number,
+    headRadius: Number,
+    headLength: Number,
     nodeA: Number,
     nodeB: Number,
     size: Number,
@@ -74,11 +76,17 @@ export default {
         return this.tail == this.first ? this.second : this.tail
       }
     },
+    arrow() {
+      return (this.node1 == this.hole && this.node2 == this.tail) -
+        (this.node2 == this.hole && this.node1 == this.tail)
+    },
     reverse() {
-      return this.index == this.start + 1 &&
+      return (
+        this.index == this.start + 1 &&
         this.history.length >= 3 &&
         this.hole == this.first &&
         this.tail == this.history[this.history.length - 3]
+      ) || this.arrow < 0
     },
     x0() {
       return this.getX(this.reverse ? this.node3 : this.node0)
@@ -113,7 +121,7 @@ export default {
         this.y2 - this.y1,
         this.x0 - this.x1,
         this.y0 - this.y1,
-        this.dLength,
+        1,
       )
     },
     d2() {
@@ -122,11 +130,35 @@ export default {
         this.y1 - this.y2,
         this.x3 - this.x2,
         this.y3 - this.y2,
-        this.dLength,
+        1,
       )
     },
+    h1() {
+      return d1
+    },
     path() {
-      return `M ${this.x2} ${this.y2} C ${this.x2 + this.d2.x} ${this.y2 + this.d2.y}, ${this.x1 + this.d1.x} ${this.y1 + this.d1.y}, ${this.x1} ${this.y1}`
+      let x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2
+      let d1 = this.d1, d2 = this.d2, len = this.dLength
+      return `M ${x2} ${y2} C ${x2 + d2.x * len} ${y2 + d2.y * len}, ${x1 + d1.x * len} ${y1 + d1.y * len}, ${x1} ${y1}`
+    },
+    headPath() {
+      let x = this.x1, y = this.y1
+      let dA = this.d1, rad = this.headRadius, len = this.headLength
+      // mixture of tangent and average slope looks better
+      let aAmount = 2, bAmount = 1
+      let dB = {
+        x: this.x2 - this.x1,
+        y: this.y2 - this.y1,
+      }
+      let dBLength = Math.sqrt(dB.x * dB.x + dB.y * dB.y)
+      let d = {
+        x: dA.x * dBLength * aAmount + dB.x * bAmount,
+        y: dA.y * dBLength * aAmount + dB.y * bAmount,
+      }
+      let factor = 1 / Math.sqrt(d.x * d.x + d.y * d.y)
+      d.x *= factor
+      d.y *= factor
+      return `M ${x - d.y * rad + d.x * len} ${y + d.x * rad + d.y * len} L ${x} ${y} L ${x + d.y * rad + d.x * len} ${y - d.x * rad + d.y * len}`
     },
   },
   methods: {
@@ -141,7 +173,8 @@ export default {
 </script>
 
 <template>
-  <path :class="{ edge: true, active: active }" :d="path" fill="none" />
+  <path :class="{ edge: true, active: active, arrow: arrow }" :d="path" fill="none" />
+  <path :class="{ head: true, arrow: arrow }" :d="headPath" fill="none" />
 </template>
 
 <style scoped>
@@ -153,6 +186,20 @@ export default {
 }
 .edge.active {
   stroke-dasharray: 0 0.2 100;
+  stroke: var(--color-border);
+}
+.edge.active.arrow {
+  stroke-dasharray: none;
+  stroke: var(--color-text);
+}
+.head {
+  stroke: var(--color-text);
+  stroke-width: 0.05;
+  stroke-linecap: round;
+  visibility: hidden;
+}
+.head.arrow {
+  visibility: visible;
 }
 
 </style>
