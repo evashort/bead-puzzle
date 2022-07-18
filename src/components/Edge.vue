@@ -8,8 +8,8 @@ export default {
     dLength: Number,
     headRadius: Number,
     headLength: Number,
-    nodeA: Number,
-    nodeB: Number,
+    node1: Number,
+    node2: Number,
     size: Number,
     history: Array,
     index: Number,
@@ -28,7 +28,7 @@ export default {
     second() {
       return this.history[this.start + 1]
     },
-    node0() {
+    prevNode() {
       if (this.index <= this.start) {
         return this.node1
       } else if (this.index <= this.start + 1) {
@@ -56,14 +56,7 @@ export default {
         return this.history[this.index - 2]
       }
     },
-    node1() {
-      return this.index > this.start ?
-        this.history[this.index - 1] : this.nodeA
-    },
-    node2() {
-      return this.index > this.start ? this.history[this.index] : this.nodeB
-    },
-    node3() {
+    nextNode() {
       if (this.index <= this.start) {
         return this.node2
       } else if (
@@ -77,41 +70,43 @@ export default {
         return this.tail == this.first ? this.second : this.tail
       }
     },
+    node0() {
+      return this.index > this.start &&
+        this.node1 == this.history[this.index] ?
+        this.nextNode : this.prevNode
+    },
+    node3() {
+      return this.index > this.start &&
+        this.node2 == this.history[this.index - 1] ?
+        this.prevNode : this.nextNode
+    },
     arrow() {
       return (this.node1 == this.hole && this.node2 == this.tail) -
         (this.node2 == this.hole && this.node1 == this.tail)
     },
-    reverse() {
-      return this.active && (
-        (this.arrow == 0 && this.node1 == this.hole) || this.arrow < 0
-      )
-    },
-    gap() {
-      return this.nodeA == this.hole || this.nodeB == this.hole
-    },
     x0() {
-      return this.getX(this.reverse ? this.node3 : this.node0)
+      return this.getX(this.node0)
     },
     y0() {
-      return this.getY(this.reverse ? this.node3 : this.node0)
+      return this.getY(this.node0)
     },
     x1() {
-      return this.getX(this.reverse ? this.node2 : this.node1)
+      return this.getX(this.node1)
     },
     y1() {
-      return this.getY(this.reverse ? this.node2 : this.node1)
+      return this.getY(this.node1)
     },
     x2() {
-      return this.getX(this.reverse ? this.node1 : this.node2)
+      return this.getX(this.node2)
     },
     y2() {
-      return this.getY(this.reverse ? this.node1 : this.node2)
+      return this.getY(this.node2)
     },
     x3() {
-      return this.getX(this.reverse ? this.node0 : this.node3)
+      return this.getX(this.node3)
     },
     y3() {
-      return this.getY(this.reverse ? this.node0 : this.node3)
+      return this.getY(this.node3)
     },
     active() {
       return this.index > this.start
