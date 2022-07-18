@@ -78,6 +78,21 @@ export default {
     }
   },
   methods: {
+    getFromNode(node) {
+      if (
+        this.history.length >= 3 &&
+        node == this.history[this.history.length - 3]
+      ) {
+        return this.hole
+      }
+
+      let row = new Uint8Array(
+        this.matrix,
+        this.size * node * this.matrix.BYTES_PER_ELEMENT,
+        this.size,
+      )
+      return row.indexOf(1) // arbitrary edge
+    },
     goForward() {
       this.beads[this.beads.indexOf(this.tail)] = this.hole
 
@@ -189,7 +204,15 @@ export default {
       v-bind:index="historyIndices[edge[0] * size + edge[1]]"
       v-bind:start="loopStart"
       />
-      <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" v-bind:tail="node == tail" />
+      <Bead
+        v-for="(node, id) of beads"
+        :dLength="0.3"
+        v-bind:id="id"
+        v-bind:node="node"
+        :nodeCount="beads.length + 1"
+        v-bind:tail="node == tail"
+        v-bind:fromNode="getFromNode(node)"
+      />
     </svg>
   </button>
 </template>

@@ -178,7 +178,13 @@ export default {
 </script>
 
 <template>
-  <path :class="{ edge: true, active: active, arrow: arrow }" :d="path" fill="none" v-bind:mask="arrow ? 'none': 'url(#head-mask)'"/>
+  <path
+    :class="{ edge: true, active: active, arrow: arrow }"
+    :d="path"
+    fill="none"
+    v-bind:mask="arrow ? 'none': 'url(#head-mask)'"
+    v-bind:id="`edge-${node1}-${node2}`"
+  />
   <path v-if="arrow" class="head" :d="headPath" fill="none"/>
   <mask v-if="arrow" id="head-mask">
     <rect x="-1.2" y="-1.2" width="2.4" height="2.4" fill="white"></rect>

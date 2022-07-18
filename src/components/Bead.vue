@@ -11,6 +11,7 @@ export default {
     node: Number,
     nodeCount: Number,
     tail: Boolean,
+    fromNode: Number,
   },
   computed: {
     transformation() {
