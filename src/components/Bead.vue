@@ -10,6 +10,7 @@ export default {
     id: Number,
     node: Number,
     nodeCount: Number,
+    tail: Boolean,
   },
   computed: {
     transformation() {
@@ -21,10 +22,10 @@ export default {
       return `M 0 ${-yRadius} L ${radius} ${yRadius} H ${-radius} Z`
     },
     x() {
-      return Math.sin(2 * Math.PI * this.node / this.nodeCount)
+      return Math.sin(2 * Math.PI * this.node / this.nodeCount + 0.00001)
     },
     y() {
-      return -Math.cos(2 * Math.PI * this.node / this.nodeCount)
+      return -Math.cos(2 * Math.PI * this.node / this.nodeCount + 0.00001)
     },
     color() {
       return colors[this.id]
@@ -35,6 +36,17 @@ export default {
 
 <template>
   <g :transform="transformation">
-    <path :d="shape" :fill="color" />
+    <path :d="shape" :fill="color" :class="{bead: true, tail: tail}" />
   </g>
 </template>
+
+<style scoped>
+.bead {
+  stroke-width: 0.04;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bead.tail {
+  stroke: var(--color-text);
+}
+</style>

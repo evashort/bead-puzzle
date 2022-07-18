@@ -78,12 +78,6 @@ export default {
     }
   },
   methods: {
-    getBeadPosition(index) {
-      return {
-        x: Math.sin(2 * Math.PI * index / (1 + this.beads.length)),
-        y: -Math.cos(2 * Math.PI * index / (1 + this.beads.length))
-      }
-    },
     goForward() {
       this.beads[this.beads.indexOf(this.tail)] = this.hole
 
@@ -195,7 +189,7 @@ export default {
       v-bind:index="historyIndices[edge[0] * size + edge[1]]"
       v-bind:start="loopStart"
       />
-      <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" />
+      <Bead v-for="(node, id) of beads" :dLength="0.3" v-bind:id="id" v-bind:node="node" :nodeCount="beads.length + 1" v-bind:tail="node == tail" />
     </svg>
   </button>
 </template>

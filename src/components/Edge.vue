@@ -164,46 +164,53 @@ export default {
   },
   methods: {
     getX(node) {
-      return Math.sin(2 * Math.PI * node / this.size)
+      return Math.sin(2 * Math.PI * node / this.size + 0.00001)
     },
     getY(node) {
-      return -Math.cos(2 * Math.PI * node / this.size)
+      return -Math.cos(2 * Math.PI * node / this.size + 0.00001)
     },
   },
 }
 </script>
 
 <template>
-  <path :class="{ edge: true, active: active, arrow: arrow, gap: gap }" :d="path" fill="none" />
-  <path :class="{ head: true, arrow: arrow }" :d="headPath" fill="none" />
+  <path class="edge" :d="path" fill="none" v-bind:mask="arrow ? 'none': 'url(#head-mask)'"/>
+  <path :class="{ segment: true, active: active, arrow: arrow }" :d="path" fill="none" v-bind:mask="arrow ? 'none': 'url(#head-mask)'"/>
+  <path v-if="arrow" class="head" :d="headPath" fill="none"/>
+  <mask v-if="arrow" id="head-mask">
+    <rect x="-1.2" y="-1.2" width="2.4" height="2.4" fill="white"></rect>
+    <path :d="headPath" fill="none" stroke="black" stroke-width="0.18" stroke-linecap="round" stroke-linejoin="round"/>
+  </mask>
 </template>
 
 <style scoped>
 .edge {
   stroke: var(--color-text);
-  stroke-width: 0.05;
+  stroke-width: 0.04;
   stroke-linecap: round;
-  stroke-dasharray: 0 0.12;
+  stroke-dasharray: 0.04 0.12;
 }
-.edge.active {
-  stroke: #bbb;
-  stroke-dasharray: none;
-}
-.edge.active.gap {
-  stroke-dasharray: 0 0.2 100;
-}
-.edge.active.arrow {
+.segment {
   stroke: var(--color-text);
-  stroke-dasharray: none;
+  stroke-width: 0.04;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.segment.active {
+  stroke-linecap: butt;
+  opacity: 1;
+}
+.segment.arrow {
+  stroke-width: 0.06;
+  stroke-linecap: butt;
+  transition: none;
 }
 .head {
   stroke: var(--color-text);
-  stroke-width: 0.05;
+  stroke-width: 0.06;
   stroke-linecap: round;
-  visibility: hidden;
-}
-.head.arrow {
-  visibility: visible;
+  stroke-linejoin: round;
 }
 
 </style>
