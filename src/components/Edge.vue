@@ -60,7 +60,8 @@ export default {
       if (this.index <= this.start) {
         return this.node2
       } else if (
-        this.index == this.history.length - 2 && this.node1 == this.tail &&
+        this.index == this.history.length - 2 &&
+        this.history[this.history.length - 3] == this.tail &&
         this.first == this.hole
       ) {
         return this.second // reversing the loop
