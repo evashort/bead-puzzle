@@ -176,12 +176,12 @@ export default {
 
 <template>
   <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()">
-    <svg class="gameView" viewBox="-1.1 -1.1 2.2 2.2">
+    <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
       <Edge
       v-for="edge of edges"
       :dLength="0.3"
-      :headRadius="0.1 * Math.sqrt(0.75)"
-      :headLength="0.1"
+      :headRadius="0.12 * Math.sqrt(0.75)"
+      :headLength="0.12"
       v-bind:node1="edge[0]"
       v-bind:node2="edge[1]"
       v-bind:size="size"

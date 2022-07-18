@@ -138,13 +138,20 @@ export default {
       return `M ${x2} ${y2} C ${x2 + d2.x * len} ${y2 + d2.y * len}, ${x1 + d1.x * len} ${y1 + d1.y * len}, ${x1} ${y1}`
     },
     headPath() {
-      let x = this.x1, y = this.y1
-      let dA = this.d1, rad = this.headRadius, len = this.headLength
+      if (this.arrow == 0) {
+        return ''
+      }
+
+      let x = this.x1, y = this.y1, dA = this.d1
+      if (this.arrow < 0) {
+        x = this.x2, y = this.y2, dA = this.d2
+      }
+
       // mixture of tangent and average slope looks better
       let aAmount = 2, bAmount = 1
       let dB = {
-        x: this.x2 - this.x1,
-        y: this.y2 - this.y1,
+        x: (this.x2 - this.x1) * this.arrow,
+        y: (this.y2 - this.y1) * this.arrow,
       }
       let dBLength = Math.sqrt(dB.x * dB.x + dB.y * dB.y)
       let d = {
@@ -154,6 +161,7 @@ export default {
       let factor = 1 / Math.sqrt(d.x * d.x + d.y * d.y)
       d.x *= factor
       d.y *= factor
+      let rad = this.headRadius, len = this.headLength
       return `M ${x - d.y * rad + d.x * len} ${y + d.x * rad + d.y * len} L ${x} ${y} L ${x + d.y * rad + d.x * len} ${y - d.x * rad + d.y * len}`
     },
   },
@@ -184,13 +192,14 @@ export default {
   stroke-width: 0.04;
   stroke-linecap: round;
   stroke-dasharray: 0.04 0.12;
+  transition: d 0.5s;
 }
 .segment {
   stroke: var(--color-text);
   stroke-width: 0.04;
   stroke-linecap: round;
   opacity: 0;
-  transition: opacity 0.5s;
+  transition: opacity 0.5s, d 0.5s;
 }
 .segment.active {
   stroke-linecap: butt;
@@ -199,7 +208,7 @@ export default {
 .segment.arrow {
   stroke-width: 0.06;
   stroke-linecap: butt;
-  transition: none;
+  transition: d 0.5s;
 }
 .head {
   stroke: var(--color-text);
