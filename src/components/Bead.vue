@@ -42,11 +42,14 @@ export default {
 
 <style scoped>
 .bead {
-  stroke-width: 0.04;
+  stroke-width: 0;
+  stroke: var(--color-text);
   stroke-linecap: round;
   stroke-linejoin: round;
+  transition: stroke-width 0.5s;
 }
 .bead.tail {
-  stroke: var(--color-text);
+  stroke-width: 0.04;
+  transition: none;
 }
 </style>

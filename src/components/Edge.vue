@@ -178,7 +178,7 @@ export default {
 </script>
 
 <template>
-  <path :class="{ segment: true, active: active, arrow: arrow }" :d="path" fill="none" v-bind:mask="arrow ? 'none': 'url(#head-mask)'"/>
+  <path :class="{ edge: true, active: active, arrow: arrow }" :d="path" fill="none" v-bind:mask="arrow ? 'none': 'url(#head-mask)'"/>
   <path v-if="arrow" class="head" :d="headPath" fill="none"/>
   <mask v-if="arrow" id="head-mask">
     <rect x="-1.2" y="-1.2" width="2.4" height="2.4" fill="white"></rect>
@@ -187,19 +187,19 @@ export default {
 </template>
 
 <style scoped>
-.segment {
+.edge {
   stroke: var(--color-text);
   stroke-width: 0.04;
   stroke-linecap: round;
-  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, d 0.5s;
+  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, stroke-width 0.5s, d 0.5s;
   stroke-dasharray: 0.04 0.12;
 }
-.segment.active {
-  opacity: 1;
+.edge.active {
+  stroke-width: 0.035;
   stroke-dasharray: 0.16 0;
   stroke-dashoffset: 0.06;
 }
-.segment.arrow {
+.edge.arrow {
   stroke-width: 0.06;
   stroke-linecap: butt;
   transition: d 0.5s;
