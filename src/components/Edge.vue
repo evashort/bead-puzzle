@@ -14,76 +14,50 @@ export default {
     history: Array,
     index: Number,
     start: Number,
+    end: Number,
   },
   computed: {
-    hole() {
-      return this.history[this.history.length - 2]
-    },
-    tail() {
-      return this.history[this.history.length - 1]
-    },
-    first() {
-      return this.history[this.start]
-    },
-    second() {
-      return this.history[this.start + 1]
-    },
     prevNode() {
-      if (this.index <= this.start) {
+      if (this.index < 0) {
         return this.node1
-      } else if (this.index <= this.start + 1) {
-        if (
-          this.first == this.tail &&
-          // going back is not a loop
-          this.history[this.history.length - 3] != this.tail
-        ) {
-          return this.hole
-        } else if (
-          this.first == this.hole &&
-          this.second == this.tail &&
-          this.history.length >= 3
-        ) {
-          return this.history[this.history.length - 3]
-        } else if (
-          this.history.length >= 3 &&
-          this.tail == this.history[this.history.length - 3]
-        ) {
-          return this.tail // reversing the loop
-        } else {
-          return this.start
-        }
+      } else if (this.index > this.start) {
+        return this.history[this.index - 1]
+      } else if (
+        this.index == this.start &&
+        this.history[this.start] == this.history[this.end]
+      ) {
+        return this.history[this.end - 1]
       } else {
-        return this.history[this.index - 2]
+        return this.history[this.index]
       }
     },
     nextNode() {
-      if (this.index <= this.start) {
+      if (this.index < 0) {
         return this.node2
+      } else if (this.index + 1 < this.end) {
+        return this.history[this.index + 2]
       } else if (
-        this.index == this.history.length - 2 &&
-        this.history[this.history.length - 3] == this.tail &&
-        this.first == this.hole
+        this.index + 1 == this.end &&
+        this.history[this.start] == this.history[this.end]
       ) {
-        return this.second // reversing the loop
-      } else if (this.index < this.history.length - 1) {
-        return this.history[this.index + 1]
+        return this.history[this.start + 1]
       } else {
-        return this.tail == this.first ? this.second : this.tail
+        return this.history[this.index + 1]
       }
     },
     node0() {
-      return this.index > this.start &&
-        this.node1 == this.history[this.index] ?
+      return this.index >= 0 && this.node1 == this.history[this.index + 1] ?
         this.nextNode : this.prevNode
     },
     node3() {
-      return this.index > this.start &&
-        this.node2 == this.history[this.index - 1] ?
+      return this.index >= 0 && this.node2 == this.history[this.index] ?
         this.prevNode : this.nextNode
     },
     arrow() {
-      return (this.node1 == this.hole && this.node2 == this.tail) -
-        (this.node2 == this.hole && this.node1 == this.tail)
+      let hole = this.history[this.history.length - 2]
+      let tail = this.history[this.history.length - 1]
+      return (this.node1 == hole && this.node2 == tail) -
+        (this.node2 == hole && this.node1 == tail)
     },
     x0() {
       return this.getX(this.node0)
@@ -110,7 +84,7 @@ export default {
       return this.getY(this.node3)
     },
     active() {
-      return this.index > this.start
+      return this.index >= 0
     },
     d1() {
       return getControlVector(

@@ -53,29 +53,41 @@ export default {
     tail() {
       return this.history[this.history.length - 1]
     },
-    historyIndices() {
-      let result = new Uint16Array(this.size * this.size)
-      for (let i = this.history.length - 1; i > 0; i--) {
-        let a = this.history[i - 1]
-        let b = this.history[i]
-        result[a * this.size + b] = result[b * this.size + a] = i
+    loopEnd() {
+      if (this.history.length <= 2) {
+        return this.history.length - 1
+      }
+      
+      if (this.tail == this.history[this.history.length - 3]) {
+        return this.history.length - 2 // going back
+      }
+      
+      if (this.hole == this.history[0] && this.tail == this.history[1]) {
+        return this.history.length - 2 // continuing loop
       }
 
-      return result
+      return this.history.length - 1
     },
     loopStart() {
-      for (let i = this.history.length - 4; i > 0; i--) {
-        if (this.history[i] == this.tail) {
-          if (i == 1 && this.history[0] == this.hole) {
-            return 0
-          }
-
+      let sentinel = this.history[this.loopEnd]
+      for (let i = this.loopEnd - 2; i > 0; i--) {
+        if (this.history[i] == sentinel) {
           return i
         }
       }
 
       return 0
-    }
+    },
+    historyIndices() {
+      let result = new Uint16Array(this.size * this.size)
+      for (let i = this.loopStart; i < this.loopEnd; i++) {
+        let a = this.history[i]
+        let b = this.history[i + 1]
+        result[a * this.size + b] = result[b * this.size + a] = i + 1
+      }
+
+      return result
+    },
   },
   methods: {
     getFromNode(node) {
@@ -201,8 +213,9 @@ export default {
       v-bind:node2="edge[1]"
       v-bind:size="size"
       v-bind:history="history"
-      v-bind:index="historyIndices[edge[0] * size + edge[1]]"
+      v-bind:index="historyIndices[edge[0] * size + edge[1]] - 1"
       v-bind:start="loopStart"
+      v-bind:end="loopEnd"
       />
       <Bead
         v-for="(node, id) of beads"
