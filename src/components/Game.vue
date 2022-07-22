@@ -1,5 +1,4 @@
 <script setup>
-import Edge from './Edge.vue'
 import Bead from './Bead.vue'
 </script>
 
@@ -328,19 +327,12 @@ export default {
         <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
         <path :d="headPath" fill="none" stroke="black" stroke-width="0.18" stroke-linecap="round" stroke-linejoin="round"/>
       </mask>
-      <Edge
-      v-for="edge of edges"
-      :dLength="0.3"
-      :headRadius="0.12 * Math.sqrt(0.75)"
-      :headLength="0.12"
-      v-bind:node1="edge[0]"
-      v-bind:node2="edge[1]"
-      v-bind:size="size"
-      v-bind:history="history"
-      v-bind:index="historyIndices[edge[0] * size + edge[1]] - 1"
-      v-bind:start="loopStart"
-      v-bind:end="loopEnd"
-      v-bind:path="edgePaths[edge.toString()]"
+      <path
+        v-for="edge of edges"
+        :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: (edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole) }"
+        :d="edgePaths[edge.toString()]"
+        fill="none"
+        v-bind:mask="(edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole) ? 'none' : 'url(#head-mask)'"
       />
       <Bead
         v-for="(node, id) of beads"
@@ -371,5 +363,22 @@ export default {
   stroke-width: 0.06;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+.edge {
+  stroke: var(--color-text);
+  stroke-width: 0.04;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, stroke-width 0.5s, d 0.5s;
+  stroke-dasharray: 0.04 0.12;
+}
+.edge.active {
+  stroke-width: 0.035;
+  stroke-dasharray: 0.16 0;
+  stroke-dashoffset: 0.06;
+}
+.edge.arrow {
+  stroke-width: 0.06;
+  stroke-linecap: butt;
+  transition: d 0.5s;
 }
 </style>
