@@ -15,6 +15,7 @@ export default {
     index: Number,
     start: Number,
     end: Number,
+    path: String,
   },
   computed: {
     prevNode() {
@@ -106,11 +107,6 @@ export default {
     },
     h1() {
       return d1
-    },
-    path() {
-      let x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2
-      let d1 = this.d1, d2 = this.d2, len = this.dLength
-      return `M ${x2} ${y2} C ${x2 + d2.x * len} ${y2 + d2.y * len}, ${x1 + d1.x * len} ${y1 + d1.y * len}, ${x1} ${y1}`
     },
     headPath() {
       if (this.arrow == 0) {

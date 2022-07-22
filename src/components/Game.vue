@@ -88,8 +88,98 @@ export default {
 
       return result
     },
+    nodeXs() {
+      let xs = new Float64Array(this.size)
+      for (let i = 0; i < this.size; i++) {
+        // avoid vertical edges because of rendering bug for masked paths
+        xs[i] = Math.sin(2 * Math.PI * i / this.size + 0.00001)
+      }
+
+      return xs
+    },
+    nodeYs() {
+      let ys = new Float64Array(this.size)
+      for (let i = 0; i < this.size; i++) {
+        ys[i] = -Math.cos(2 * Math.PI * i / this.size + 0.00001)
+      }
+
+      return ys
+    },
+    tangents() {
+      let count = this.loopEnd + 1 - this.loopStart
+      let xs = new Float64Array(count)
+      let ys = new Float64Array(count)
+      if (this.history[this.loopStart] == this.history[this.loopEnd]) {
+        let [x, y] = this.getTangent(
+          this.history[this.loopEnd - 1],
+          this.history[this.loopStart],
+          this.history[this.loopStart + 1],
+        )
+        xs[0] = xs[count - 1] = x
+        ys[0] = ys[count - 1] = y
+      }
+
+      for (let i = this.loopStart + 1; i < this.loopEnd; i++) {
+        let [x, y] = this.getTangent(
+          this.history[i - 1],
+          this.history[i],
+          this.history[i + 1],
+        )
+        xs[i - this.loopStart] = x
+        ys[i - this.loopStart] = y
+      }
+
+      return [xs, ys]
+    },
+    edgePaths() {
+      let controlLength = 0.3
+      let edgePaths = {}
+      let [dxs, dys] = this.tangents
+      let offset = this.loopStart
+      for (let edge of this.edges) {
+        let [a, b] = edge
+        let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
+        let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
+        let i = this.historyIndices[a * this.size + b]
+        if (i <= 0) {
+          edgePaths[edge.toString()] = `M ${x1} ${y1} L ${x2} ${y2}`
+          continue
+        }
+
+        let dx1 = dxs[i - offset - 1], dy1 = dys[i - offset - 1]
+        let dx2 = -dxs[i - offset], dy2 = -dys[i - offset]
+        if ((this.history[i - 1] < this.history[i]) != (a < b)) {
+          [dx1, dy1, dx2, dy2] = [dx2, dy2, dx1, dy1]
+        }
+
+        let x0 = x1 + dx1 * controlLength, y0 = y1 + dy1 * controlLength
+        let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
+        edgePaths[edge.toString()] =
+          `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
+      }
+
+      return edgePaths
+    },
   },
   methods: {
+    getTangent(i, j, k) {
+      let x1 = this.nodeXs[i], y1 = this.nodeYs[i]
+      let x2 = this.nodeXs[j], y2 = this.nodeYs[j]
+      let x3 = this.nodeXs[k], y3 = this.nodeYs[k]
+
+      let dx1 = x2 - x1, dy1 = y2 - y1
+      let len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1)
+
+      let dx2 = x3 - x2, dy2 = y3 - y2
+      let len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
+
+      let dx3 = dx1 * len2 + dx2 * len1
+      let dy3 = dy1 * len2 + dy2 * len1
+      let len3 = Math.sqrt(dx3 * dx3 + dy3 * dy3)
+
+      let factor = len3 > 0 ? 1 / len3 : 0
+      return [dx3 * factor, dy3 * factor]
+    },
     getFromNode(node) {
       if (
         this.history.length >= 3 &&
@@ -216,6 +306,7 @@ export default {
       v-bind:index="historyIndices[edge[0] * size + edge[1]] - 1"
       v-bind:start="loopStart"
       v-bind:end="loopEnd"
+      v-bind:path="edgePaths[edge.toString()]"
       />
       <Bead
         v-for="(node, id) of beads"
