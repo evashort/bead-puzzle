@@ -108,33 +108,6 @@ export default {
     h1() {
       return d1
     },
-    headPath() {
-      if (this.arrow == 0) {
-        return ''
-      }
-
-      let x = this.x1, y = this.y1, dA = this.d1
-      if (this.arrow < 0) {
-        x = this.x2, y = this.y2, dA = this.d2
-      }
-
-      // mixture of tangent and average slope looks better
-      let aAmount = 2, bAmount = 1
-      let dB = {
-        x: (this.x2 - this.x1) * this.arrow,
-        y: (this.y2 - this.y1) * this.arrow,
-      }
-      let dBLength = Math.sqrt(dB.x * dB.x + dB.y * dB.y)
-      let d = {
-        x: dA.x * dBLength * aAmount + dB.x * bAmount,
-        y: dA.y * dBLength * aAmount + dB.y * bAmount,
-      }
-      let factor = 1 / Math.sqrt(d.x * d.x + d.y * d.y)
-      d.x *= factor
-      d.y *= factor
-      let rad = this.headRadius, len = this.headLength
-      return `M ${x - d.y * rad + d.x * len} ${y + d.x * rad + d.y * len} L ${x} ${y} L ${x + d.y * rad + d.x * len} ${y - d.x * rad + d.y * len}`
-    },
   },
   methods: {
     getX(node) {
@@ -155,11 +128,6 @@ export default {
     v-bind:mask="arrow ? 'none': 'url(#head-mask)'"
     v-bind:id="`edge-${node1}-${node2}`"
   />
-  <path v-if="arrow" class="head" :d="headPath" fill="none"/>
-  <mask v-if="arrow" id="head-mask">
-    <rect x="-1.2" y="-1.2" width="2.4" height="2.4" fill="white"></rect>
-    <path :d="headPath" fill="none" stroke="black" stroke-width="0.18" stroke-linecap="round" stroke-linejoin="round"/>
-  </mask>
 </template>
 
 <style scoped>
@@ -179,12 +147,6 @@ export default {
   stroke-width: 0.06;
   stroke-linecap: butt;
   transition: d 0.5s;
-}
-.head {
-  stroke: var(--color-text);
-  stroke-width: 0.06;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 </style>
