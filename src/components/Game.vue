@@ -1,7 +1,3 @@
-<script setup>
-import Bead from './Bead.vue'
-</script>
-
 <script>
 export default {
   data() {
@@ -178,6 +174,12 @@ export default {
     arrowPath() {
       return this.edgePaths[[this.hole, this.tail].toString()]
     },
+    beadRadius() {
+      return 0.1
+    },
+    beadHeight() {
+      return this.beadRadius * Math.sqrt(3)
+    },
   },
   methods: {
     getTangent(i, j, k) {
@@ -336,15 +338,16 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole) ? 'none' : 'url(#head-mask)'"
       />
-      <Bead
+      <g
         v-for="(node, id) of beads"
-        :dLength="0.3"
-        v-bind:id="id"
-        v-bind:node="node"
-        :nodeCount="beads.length + 1"
-        v-bind:tail="node == tail"
-        v-bind:fromNode="getFromNode(node)"
-      />
+        :transform="`translate(${nodeXs[node]} ${nodeYs[node]})`"
+      >
+        <path
+          :d="`M 0 ${-0.5 * beadHeight} L ${beadRadius} ${0.5 * beadHeight} H ${-beadRadius} Z`"
+          :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
+          :class="{bead: true, tail: node == tail}"
+        />
+      </g>
     </svg>
   </button>
 </template>
@@ -382,5 +385,16 @@ export default {
   stroke-width: 0.06;
   stroke-linecap: butt;
   transition: d 0.5s;
+}
+.bead {
+  stroke-width: 0;
+  stroke: var(--color-text);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-width 0.5s;
+}
+.bead.tail {
+  stroke-width: 0.04;
+  transition: none;
 }
 </style>
