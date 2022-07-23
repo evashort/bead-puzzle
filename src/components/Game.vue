@@ -161,6 +161,19 @@ export default {
 
       return edgePaths
     },
+    nodePaths() {
+      let paths = new Array(this.size)
+      for (let node = 0; node < this.size; node++) {
+        paths[node] = `M ${this.nodeXs[node]} ${this.nodeYs[node]} v -1e-5`
+      }
+
+      for (let i = this.loopStart; i < this.loopEnd; i++) {
+        let a = this.history[i], b = this.history[i + 1]
+        paths[a] = this.edgePaths[[b, a].toString()]
+      }
+
+      return paths
+    },
     headRadius() {
       return 0.1
     },
@@ -338,14 +351,12 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole) ? 'none' : 'url(#head-mask)'"
       />
-      <g
-        v-for="(node, id) of beads"
-        :transform="`translate(${nodeXs[node]} ${nodeYs[node]})`"
-      >
+      <g v-for="(node, id) of beads">
         <path
-          :d="`M 0 ${-0.5 * beadHeight} L ${beadRadius} ${0.5 * beadHeight} H ${-beadRadius} Z`"
+          :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
           :class="{bead: true, tail: node == tail}"
+          :style="{ 'offset-path': `path('${nodePaths[node]}')`, }"
         />
       </g>
     </svg>
@@ -392,6 +403,12 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke-width 0.5s;
+  animation: slide 2s ease infinite;
+  animation-fill-mode: forwards;
+}
+@keyframes slide {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
 }
 .bead.tail {
   stroke-width: 0.04;
