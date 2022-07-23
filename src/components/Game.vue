@@ -355,8 +355,8 @@ export default {
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail}"
-          :style="{ 'offset-path': `path('${nodePaths[node]}')`, }"
+          :class="{bead: true, tail: node == tail, animate: ![-1, history.length - 1].includes(history.indexOf(node)) }"
+          :style="{ 'offset-path': `path('${nodePaths[node]}')` }"
         />
       </g>
     </svg>
@@ -403,8 +403,10 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke-width 0.5s;
-  animation: slide 2s ease infinite;
-  animation-fill-mode: forwards;
+  offset-distance: 100%;
+}
+.bead.animate {
+  animation: slide 2s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
