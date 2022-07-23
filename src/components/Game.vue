@@ -21,7 +21,8 @@ export default {
       if (holeRow[tail]) {
         return {
           beads: [...this.startingBeads],
-          history: [hole, tail]
+          history: [hole, tail],
+          animations: new Uint8Array(this.startingBeads.length),
         }
       }
     }
@@ -229,7 +230,9 @@ export default {
       return row.indexOf(1) // arbitrary edge
     },
     goForward() {
-      this.beads[this.beads.indexOf(this.tail)] = this.hole
+      let id = this.beads.indexOf(this.tail)
+      this.beads[id] = this.hole
+      this.animations[id] = 1
 
       // first choice: go back instead
       if (
