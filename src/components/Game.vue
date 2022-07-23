@@ -173,6 +173,7 @@ export default {
         paths[a] = this.edgePaths[[b, a].toString()]
       }
 
+      paths[this.tail] = this.edgePaths[[this.tail, this.hole].toString()]
       return paths
     },
     headRadius() {
@@ -427,5 +428,7 @@ export default {
 .bead.tail {
   stroke-width: 0.04;
   transition: none;
+  animation-direction: reverse;
+  offset-distance: 0%;
 }
 </style>
