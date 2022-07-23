@@ -53,11 +53,11 @@ export default {
       if (this.history.length <= 2) {
         return this.history.length - 1
       }
-      
+
       if (this.tail == this.history[this.history.length - 3]) {
         return this.history.length - 2 // going back
       }
-      
+
       if (this.hole == this.history[0] && this.tail == this.history[1]) {
         return this.history.length - 2 // continuing loop
       }
@@ -232,7 +232,7 @@ export default {
     goForward() {
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
-      this.animations[id] = 1
+      this.animations[id] = [1, 2, 1][this.animations[id]]
 
       // first choice: go back instead
       if (
@@ -296,7 +296,9 @@ export default {
     goBack() {
       if (this.history.length > 2) {
         this.history.pop()
-        this.beads[this.beads.indexOf(this.hole)] = this.tail
+        let id = this.beads.indexOf(this.hole)
+        this.beads[id] = this.tail
+        this.animations[id] = [1, 2, 1][this.animations[id]]
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
@@ -322,7 +324,7 @@ export default {
           return
         }
       }
-    }
+    },
   }
 }
 </script>
@@ -358,7 +360,7 @@ export default {
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail, animate: ![-1, history.length - 1].includes(history.indexOf(node)) }"
+          :class="{bead: true, tail: node == tail, animate: this.animations[id] == 1, animate2: this.animations[id] == 2 }"
           :style="{ 'offset-path': `path('${nodePaths[node]}')` }"
         />
       </g>
@@ -412,6 +414,13 @@ export default {
   animation: slide 2s ease forwards;
 }
 @keyframes slide {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+.bead.animate2 {
+  animation: slide2 2s ease forwards;
+}
+@keyframes slide2 {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
