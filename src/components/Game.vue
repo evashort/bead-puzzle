@@ -316,14 +316,14 @@ export default {
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
       <path class="head"
         :d="headPath"
-        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${0.5 * headHeight}px` }"
+        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
         fill="none"
       />
       <mask id="head-mask">
         <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
         <path
           :d="headPath"
-          :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${0.5 * headHeight}px` }"
+          :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
           fill="none"
           stroke="black"
           stroke-width="0.18"
