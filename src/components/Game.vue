@@ -137,11 +137,13 @@ export default {
       let offset = this.loopStart
       for (let edge of this.edges) {
         let [a, b] = edge
+        let backEdge = edge.slice().reverse()
         let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
         let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
         let i = this.historyIndices[a * this.size + b]
         if (i <= 0) {
           edgePaths[edge.toString()] = `M ${x1} ${y1} L ${x2} ${y2}`
+          edgePaths[backEdge.toString()] = `M ${x2} ${y2} L ${x1} ${y1}`
           continue
         }
 
@@ -155,38 +157,24 @@ export default {
         let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
         edgePaths[edge.toString()] =
           `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
+        edgePaths[backEdge.toString()] =
+          `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
       }
 
       return edgePaths
     },
+    headRadius() {
+      return 0.1
+    },
+    headHeight() {
+      return this.headRadius * Math.sqrt(1.5)
+    },
     headPath() {
-      let radius = 0.1
-      let height = radius * Math.sqrt(4 / 3)
-
-      let [dxs, dys] = this.tangents
-      let holeIndex = this.history.length - 2 - this.loopStart
-      let sign = this.loopEnd <= this.history.length - 2 &&
-        this.tail != this.history[1] ? 1 : -1
-      let dxTan = sign * dxs[holeIndex], dyTan = sign * dys[holeIndex]
-
-      let x = this.nodeXs[this.hole], y = this.nodeYs[this.hole]
-      let dxSec = x - this.nodeXs[this.tail]
-      let dySec = y - this.nodeYs[this.tail]
-
-      // mixture of tangent and average slope looks better than tangent alone
-      let tanAmount = 2, secAmount = 1
-      let secLen = Math.sqrt(dxSec * dxSec + dySec * dySec)
-      let dx = dxTan * secLen * tanAmount + dxSec * secAmount
-      let dy = dyTan * secLen * tanAmount + dySec * secAmount
-      let factor = 1 / Math.sqrt(dx * dx + dy * dy)
-      dx *= factor
-      dy *= factor
-
-      let dxHeight = dx * height, dyHeight = dy * height
-      let dxRadius = -dy * radius, dyRadius = dx * radius
-      let xLeft = x - dxHeight - dxRadius, yLeft = y - dyHeight - dyRadius
-      let xRight = x - dxHeight + dxRadius, yRight = y - dyHeight + dyRadius
-      return `M ${xLeft} ${yLeft} L ${x} ${y} L ${xRight} ${yRight}`
+      let r = this.headRadius, hr = 0.5 * this.headHeight
+      return `M ${hr} ${-r} L ${-hr} ${0} L ${hr} ${r}`
+    },
+    arrowPath() {
+      return this.edgePaths[[this.hole, this.tail].toString()]
     },
   },
   methods: {
@@ -322,10 +310,22 @@ export default {
 <template>
   <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()">
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
-      <path class="head" :d="headPath" fill="none"/>
+      <path class="head"
+        :d="headPath"
+        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${0.5 * headHeight}px` }"
+        fill="none"
+      />
       <mask id="head-mask">
         <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
-        <path :d="headPath" fill="none" stroke="black" stroke-width="0.18" stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+          :d="headPath"
+          :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${0.5 * headHeight}px` }"
+          fill="none"
+          stroke="black"
+          stroke-width="0.18"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </mask>
       <path
         v-for="edge of edges"
