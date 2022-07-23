@@ -142,8 +142,10 @@ export default {
         let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
         let i = this.historyIndices[a * this.size + b]
         if (i <= 0) {
-          edgePaths[edge.toString()] = `M ${x1} ${y1} L ${x2} ${y2}`
-          edgePaths[backEdge.toString()] = `M ${x2} ${y2} L ${x1} ${y1}`
+          edgePaths[edge.toString()] =
+            `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
+          edgePaths[backEdge.toString()] =
+            `M ${x2} ${y2} C ${x2} ${y2}, ${x1} ${y1}, ${x1} ${y1}`
           continue
         }
 
