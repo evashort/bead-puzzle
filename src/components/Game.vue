@@ -355,7 +355,7 @@ export default {
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] == 1, animate2: animations[id] == 2, animate3: animations[id] == 3, animate4: animations[id] == 4 }"
+          :class="{bead: true, tail: node == tail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3 }"
           :style="{ 'offset-path': `path('${edgePaths[(animations[id] >= 3 ? [node, oldBeads[id]] : [oldBeads[id], node]).toString()]}')` }"
         />
       </g>
@@ -413,7 +413,7 @@ export default {
   animation: slide 2s ease forwards;
   offset-distance: 100%;
 }
-.bead.animate3 {
+.bead.animate.reverse {
   animation: slide 2s ease forwards reverse;
   offset-distance: 0%;
 }
@@ -421,13 +421,8 @@ export default {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.bead.animate2 {
-  animation: slide2 2s ease forwards;
-  offset-distance: 100%;
-}
-.bead.animate4 {
-  animation: slide2 2s ease forwards reverse;
-  offset-distance: 0%;
+.bead.alternate {
+  animation-name: slide2
 }
 @keyframes slide2 {
   from { offset-distance: 0%; }
