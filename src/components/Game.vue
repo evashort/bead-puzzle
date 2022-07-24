@@ -23,6 +23,7 @@ export default {
           beads: [...this.startingBeads],
           history: [hole, tail],
           animations: new Uint8Array(this.startingBeads.length),
+          oldBeads: [...this.startingBeads],
         }
       }
     }
@@ -160,33 +161,12 @@ export default {
           `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
       }
 
-      return edgePaths
-    },
-    nodePaths() {
-      let paths = new Array(this.size)
       for (let node = 0; node < this.size; node++) {
-        paths[node] = `M ${this.nodeXs[node]} ${this.nodeYs[node]} v -1e-5`
+        edgePaths[[node, node].toString()] =
+          `M ${this.nodeXs[node]} ${this.nodeYs[node]} v -1e-5`
       }
 
-      let nodeAnimations = new Uint8Array(this.size)
-      for (let [id, node] of this.beads.entries()) {
-        nodeAnimations[node] = this.animations[id]
-      }
-
-      for (let i = this.loopStart; i < this.loopEnd; i++) {
-        let a = this.history[i], b = this.history[i + 1]
-        let path = this.edgePaths[[b, a].toString()]
-
-        if (nodeAnimations[a] == 1 || nodeAnimations[a] == 2) {
-          paths[a] = path
-        }
-
-        if (nodeAnimations[b] == 3 || nodeAnimations[b] == 4) {
-          paths[b] = path
-        }
-      }
-
-      return paths
+      return edgePaths
     },
     headRadius() {
       return 0.1
@@ -246,6 +226,7 @@ export default {
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.animations[id] = 1 + this.animations[id] % 2
+      this.oldBeads[id] = this.tail
 
       // first choice: go back instead
       if (
@@ -312,6 +293,7 @@ export default {
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
         this.animations[id] = 3 + this.animations[id] % 2
+        this.oldBeads[id] = this.hole
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
@@ -374,7 +356,7 @@ export default {
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
           :class="{bead: true, tail: node == tail, animate: animations[id] == 1, animate2: animations[id] == 2, animate3: animations[id] == 3, animate4: animations[id] == 4 }"
-          :style="{ 'offset-path': `path('${nodePaths[node]}')` }"
+          :style="{ 'offset-path': `path('${edgePaths[(animations[id] >= 3 ? [node, oldBeads[id]] : [oldBeads[id], node]).toString()]}')` }"
         />
       </g>
     </svg>
