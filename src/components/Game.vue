@@ -163,7 +163,7 @@ export default {
 
       for (let node = 0; node < this.size; node++) {
         edgePaths[[node, node].toString()] =
-          `M ${this.nodeXs[node]} ${this.nodeYs[node]} v -1e-5`
+          `M ${this.nodeXs[node]} ${this.nodeYs[node]}`
       }
 
       return edgePaths
@@ -237,6 +237,7 @@ export default {
         if (this.history.length <= 2) {
           // reached beginning, time to go forward again
           this.history.pop()
+          this.animations[id] += 2
         } else if (this.history[0] == this.tail) {
           // reverse the loop
           this.history.pop()
@@ -248,6 +249,7 @@ export default {
           // default is to continue going back
           this.history[this.history.length - 1] =
             this.history[this.history.length - 3]
+          this.animations[id] += 2
           return
         }
       }
@@ -355,8 +357,8 @@ export default {
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3 }"
-          :style="{ 'offset-path': `path('${edgePaths[(animations[id] >= 3 ? [node, oldBeads[id]] : [oldBeads[id], node]).toString()]}')` }"
+          :class="{bead: true, tail: node == tail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
+          :style="{ 'offset-path': `path('${edgePaths[(historyIndices[node * size + oldBeads[id]] <= 0 && node == tail ? [hole, tail] : [oldBeads[id], node]).toString()]}')` }"
         />
       </g>
     </svg>
@@ -397,25 +399,34 @@ export default {
   stroke-linecap: butt;
   transition: d 0.5s;
 }
+/*
+tail onPath undo loop reverse offset-rotate
+0    0                        -90deg
+0    1                0       auto
+0    1                1       reverse
+1    0      0                 reverse
+1           1    0    0       auto
+1           1    0    1       reverse
+1           1    1            reverse
+1    1      0                 auto
+*/
 .bead {
   stroke-width: 0;
   stroke: var(--color-text);
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke-width 0.5s;
-  offset-distance: 0%;
+  offset-distance: 100%;
   offset-rotate: -90deg;
 }
 .bead.onPath {
   offset-rotate: auto;
 }
+.bead.onPath.reverse {
+  offset-rotate: reverse;
+}
 .bead.animate {
   animation: slide 2s ease forwards;
-  offset-distance: 100%;
-}
-.bead.animate.reverse {
-  animation: slide 2s ease forwards reverse;
-  offset-distance: 0%;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
@@ -431,5 +442,18 @@ export default {
 .bead.tail {
   stroke-width: 0.04;
   transition: none;
+  offset-rotate: reverse;
+}
+.bead.tail.onPath {
+  offset-rotate: auto;
+}
+.bead.tail.undo {
+  offset-rotate: auto;
+}
+.bead.tail.undo.reverse {
+  offset-rotate: reverse;
+}
+.bead.tail.undo.loop {
+  offset-rotate: reverse;
 }
 </style>
