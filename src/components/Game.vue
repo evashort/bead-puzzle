@@ -168,12 +168,24 @@ export default {
         paths[node] = `M ${this.nodeXs[node]} ${this.nodeYs[node]} v -1e-5`
       }
 
-      for (let i = this.loopStart; i < this.loopEnd; i++) {
-        let a = this.history[i], b = this.history[i + 1]
-        paths[a] = this.edgePaths[[b, a].toString()]
+      let nodeAnimations = new Uint8Array(this.size)
+      for (let [id, node] of this.beads.entries()) {
+        nodeAnimations[node] = this.animations[id]
       }
 
-      paths[this.tail] = this.edgePaths[[this.tail, this.hole].toString()]
+      for (let i = this.loopStart; i < this.loopEnd; i++) {
+        let a = this.history[i], b = this.history[i + 1]
+        let path = this.edgePaths[[b, a].toString()]
+
+        if (nodeAnimations[a] == 1 || nodeAnimations[a] == 2) {
+          paths[a] = path
+        }
+
+        if (nodeAnimations[b] == 3 || nodeAnimations[b] == 4) {
+          paths[b] = path
+        }
+      }
+
       return paths
     },
     headRadius() {
@@ -233,7 +245,7 @@ export default {
     goForward() {
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
-      this.animations[id] = [1, 2, 1][this.animations[id]]
+      this.animations[id] = 1 + this.animations[id] % 2
 
       // first choice: go back instead
       if (
@@ -299,7 +311,7 @@ export default {
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
-        this.animations[id] = [1, 2, 1][this.animations[id]]
+        this.animations[id] = 3 + this.animations[id] % 2
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
@@ -352,16 +364,16 @@ export default {
       </mask>
       <path
         v-for="edge of edges"
-        :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: (edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole) }"
+        :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) }"
         :d="edgePaths[edge.toString()]"
         fill="none"
-        v-bind:mask="(edge[0] == this.hole && edge[1] == this.tail) || (edge[0] == this.tail && edge[1] == this.hole) ? 'none' : 'url(#head-mask)'"
+        v-bind:mask="(edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) ? 'none' : 'url(#head-mask)'"
       />
       <g v-for="(node, id) of beads">
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail, animate: this.animations[id] == 1, animate2: this.animations[id] == 2 }"
+          :class="{bead: true, tail: node == tail, animate: animations[id] == 1, animate2: animations[id] == 2, animate3: animations[id] == 3, animate4: animations[id] == 4 }"
           :style="{ 'offset-path': `path('${nodePaths[node]}')` }"
         />
       </g>
@@ -409,10 +421,15 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke-width 0.5s;
-  offset-distance: 100%;
+  offset-distance: 0%;
 }
 .bead.animate {
   animation: slide 2s ease forwards;
+  offset-distance: 100%;
+}
+.bead.animate3 {
+  animation: slide 2s ease forwards reverse;
+  offset-distance: 0%;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
@@ -420,6 +437,11 @@ export default {
 }
 .bead.animate2 {
   animation: slide2 2s ease forwards;
+  offset-distance: 100%;
+}
+.bead.animate4 {
+  animation: slide2 2s ease forwards reverse;
+  offset-distance: 0%;
 }
 @keyframes slide2 {
   from { offset-distance: 0%; }
@@ -428,7 +450,5 @@ export default {
 .bead.tail {
   stroke-width: 0.04;
   transition: none;
-  animation-direction: reverse;
-  offset-distance: 0%;
 }
 </style>
