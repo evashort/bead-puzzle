@@ -24,6 +24,7 @@ export default {
           history: [hole, tail],
           animations: new Uint8Array(this.startingBeads.length),
           oldBeads: [...this.startingBeads],
+          oldFirstEdge: [hole, tail],
         }
       }
     }
@@ -168,6 +169,11 @@ export default {
 
       return edgePaths
     },
+    edgeTruncated() {
+      let startNode = this.history[this.loopStart]
+      return this.history[this.loopEnd] != startNode &&
+        this.history.lastIndexOf(startNode) > this.loopStart
+    },
     headRadius() {
       return 0.1
     },
@@ -223,6 +229,8 @@ export default {
       return row.indexOf(1) // arbitrary edge
     },
     goForward() {
+      this.oldFirstEdge = this.history.slice(0, 2)
+
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.animations[id] = 1 + this.animations[id] % 2
@@ -290,6 +298,8 @@ export default {
       }
     },
     goBack() {
+      this.oldFirstEdge = this.history.slice(0, 2)
+
       if (this.history.length > 2) {
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
@@ -303,6 +313,8 @@ export default {
       }
     },
     selectLeft() {
+      this.oldFirstEdge = this.history.slice(0, 2)
+
       // iterate counterclockwise and choose the first edge
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
@@ -313,6 +325,8 @@ export default {
       }
     },
     selectRight() {
+      this.oldFirstEdge = this.history.slice(0, 2)
+
       // iterate counterclockwise and choose the first edge
       for (let i = 1; i <= this.size; i++) {
         let newTail = (this.tail + i) % this.size
@@ -329,14 +343,9 @@ export default {
 <template>
   <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()">
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
-      <path class="head"
-        :d="headPath"
-        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
-        fill="none"
-      />
-      <mask id="head-mask">
-        <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
+      <defs>
         <path
+          id="head-path"
           :d="headPath"
           :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
           fill="none"
@@ -345,13 +354,33 @@ export default {
           stroke-linecap="round"
           stroke-linejoin="round"
         />
+      </defs>
+      <path class="head"
+        :d="headPath"
+        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
+        fill="none"
+      />
+      <mask id="head-mask">
+        <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
+        <use href="#head-path"></use>
+      </mask>
+      <mask id="truncate-mask">
+        <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
+        <circle
+          :cx="nodeXs[oldFirstEdge[0]]"
+          :cy="nodeYs[oldFirstEdge[0]]"
+          :r="edgeTruncated ? 0.25 : 0"
+          fill="black"
+          :style="{'transition': 'r 0.5s'}">
+        </circle>
+        <use href="#head-path"></use>
       </mask>
       <path
         v-for="edge of edges"
         :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) }"
         :d="edgePaths[edge.toString()]"
         fill="none"
-        v-bind:mask="(edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) ? 'none' : 'url(#head-mask)'"
+        v-bind:mask="(edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g v-for="(node, id) of beads">
         <path
@@ -426,7 +455,7 @@ tail onPath undo loop reverse offset-rotate
   offset-rotate: reverse;
 }
 .bead.animate {
-  animation: slide 2s ease forwards;
+  animation: slide 0.75s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
