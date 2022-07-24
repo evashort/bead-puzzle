@@ -355,7 +355,7 @@ export default {
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail, animate: animations[id] == 1, animate2: animations[id] == 2, animate3: animations[id] == 3, animate4: animations[id] == 4 }"
+          :class="{bead: true, tail: node == tail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] == 1, animate2: animations[id] == 2, animate3: animations[id] == 3, animate4: animations[id] == 4 }"
           :style="{ 'offset-path': `path('${edgePaths[(animations[id] >= 3 ? [node, oldBeads[id]] : [oldBeads[id], node]).toString()]}')` }"
         />
       </g>
@@ -404,6 +404,10 @@ export default {
   stroke-linejoin: round;
   transition: stroke-width 0.5s;
   offset-distance: 0%;
+  offset-rotate: -90deg;
+}
+.bead.onPath {
+  offset-rotate: auto;
 }
 .bead.animate {
   animation: slide 2s ease forwards;
