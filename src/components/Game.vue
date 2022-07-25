@@ -25,6 +25,7 @@ export default {
           animations: new Uint8Array(this.startingBeads.length),
           oldBeads: [...this.startingBeads],
           oldFirstEdge: [hole, tail],
+          showTail: true,
         }
       }
     }
@@ -53,7 +54,7 @@ export default {
     },
     loopEnd() {
       if (this.history.length <= 2) {
-        return this.history.length - 1
+        return this.history.length - 1 - !this.showTail
       }
 
       if (this.tail == this.history[this.history.length - 3]) {
@@ -64,7 +65,7 @@ export default {
         return this.history.length - 2 // continuing loop
       }
 
-      return this.history.length - 1
+      return this.history.length - 1 - !this.showTail
     },
     loopStart() {
       let sentinel = this.history[this.loopEnd]
@@ -171,8 +172,12 @@ export default {
     },
     edgeTruncated() {
       let startNode = this.history[this.loopStart]
-      return this.history[this.loopEnd] != startNode &&
-        this.history.lastIndexOf(startNode) > this.loopStart
+      if (this.history[this.loopEnd] == startNode) {
+        return false
+      }
+
+      let next = this.history.indexOf(startNode, this.loopStart + 1)
+      return next >= 0 && next < this.loopEnd
     },
     headRadius() {
       return 0.1
@@ -229,6 +234,16 @@ export default {
       return row.indexOf(1) // arbitrary edge
     },
     goForward() {
+      if (
+        !this.showTail && (
+          this.history[0] != this.hole || this.history[1] != this.tail ||
+          this.history.length <= 2
+        )
+      ) {
+        this.showTail = true
+        return
+      }
+
       this.oldFirstEdge = this.history.slice(0, 2)
 
       let id = this.beads.indexOf(this.tail)
@@ -313,6 +328,11 @@ export default {
       }
     },
     selectLeft() {
+      if (!this.showTail) {
+        this.showTail = true
+        return
+      }
+
       this.oldFirstEdge = this.history.slice(0, 2)
 
       // iterate counterclockwise and choose the first edge
@@ -325,6 +345,11 @@ export default {
       }
     },
     selectRight() {
+      if (!this.showTail) {
+        this.showTail = true
+        return
+      }
+
       this.oldFirstEdge = this.history.slice(0, 2)
 
       // iterate counterclockwise and choose the first edge
@@ -336,12 +361,15 @@ export default {
         }
       }
     },
+    showHideTail() {
+      this.showTail = !this.showTail
+    },
   }
 }
 </script>
 
 <template>
-  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()">
+  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @keydown.0.stop.prevent="showHideTail()">
     <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
       <defs>
         <path
@@ -355,14 +383,16 @@ export default {
           stroke-linejoin="round"
         />
       </defs>
-      <path class="head"
+      <path
+        v-if="showTail"
+        class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
         fill="none"
       />
       <mask id="head-mask">
         <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
-        <use href="#head-path"></use>
+        <use v-if="showTail" href="#head-path"></use>
       </mask>
       <mask id="truncate-mask">
         <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
@@ -373,20 +403,20 @@ export default {
           fill="black"
           :style="{'transition': 'r 0.5s'}">
         </circle>
-        <use href="#head-path"></use>
+        <use v-if="showTail" href="#head-path"></use>
       </mask>
       <path
         v-for="edge of edges"
-        :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) }"
+        :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: ((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail }"
         :d="edgePaths[edge.toString()]"
         fill="none"
-        v-bind:mask="(edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
+        v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g v-for="(node, id) of beads">
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
+          :class="{bead: true, tail: node == tail && showTail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
           :style="{ 'offset-path': `path('${edgePaths[(historyIndices[node * size + oldBeads[id]] <= 0 && node == tail ? [hole, tail] : [oldBeads[id], node]).toString()]}')` }"
         />
       </g>
