@@ -218,21 +218,6 @@ export default {
       let factor = len3 > 0 ? 1 / len3 : 0
       return [dx3 * factor, dy3 * factor]
     },
-    getFromNode(node) {
-      if (
-        this.history.length >= 3 &&
-        node == this.history[this.history.length - 3]
-      ) {
-        return this.hole
-      }
-
-      let row = new Uint8Array(
-        this.matrix,
-        this.size * node * this.matrix.BYTES_PER_ELEMENT,
-        this.size,
-      )
-      return row.indexOf(1) // arbitrary edge
-    },
     goForward() {
       if (
         !this.showTail && (
@@ -244,6 +229,9 @@ export default {
         return
       }
 
+      this.goForwardHelp()
+    },
+    goForwardHelp() {
       this.oldFirstEdge = this.history.slice(0, 2)
 
       let id = this.beads.indexOf(this.tail)
@@ -364,13 +352,35 @@ export default {
     showHideTail() {
       this.showTail = !this.showTail
     },
+    clicked(event) {
+      this.showTail = false
+      let gameView = document.getElementById('game-view')
+      let x = event.offsetX / gameView.clientWidth * 2.4 - 1.2
+      let y = event.offsetY / gameView.clientHeight * 2.4 - 1.2
+      for (let i = 0; i < this.size; i++) {
+        if (this.matrix[this.size * this.hole + i] || i == this.hole) {
+          let dx = this.nodeXs[i] - x
+          let dy = this.nodeYs[i] - y
+          if (dx * dx + dy * dy < 0.4 * 0.4) {
+            if (i == this.hole) {
+              this.goBack()
+            } else {
+              this.history[this.history.length - 1] = i
+              this.goForwardHelp()
+            }
+
+            return
+          }
+        }
+      }
+    },
   }
 }
 </script>
 
 <template>
-  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @keydown.0.stop.prevent="showHideTail()">
-    <svg class="gameView" viewBox="-1.2 -1.2 2.4 2.4">
+  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @keydown.space.stop.prevent="showHideTail()" @click.stop.prevent="clicked">
+    <svg class="gameView" id="game-view" viewBox="-1.2 -1.2 2.4 2.4">
       <defs>
         <path
           id="head-path"
