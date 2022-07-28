@@ -91,7 +91,7 @@ export default {
       let xs = new Float64Array(this.size)
       for (let i = 0; i < this.size; i++) {
         // avoid vertical edges because of rendering bug for masked paths
-        xs[i] = Math.sin(2 * Math.PI * i / this.size + 0.00001)
+        xs[i] = 100 * Math.sin(2 * Math.PI * i / this.size + 0.02)
       }
 
       return xs
@@ -99,7 +99,7 @@ export default {
     nodeYs() {
       let ys = new Float64Array(this.size)
       for (let i = 0; i < this.size; i++) {
-        ys[i] = -Math.cos(2 * Math.PI * i / this.size + 0.00001)
+        ys[i] = -100 * Math.cos(2 * Math.PI * i / this.size + 0.02)
       }
 
       return ys
@@ -131,7 +131,7 @@ export default {
       return [xs, ys]
     },
     edgePaths() {
-      let controlLength = 0.3
+      let controlLength = 30
       let edgePaths = {}
       let [dxs, dys] = this.tangents
       let offset = this.loopStart
@@ -180,7 +180,7 @@ export default {
       return next >= 0 && next < this.loopEnd
     },
     headRadius() {
-      return 0.1
+      return 10
     },
     headHeight() {
       return this.headRadius * Math.sqrt(1.5)
@@ -193,7 +193,7 @@ export default {
       return this.edgePaths[[this.hole, this.tail].toString()]
     },
     beadRadius() {
-      return 0.1
+      return 10
     },
     beadHeight() {
       return this.beadRadius * Math.sqrt(3)
@@ -355,13 +355,13 @@ export default {
     clicked(event) {
       this.showTail = false
       let gameView = document.getElementById('game-view')
-      let x = event.offsetX / gameView.clientWidth * 2.4 - 1.2
-      let y = event.offsetY / gameView.clientHeight * 2.4 - 1.2
+      let x = event.offsetX / gameView.clientWidth * 240 - 120
+      let y = event.offsetY / gameView.clientHeight * 240 - 120
       for (let i = 0; i < this.size; i++) {
         if (this.matrix[this.size * this.hole + i] || i == this.hole) {
           let dx = this.nodeXs[i] - x
           let dy = this.nodeYs[i] - y
-          if (dx * dx + dy * dy < 0.4 * 0.4) {
+          if (dx * dx + dy * dy < 40 * 40) {
             if (i == this.hole) {
               this.goBack()
             } else {
@@ -380,15 +380,15 @@ export default {
 
 <template>
   <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @keydown.space.stop.prevent="showHideTail()" @click.stop.prevent="clicked">
-    <svg class="gameView" id="game-view" viewBox="-1.2 -1.2 2.4 2.4">
+    <svg class="gameView" id="game-view" viewBox="-120 -120 240 240">
       <defs>
         <path
           id="head-path"
           :d="headPath"
-          :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
+          :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
           fill="none"
           stroke="black"
-          stroke-width="0.18"
+          stroke-width="18"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
@@ -397,19 +397,19 @@ export default {
         v-if="showTail"
         class="head"
         :d="headPath"
-        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 1.6}%` }"
+        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
         fill="none"
       />
       <mask id="head-mask">
-        <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
+        <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use v-if="showTail" href="#head-path"></use>
       </mask>
       <mask id="truncate-mask">
-        <rect x="-1.3" y="-1.3" width="2.6" height="2.6" fill="white"></rect>
+        <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <circle
           :cx="nodeXs[oldFirstEdge[0]]"
           :cy="nodeYs[oldFirstEdge[0]]"
-          :r="edgeTruncated ? 0.25 : 0"
+          :r="edgeTruncated ? 25 : 0"
           fill="black"
           :style="{'transition': 'r 0.5s'}">
         </circle>
@@ -423,10 +423,19 @@ export default {
         v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g v-for="(node, id) of beads">
+        <image
+          href="../assets/star.svg"
+          x="-12.5"
+          y="-12.5"
+          width="25"
+          height="25"
+          :class="{bead: true, tail: node == tail && showTail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
+          :style="{ 'transform': 'rotate(90deg)', 'offset-path': `path('${edgePaths[(historyIndices[node * size + oldBeads[id]] <= 0 && node == tail ? [hole, tail] : [oldBeads[id], node]).toString()]}')` }"
+        />
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, tail: node == tail && showTail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
+          :class="{bead: true, outline: true, tail: node == tail && showTail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
           :style="{ 'offset-path': `path('${edgePaths[(historyIndices[node * size + oldBeads[id]] <= 0 && node == tail ? [hole, tail] : [oldBeads[id], node]).toString()]}')` }"
         />
       </g>
@@ -447,24 +456,24 @@ export default {
 }
 .head {
   stroke: var(--color-text);
-  stroke-width: 0.06;
+  stroke-width: 6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .edge {
   stroke: var(--color-text);
-  stroke-width: 0.04;
+  stroke-width: 4;
   stroke-linecap: round;
   transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, stroke-width 0.5s, d 0.5s;
-  stroke-dasharray: 0.04 0.12;
+  stroke-dasharray: 4 12;
 }
 .edge.active {
-  stroke-width: 0.035;
-  stroke-dasharray: 0.16 0;
-  stroke-dashoffset: 0.06;
+  stroke-width: 3.5;
+  stroke-dasharray: 16 0;
+  stroke-dashoffset: 6;
 }
 .edge.arrow {
-  stroke-width: 0.06;
+  stroke-width: 6;
   stroke-linecap: butt;
   transition: d 0.5s;
 }
@@ -479,12 +488,14 @@ tail onPath undo loop reverse offset-rotate
 1           1    1            reverse
 1    1      0                 auto
 */
-.bead {
+.bead.outline {
   stroke-width: 0;
   stroke: var(--color-text);
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke-width 0.5s;
+}
+.bead {
   offset-distance: 100%;
   offset-rotate: -90deg;
 }
@@ -508,9 +519,11 @@ tail onPath undo loop reverse offset-rotate
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.bead.tail {
-  stroke-width: 0.04;
+.bead.outline.tail {
+  stroke-width: 4;
   transition: none;
+}
+.bead.tail {
   offset-rotate: reverse;
 }
 .bead.tail.onPath {
