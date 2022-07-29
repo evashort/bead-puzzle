@@ -198,6 +198,39 @@ export default {
     beadHeight() {
       return this.beadRadius * Math.sqrt(3)
     },
+    beadClasses() {
+      return this.beads.map(
+        function(node, id, beads) {
+          return {
+            bead: true,
+            tail: node == this.tail && this.showTail,
+            onPath: this.historyIndices[
+              node * this.size + this.oldBeads[id]
+            ] > 0,
+            animate: this.animations[id] > 0,
+            alternate: this.animations[id] % 2,
+            reverse: this.animations[id] >= 3,
+            undo: this.oldBeads[id] == this.hole,
+            loop: this.hole == this.history[0],
+          }
+        },
+        this,
+      )
+    },
+    beadOffsetPaths() {
+      return this.beads.map(
+        function(node, id, beads) {
+          let edge =
+            this.historyIndices[node * this.size + this.oldBeads[id]] <= 0 &&
+            node == this.tail ?
+            [this.hole, this.tail] :
+            [this.oldBeads[id], node]
+          let path = this.edgePaths[edge.toString()]
+          return `path('${path}')`
+        },
+        this,
+      )
+    },
   },
   methods: {
     getTangent(i, j, k) {
@@ -425,18 +458,18 @@ export default {
       <g v-for="(node, id) of beads">
         <image
           href="../assets/star.svg"
-          x="-12.5"
-          y="-12.5"
-          width="25"
-          height="25"
-          :class="{bead: true, tail: node == tail && showTail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
-          :style="{ 'transform': 'rotate(90deg)', 'offset-path': `path('${edgePaths[(historyIndices[node * size + oldBeads[id]] <= 0 && node == tail ? [hole, tail] : [oldBeads[id], node]).toString()]}')` }"
+          x="-5"
+          y="-5"
+          width="10"
+          height="10"
+          :class="beadClasses[id]"
+          :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[id] }"
         />
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
           :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
-          :class="{bead: true, outline: true, tail: node == tail && showTail, onPath: historyIndices[node * size + oldBeads[id]] > 0, animate: animations[id] > 0, alternate: animations[id] % 2, reverse: animations[id] >= 3, undo: oldBeads[id] == hole, loop: hole == history[0] }"
-          :style="{ 'offset-path': `path('${edgePaths[(historyIndices[node * size + oldBeads[id]] <= 0 && node == tail ? [hole, tail] : [oldBeads[id], node]).toString()]}')` }"
+          :class="{ ...beadClasses[id], outline: true }"
+          :style="{ 'offset-path': beadOffsetPaths[id] }"
         />
       </g>
     </svg>
