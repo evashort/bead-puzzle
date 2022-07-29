@@ -455,19 +455,30 @@ export default {
         fill="none"
         v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
+      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
+        href="../assets/heart.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[0] }"
+      />
+      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[1]"
+        href="../assets/butterfly.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[1] }"
+      />
+      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
+        href="../assets/leaf.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[2] }"
+      />
+      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
+        href="../assets/fish.svg"
+        :style="{ 'transform': 'scale(2.5)', 'offset-path': beadOffsetPaths[3] }"
+      />
+      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
+        href="../assets/flower.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[4] }"
+      />
       <g v-for="(node, id) of beads">
-        <image
-          href="../assets/star.svg"
-          x="-5"
-          y="-5"
-          width="10"
-          height="10"
-          :class="beadClasses[id]"
-          :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[id] }"
-        />
         <path
           :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
-          :fill="['red', 'green', 'blue', 'indigo', 'pink'][id]"
+          fill="none"
           :class="{ ...beadClasses[id], outline: true }"
           :style="{ 'offset-path': beadOffsetPaths[id] }"
         />
