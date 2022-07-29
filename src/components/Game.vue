@@ -457,27 +457,27 @@ export default {
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
         href="../assets/heart.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[0] }"
+        :style="{ 'transform': 'rotate(90deg) scale(2.7)', 'offset-path': beadOffsetPaths[0] }"
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[1]"
         href="../assets/butterfly.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[1] }"
+        :style="{ 'transform': 'rotate(90deg) scale(2.8)', 'offset-path': beadOffsetPaths[1] }"
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
         href="../assets/leaf.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[2] }"
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
-        href="../assets/fish.svg"
-        :style="{ 'transform': 'scale(2.5)', 'offset-path': beadOffsetPaths[3] }"
+        href="../assets/drop.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(3.1)', 'offset-path': beadOffsetPaths[3] }"
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
         href="../assets/flower.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[4] }"
       />
       <g v-for="(node, id) of beads">
-        <path
-          :d="`M ${0.5 * beadHeight} 0 L ${-0.5 * beadHeight} ${beadRadius} V ${-beadRadius} Z`"
+        <circle
+          :r="2 * beadRadius"
           fill="none"
           :class="{ ...beadClasses[id], outline: true }"
           :style="{ 'offset-path': beadOffsetPaths[id] }"
