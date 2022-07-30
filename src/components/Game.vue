@@ -468,8 +468,8 @@ export default {
         :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[2] }"
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
-        href="../assets/drop.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(3.1)', 'offset-path': beadOffsetPaths[3] }"
+        href="../assets/mushroom.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.65)', 'offset-path': beadOffsetPaths[3] }"
       />
       <image x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
         href="../assets/flower.svg"

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="240mm"
+   height="240mm"
+   viewBox="0 0 240 240"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="mushroom.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#181818"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#353535"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.26362494"
+     inkscape:cx="447.6056"
+     inkscape:cy="-77.761989"
+     inkscape:window-width="1133"
+     inkscape:window-height="1008"
+     inkscape:window-x="778"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect1058"
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.264999"
+       d="m 88.629731,133.98196 c -2.335179,16.54983 -8.93599,21.33866 -13.076124,35.01345 -25.46358,74.76906 109.715883,81.38132 94.410623,7.06361 -1.22343,-12.8103 -9.29595,-22.01213 -12.63532,-41.57524 z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.249878px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 99.083684,79.805611 c 0,0 -6.3026,46.121469 -14.052987,51.176339 -19.585229,0.6978 -18.726711,23.54282 -5.978258,24.91094 27.260991,2.92555 65.688791,4.34249 87.747151,-0.93759 11.24091,-2.69073 13.45964,-22.274 -6.54736,-23.50455 -6.76115,-4.28635 -15.98747,-52.276978 -15.98747,-52.276978 l -45.181076,0.631837 z"
+       id="path1002"
+       sodipodi:nodetypes="ccsscccc" />
+    <path
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 21.26943,101.85423 C 65.232688,118.50101 162.29047,113.86827 215.86772,99.552995 236.93785,93.923285 233.428,65.814019 201.00627,57.780364 176.43992,51.693162 152.34813,-9.7255829 78.010495,32.238096 22.939087,63.325968 -8.5729468,90.554345 21.26943,101.85423 Z"
+       id="path242"
+       sodipodi:nodetypes="sssss" />
+    <path
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 78.358473,36.903226 C 76.335504,20.069686 94.238666,14.225746 104.2617,23.064515 100.46494,35.012042 89.662048,38.97473 78.358473,36.903226 Z"
+       id="path1787"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 136.21401,27.542632 c 4.05089,-16.46362 42.97501,-0.384526 36.44384,16.66986 -12.0594,0.715463 -30.42668,-6.284975 -36.44384,-16.66986 z"
+       id="path1814"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 183.56815,50.564516 c 6.31574,-13.107733 29.89632,-3.161351 26.61291,13.483869 -9.11935,0.592689 -20.27708,-5.202687 -26.61291,-13.483869 z"
+       id="path1820"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:#4053d3;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 19.756594,77.648796 C 14.471809,65.331616 38.425057,45.695074 45.437191,56.039296 45.153145,66.983188 31.060164,79.7203 19.756594,77.648796 Z"
+       id="path1822"
+       sodipodi:nodetypes="ccc" />
+  </g>
+</svg>
