@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="240mm"
+   height="240mm"
+   viewBox="0 0 240 240"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="heart_outline.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#181818"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#353535"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.186411"
+     inkscape:cx="-305.77595"
+     inkscape:cy="565.95373"
+     inkscape:window-width="1281"
+     inkscape:window-height="1008"
+     inkscape:window-x="623"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="offset"
+       id="path-effect1090"
+       is_visible="true"
+       lpeversion="1.2"
+       linejoin_type="round"
+       unit="mm"
+       offset="-12"
+       miter_limit="4"
+       attempt_force_join="false"
+       update_on_knot_move="true" />
+    <linearGradient
+       id="linearGradient33711">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0.41260743"
+         id="stop33719" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0.56446993"
+         id="stop33721" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="offset"
+       id="path-effect33675"
+       is_visible="true"
+       lpeversion="1.2"
+       linejoin_type="miter"
+       unit="mm"
+       offset="-9"
+       miter_limit="4"
+       attempt_force_join="false"
+       update_on_knot_move="true" />
+    <inkscape:path-effect
+       effect="offset"
+       id="path-effect33671"
+       is_visible="true"
+       lpeversion="1.2"
+       linejoin_type="round"
+       unit="mm"
+       offset="-1.5"
+       miter_limit="4.1"
+       attempt_force_join="false"
+       update_on_knot_move="true" />
+    <inkscape:path-effect
+       effect="simplify"
+       id="path-effect15065"
+       is_visible="true"
+       lpeversion="1"
+       steps="33"
+       threshold="0.0035"
+       smooth_angles="280"
+       helper_size="15"
+       simplify_individual_paths="false"
+       simplify_just_coalesce="false" />
+    <inkscape:path-effect
+       effect="offset"
+       id="path-effect12883"
+       is_visible="true"
+       lpeversion="1.2"
+       linejoin_type="miter"
+       unit="mm"
+       offset="-4"
+       miter_limit="4"
+       attempt_force_join="false"
+       update_on_knot_move="true" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="display:inline;fill:#b51d14;fill-opacity:1;stroke:#ffffff;stroke-width:18.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-dasharray:none;paint-order:normal"
+       d="m 111.81436,46.58576 c 5.10042,5.525887 10.98491,5.966772 16.43464,0.656052 39.65538,-38.643849 108.77264,-14.040979 94.7575,53.301068 -8.96811,43.09133 -52.1473,71.66225 -87.03157,108.75982 -11.42764,12.15268 -19.27377,11.20944 -30.29046,0 C 64.293288,167.1873 25.722883,142.00261 18.907179,103.40264 5.4154487,26.993732 75.930869,7.708905 111.81436,46.58576 Z"
+       id="path3700"
+       sodipodi:nodetypes="sssssss" />
+  </g>
+</svg>
