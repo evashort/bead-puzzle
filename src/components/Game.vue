@@ -104,6 +104,26 @@ export default {
 
       return ys
     },
+    goalXs() {
+      let xs = new Float64Array(this.size)
+      xs[0] = this.nodeXs[0] + 30
+      xs[1] = this.nodeXs[1] + 30 * Math.sqrt(0.5)
+      xs[2] = this.nodeXs[2] + 30 * Math.sqrt(0.5)
+      xs[3] = this.nodeXs[3] + 30
+      xs[4] = this.nodeXs[4] - 30 * Math.sqrt(0.5)
+      xs[5] = this.nodeXs[5] - 30 * Math.sqrt(0.5)
+      return xs
+    },
+    goalYs() {
+      let ys = new Float64Array(this.size)
+      ys[0] = this.nodeYs[0]
+      ys[1] = this.nodeYs[1] - 30 * Math.sqrt(0.5)
+      ys[2] = this.nodeYs[2] + 30 * Math.sqrt(0.5)
+      ys[3] = this.nodeYs[3]
+      ys[4] = this.nodeYs[4] + 30 * Math.sqrt(0.5)
+      ys[5] = this.nodeYs[5] - 30 * Math.sqrt(0.5)
+      return ys
+    },
     tangents() {
       let count = this.loopEnd + 1 - this.loopStart
       let xs = new Float64Array(count)
@@ -425,6 +445,9 @@ export default {
           stroke-linecap="round"
           stroke-linejoin="round"
         />
+        <image id="check" x="-10" y="-10" width="20" height="20"
+          href="../assets/checkmark.svg"
+        />
       </defs>
       <path
         v-if="showTail"
@@ -482,6 +505,41 @@ export default {
           :class="{ ...beadClasses[id], outline: true }"
           :style="{ 'offset-path': beadOffsetPaths[id] }"
         />
+      </g>
+      <g :transform="`translate(${goalXs[1]},${goalYs[1]})`">
+        <image x="-3" y="-3" width="6" height="6"
+          href="../assets/heart_outline.svg"
+          :style="{ 'transform': `scale(2.7)` }"
+        />
+        <use :class="{ checkmark: true, checked: beads[0] == 1 }" href="#check"></use>
+      </g>
+      <g :transform="`translate(${goalXs[2]},${goalYs[2]})`">
+        <image x="-3" y="-3" width="6" height="6"
+          href="../assets/butterfly_outline.svg"
+          :style="{ 'transform': 'scale(2.8)' }"
+        />
+        <use :class="{ checkmark: true, checked: beads[1] == 2 }" href="#check"></use>
+      </g>
+      <g :transform="`translate(${goalXs[3]},${goalYs[3]})`">
+        <image x="-3" y="-3" width="6" height="6"
+          href="../assets/leaf_outline.svg"
+          :style="{ 'transform': 'scale(2.5)' }"
+        />
+        <use :class="{ checkmark: true, checked: beads[2] == 3 }" href="#check"></use>
+      </g>
+      <g :transform="`translate(${goalXs[4]},${goalYs[4]})`">
+        <image x="-3" y="-3" width="6" height="6"
+          href="../assets/mushroom_outline.svg"
+          :style="{ 'transform': 'scale(2.6)' }"
+        />
+        <use :class="{ checkmark: true, checked: beads[3] == 4 }" href="#check"></use>
+      </g>
+      <g :transform="`translate(${goalXs[5]},${goalYs[5]})`">
+        <image x="-3" y="-3" width="6" height="6"
+          href="../assets/flower_outline.svg"
+          :style="{ 'transform': 'scale(2.5)' }"
+        />
+        <use :class="{ checkmark: true, checked: beads[4] == 5 }" href="#check"></use>
       </g>
     </svg>
   </button>
@@ -581,5 +639,12 @@ tail onPath undo loop reverse offset-rotate
 }
 .bead.tail.undo.loop {
   offset-rotate: reverse;
+}
+.checkmark {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.checkmark.checked {
+  opacity: 1;
 }
 </style>
