@@ -5,7 +5,7 @@ import Game from './components/Game.vue'
 
 <template>
   <HelloWorld msg="Hello World" />
-  <Game :startingBeads="[2, 1, 3, 5, 4]" :edges="[[0, 1], [2, 3], [3, 4], [4, 5], [0, 5], [0, 2], [0, 4], [1, 3], [1, 4], [1, 5]]"/>
+  <Game :startingBeads="[2, 1, 3, 5, 4]" :edges="[[0, 1], [2, 3], [3, 4], [4, 5], [0, 5], [0, 2], [0, 4], [1, 3], [1, 4], [1, 5]]" :dustDuration="360" :dustCount="18"/>
 </template>
 
 <style>

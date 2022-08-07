@@ -1,3 +1,7 @@
+<script setup>
+import seedrandom from 'seedrandom'
+</script>
+
 <script>
 export default {
   data() {
@@ -15,6 +19,17 @@ export default {
       }
     }
 
+    let dustDelays = new Float64Array(this.dustCount)
+    let now = Date.now()
+    let dustIndex = Math.floor(
+      now * 0.001 / this.dustDuration * this.dustCount
+    )
+    for (let i = 0; i < this.dustCount; i++) {
+      let j = dustIndex - i
+      let startTime = j * this.dustDuration / this.dustCount
+      dustDelays[j % this.dustCount] = startTime - now * 0.001
+    }
+
     // iterate clockwise and choose the first edge
     for (let i = 1; i < size; i++) {
       let tail = (hole + i) % size
@@ -26,13 +41,30 @@ export default {
           oldBeads: [...this.startingBeads],
           oldFirstEdge: [hole, tail],
           showTail: true,
+          now: now,
+          dustDelays: dustDelays,
         }
       }
     }
   },
   props: {
     startingBeads: Array,
-    edges: Array
+    edges: Array,
+    dustDuration: Number,
+    dustCount: Number,
+  },
+  created() {
+    // https://newbedev.com/make-computed-vue-properties-dependent-on-current-time
+    var self = this
+    setInterval(function () {
+      let oldDustIndex = self.dustIndex
+      self.now = Date.now()
+      let j = self.dustIndex
+      if (j > oldDustIndex) {
+        let startTime = j * self.dustDuration / self.dustCount
+        self.dustDelays[j % self.dustCount] = startTime - self.now * 0.001
+      }
+    }, 1000)
   },
   computed: {
     size() {
@@ -251,6 +283,28 @@ export default {
         this,
       )
     },
+    dustIndex() {
+      return Math.floor(
+        this.now * 0.001 / this.dustDuration * this.dustCount
+      )
+    },
+    dust() {
+      let dust = new Array(this.dustCount)
+      for (let i = 0; i < this.dustCount; i++) {
+        let j = this.dustIndex - i
+        let generator = new seedrandom(j)
+        let angle = generator.quick() * 2 * Math.PI
+        let distance = 80 * Math.sqrt(generator.quick())
+        dust[j % this.dustCount] = {
+          j: j,
+          cx: distance * Math.cos(angle),
+          cy: distance * Math.sin(angle),
+          r: 3 + 5 * generator.quick(),
+        }
+      }
+
+      return dust
+    }
   },
   methods: {
     getTangent(i, j, k) {
@@ -456,6 +510,16 @@ export default {
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
         fill="none"
       />
+      <circle
+        v-for="(mote, i) of dust"
+        :cx="mote.cx"
+        :cy="mote.cy"
+        :r="mote.r"
+        :class="{dust: true, alternate: Math.floor(mote.j / dustCount) % 2}"
+        :style="{'animation-duration': `${dustDuration}s`, 'animation-delay': `${dustDelays[i]}s`}"
+        fill="darkgreen"
+        >
+      </circle>
       <mask id="head-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use v-if="showTail" href="#head-path"></use>
@@ -646,5 +710,32 @@ tail onPath undo loop reverse offset-rotate
 }
 .checkmark.checked {
   opacity: 1;
+}
+.dust {
+  animation-name: dustFade;
+  animation-fill-mode: forwards;
+}
+.dust.alternate {
+  animation-name: dustFade2;
+}
+@keyframes dustFade {
+  from { opacity: 0.00785; }
+  3% { opacity: 0.00785; }
+  10% { opacity: 0.01; }
+  45% { opacity: 1; }
+  65% { opacity: 1; }
+  90% { opacity: 0.01; }
+  97% { opacity: 0; }
+  to { opacity: 0; }
+}
+@keyframes dustFade2 {
+  from { opacity: 0.00785; }
+  3% { opacity: 0.00785; }
+  10% { opacity: 0.01; }
+  45% { opacity: 1; }
+  65% { opacity: 1; }
+  90% { opacity: 0.01; }
+  97% { opacity: 0; }
+  to { opacity: 0; }
 }
 </style>
