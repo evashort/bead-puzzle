@@ -374,7 +374,7 @@ def get_stem(graph, labels='abcdefghijklmnopqrstuvwxyz'):
 if __name__ == '__main__':
     folder = Path('graphs')
     folder.mkdir(exist_ok=True)
-    nodes = 6
+    nodes = 7
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)
     temp = np.empty_like(distances)
