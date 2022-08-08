@@ -307,11 +307,12 @@ export default {
           cx: distance * Math.cos(angle),
           cy: distance * Math.sin(angle),
           r: 3 + 5 * generator.quick(),
+          color: this.getDustColor(j, generator)
         }
       }
 
       return dust
-    }
+    },
   },
   methods: {
     getDustDuration(fast) {
@@ -321,6 +322,50 @@ export default {
       return Math.floor(
         (this.now - this.dustOrigin) * 0.001 / dustDuration * this.dustCount
       )
+    },
+    getDustColor(j, generator) {
+      let duration = 20
+      let uniformFraction = 0.3
+      let realms = [
+        {
+          chartreuse: 4,
+          yellow: 1,
+        },
+        {
+          red: 1,
+          orange: 2,
+        },
+        {
+          lightskyblue: 1,
+          fuchsia: 1,
+        },
+      ]
+      let realmIndex = Math.floor(j / duration)
+      let threshold = 1
+      let phase = j % duration - uniformFraction * duration
+      if (phase > 0) {
+        let remaining = duration * (1 - uniformFraction)
+        threshold = 0.5 * (1 + Math.cos(phase * Math.PI / remaining))
+      }
+
+      let sample = generator.quick()
+      if (sample > threshold) {
+        realmIndex++
+        sample = (sample - threshold) / (1 - threshold)
+      } else {
+        sample /= threshold
+      }
+      let realm = realms[realmIndex % realms.length]
+      sample *= Object.values(realm).reduce((a, b) => a + b)
+      let color, weight
+      for ([color, weight] of Object.entries(realm)) {
+        sample -= weight
+        if (sample < 0) {
+          break
+        }
+      }
+
+      return color
     },
     getTangent(i, j, k) {
       let x1 = this.nodeXs[i], y1 = this.nodeYs[i]
@@ -566,7 +611,7 @@ export default {
           :cx="mote.cx"
           :cy="mote.cy"
           :r="mote.r"
-          fill="chartreuse"
+          :fill="mote.color"
           :style="{'transition-property': 'filter', 'transition-duration': '2s', 'filter': `brightness(${fast ? 100 : 50}%)`}"
           >
         </circle>
