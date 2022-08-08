@@ -1,5 +1,7 @@
 import itertools
+import json
 import numpy as np
+from pathlib import Path
 
 def get_hole_slice(n, i):
     # if you have an array containing (in lexicographic order) all possible
@@ -222,10 +224,7 @@ def get_good_graphs(nodes):
 def get_initial_distances(graph, out=None):
     graph = np.asanyarray(graph)
     if out is None:
-        out = np.empty(
-            2 * (np.product(np.arange(1, len(graph) + 1)),),
-            dtype=np.float16,
-        )
+        out = get_empty_distances(len(graph))
 
     out.fill(float('inf'))
     range_view = np.arange(len(out)).reshape(range(len(graph), 0, -1))
@@ -238,6 +237,12 @@ def get_initial_distances(graph, out=None):
 
     np.fill_diagonal(out, 0)
     return out
+
+def get_empty_distances(nodes):
+    return np.empty(
+        2 * (np.product(np.arange(1, nodes + 1)),),
+        dtype=np.float16,
+    )
 
 def get_swap_slices(n, i):
     if 0 <= i < n - 1:
@@ -317,7 +322,7 @@ def get_rotation_slice(n):
     result *= np.arange(n)
     return result
 
-def get_max_distance_and_puzzles(n, distances, distinct_rotations):
+def get_max_distance_and_puzzles_help(n, distances, distinct_rotations):
     rotation_slice = get_rotation_slice(n)[distinct_rotations]
     # we can require the final permutation to be a rotation of 0123...n
     # without losing generality
@@ -338,35 +343,81 @@ def get_max_distance_and_puzzles(n, distances, distinct_rotations):
 
     return max_distance, puzzles
 
-def get_graphs_and_puzzles(nodes):
-    distances = None
-    out = None
-    temp = None
-    for graph in get_good_graphs(nodes):
-        distances = get_initial_distances(graph, out=distances)
-        if out is None:
-            out = np.empty_like(distances)
+def get_max_distance_and_puzzles(graph, distances=None, out=None, temp=None):
+    distances = get_initial_distances(graph, out=distances)
+    if out is None:
+        out = np.empty_like(distances)
 
-        if temp is None:
-            temp = np.empty_like(distances)
+    if temp is None:
+        temp = np.empty_like(distances)
 
-        out.reshape(-1)[0] = 1
-        while out.any():
-            get_distance_product(distances, distances, out, temp)
-            distances, out = out, distances
-            np.not_equal(distances, out, out=out)
+    out.reshape(-1)[0] = 1
+    while out.any():
+        get_distance_product(distances, distances, out, temp)
+        distances, out = out, distances
+        np.not_equal(distances, out, out=out)
 
-        max_distance, puzzles = get_max_distance_and_puzzles(
-            nodes,
-            distances,
-            get_distinct_rotations(graph),
-        )
+    max_distance, puzzles = get_max_distance_and_puzzles_help(
+        len(graph),
+        distances,
+        get_distinct_rotations(graph),
+    )
 
-        yield graph, max_distance, puzzles
+    return max_distance, puzzles
+
+def get_stem(graph, labels='abcdefghijklmnopqrstuvwxyz'):
+    return '_'.join(
+        f'{labels[x]}{labels[y]}' for x, y in zip(*np.nonzero(graph)) if x < y
+    )
+
 
 if __name__ == '__main__':
-    for graph, max_distance, puzzles in get_graphs_and_puzzles(6):
-        print(graph)
-        print(max_distance)
-        for start, rotation in puzzles:
-            print(rotation, ''.join(map(str, start)), '-> 0123')
+    folder = Path('graphs')
+    folder.mkdir(exist_ok=True)
+    nodes = 6
+    distances = get_empty_distances(nodes)
+    out = np.empty_like(distances)
+    temp = np.empty_like(distances)
+    for i, graph in enumerate(get_good_graphs(nodes)):
+        stem = get_stem(graph)
+        print(f'{i + 1} {stem}')
+        path = folder / f'{stem}.json'
+        result = None
+        try:
+            f = open(path, encoding='utf-8')
+        except FileNotFoundError:
+            pass
+        else:
+            with f:
+                try:
+                    result = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    pass
+
+        if result is None:
+            max_distance, puzzles = get_max_distance_and_puzzles(
+                graph,
+                distances=distances,
+                out=out,
+                temp=temp
+            )
+            result = {
+                'nodes': nodes,
+                'edges': [
+                    [int(x), int(y)] # avoid the following error:
+                    # TypeError: Object of type int64 is not JSON serializable
+                    for x, y in zip(*np.nonzero(graph)) if x < y
+                ],
+                'puzzles': [
+                    {
+                        'beads': [start.index(i) for i in range(1, nodes)],
+                        'rotation': int(rotation),
+                    }
+                    for start, rotation in puzzles
+                ],
+                'distance': max_distance,
+            }
+            with open(path, 'w', encoding='utf-8') as g:
+                json.dump(result, g, indent=4)
+
+        print(json.dumps(result, indent=4))
