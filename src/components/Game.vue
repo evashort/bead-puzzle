@@ -567,7 +567,7 @@ export default {
           :cy="mote.cy"
           :r="mote.r"
           fill="chartreuse"
-          :style="{'transition-property': 'opacity', 'transition-duration': '2s', 'opacity': fast ? 1 : 0.5}"
+          :style="{'transition-property': 'filter', 'transition-duration': '2s', 'filter': `brightness(${fast ? 100 : 50}%)`}"
           >
         </circle>
       </g>
