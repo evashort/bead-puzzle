@@ -20,14 +20,16 @@ export default {
     }
 
     let dustDelays = new Float64Array(this.dustCount)
+    // higher origin reduces numerical instability introduced by going fast
+    let dustOrigin = 946713600000 // year 2000
     let now = Date.now()
     let dustIndex = Math.floor(
-      now * 0.001 / this.dustDuration * this.dustCount
+      (now - dustOrigin) * 0.001 / this.baseDustDuration * this.dustCount
     )
     for (let i = 0; i < this.dustCount; i++) {
       let j = dustIndex - i
-      let startTime = j * this.dustDuration / this.dustCount
-      dustDelays[j % this.dustCount] = startTime - now * 0.001
+      let startTime = j * this.baseDustDuration / this.dustCount
+      dustDelays[j % this.dustCount] = startTime - (now - dustOrigin) * 0.001
     }
 
     // iterate clockwise and choose the first edge
@@ -43,6 +45,8 @@ export default {
           showTail: true,
           now: now,
           dustDelays: dustDelays,
+          dustOrigin: dustOrigin,
+          fast: false,
         }
       }
     }
@@ -50,7 +54,7 @@ export default {
   props: {
     startingBeads: Array,
     edges: Array,
-    dustDuration: Number,
+    baseDustDuration: Number,
     dustCount: Number,
   },
   created() {
@@ -62,9 +66,11 @@ export default {
       let j = self.dustIndex
       if (j > oldDustIndex) {
         let startTime = j * self.dustDuration / self.dustCount
-        self.dustDelays[j % self.dustCount] = startTime - self.now * 0.001
+        self.dustDelays[j % self.dustCount] = startTime - 0.001 * (
+          self.now - self.dustOrigin
+        )
       }
-    }, 1000)
+    }, 100)
   },
   computed: {
     size() {
@@ -283,10 +289,11 @@ export default {
         this,
       )
     },
+    dustDuration() {
+      return this.getDustDuration(this.fast)
+    },
     dustIndex() {
-      return Math.floor(
-        this.now * 0.001 / this.dustDuration * this.dustCount
-      )
+      return this.getDustIndex(this.dustDuration)
     },
     dust() {
       let dust = new Array(this.dustCount)
@@ -307,6 +314,14 @@ export default {
     }
   },
   methods: {
+    getDustDuration(fast) {
+      return this.baseDustDuration * (fast ? 0.02 : 1)
+    },
+    getDustIndex(dustDuration) {
+      return Math.floor(
+        (this.now - this.dustOrigin) * 0.001 / dustDuration * this.dustCount
+      )
+    },
     getTangent(i, j, k) {
       let x1 = this.nodeXs[i], y1 = this.nodeYs[i]
       let x2 = this.nodeXs[j], y2 = this.nodeYs[j]
@@ -343,6 +358,7 @@ export default {
 
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
+      this.checkWin()
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
 
@@ -414,6 +430,7 @@ export default {
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
+        this.checkWin()
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         if (this.history[0] == this.tail) {
@@ -481,7 +498,37 @@ export default {
         }
       }
     },
-  }
+    checkWin() {
+      for (let [id, node] of this.beads.entries()) {
+        if (node != id + 1) {
+          this.fast = false
+          return
+        }
+      }
+
+      this.fast = true
+    },
+  },
+  watch: {
+    fast(newFast, oldFast) {
+      let oldDuration = this.getDustDuration(oldFast)
+      let newDuration = this.getDustDuration(newFast)
+      let oldIndex = this.getDustIndex(oldDuration)
+      let oldOrigin = this.dustOrigin
+      this.now = Date.now()
+      // change dustOrigin to keep dustIndex constant
+      // dustIndex = (now - dustOrigin) / dustDuration
+      // dustOrigin = now - dustIndex * newDuration
+      let factor = newDuration / oldDuration
+      this.dustOrigin = this.now * (1 - factor) + this.dustOrigin * factor
+      for (let i = 0; i < this.dustCount; i++) {
+        let j = oldIndex - i
+        let startTime = j * oldDuration / this.dustCount
+        let oldDelay = startTime - 0.001 * (this.now - oldOrigin)
+        this.dustDelays[j % this.dustCount] = oldDelay * factor
+      }
+    }
+  },
 }
 </script>
 
@@ -510,16 +557,20 @@ export default {
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
         fill="none"
       />
-      <circle
+      <g
         v-for="(mote, i) of dust"
-        :cx="mote.cx"
-        :cy="mote.cy"
-        :r="mote.r"
-        :class="{dust: true, alternate: Math.floor(mote.j / dustCount) % 2}"
+        :class="{dust: true, alternate: Math.floor(mote.j / dustCount) % 2 != fast}"
         :style="{'animation-duration': `${dustDuration}s`, 'animation-delay': `${dustDelays[i]}s`}"
-        fill="darkgreen"
-        >
-      </circle>
+      >
+        <circle
+          :cx="mote.cx"
+          :cy="mote.cy"
+          :r="mote.r"
+          fill="chartreuse"
+          :style="{'transition-property': 'opacity', 'transition-duration': '2s', 'opacity': fast ? 1 : 0.5}"
+          >
+        </circle>
+      </g>
       <mask id="head-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use v-if="showTail" href="#head-path"></use>
