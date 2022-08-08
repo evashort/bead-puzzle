@@ -2,6 +2,7 @@ import itertools
 import json
 import numpy as np
 from pathlib import Path
+import sys
 
 def get_hole_slice(n, i):
     # if you have an array containing (in lexicographic order) all possible
@@ -372,13 +373,19 @@ def get_stem(graph, labels='abcdefghijklmnopqrstuvwxyz'):
 
 
 if __name__ == '__main__':
+    process_count = 1 if len(sys.argv) < 2 else int(sys.argv[1])
+    process_index = 0 if len(sys.argv) < 3 else int(sys.argv[2])
+    print(f'process {process_index + 1} of {process_count}', flush=True)
     folder = Path('graphs')
     folder.mkdir(exist_ok=True)
-    nodes = 5
+    nodes = 7
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)
     temp = np.empty_like(distances)
     for i, graph in enumerate(get_good_graphs(nodes)):
+        if i % process_count != process_index:
+            continue
+
         stem = get_stem(graph)
         print(f'{i + 1} {stem}')
         path = folder / f'{stem}.json'
