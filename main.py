@@ -387,7 +387,7 @@ if __name__ == '__main__':
             continue
 
         stem = get_stem(graph)
-        print(f'{i + 1} {stem}')
+        print(f'{i + 1} {stem}', flush=True)
         path = folder / f'{stem}.json'
         result = None
         try:
@@ -426,5 +426,3 @@ if __name__ == '__main__':
             }
             with open(path, 'w', encoding='utf-8') as g:
                 json.dump(result, g, indent=4)
-
-        print(json.dumps(result, indent=4))
