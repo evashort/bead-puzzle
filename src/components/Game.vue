@@ -571,6 +571,8 @@ export default {
         }
       }
 
+      this.checkWin()
+
       // iterate clockwise and choose the first edge
       for (let i = 1; i < this.size; i++) {
         let tail = (hole + i) % this.size
