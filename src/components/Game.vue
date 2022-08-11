@@ -555,6 +555,32 @@ export default {
     },
   },
   watch: {
+    startingBeads(newStartingBeads, oldStartingBeads) {
+      this.beads = [...newStartingBeads]
+      this.oldBeads = [...newStartingBeads]
+      this.animations = new Uint8Array(this.beads.length)
+      let beadSet = new Set(this.beads)
+      let hole = 0
+      for (; beadSet.has(hole); hole++) { }
+      let holeRow = new Uint8Array(this.size)
+      for (let [a, b] of this.edges) {
+        if (a == hole) {
+          holeRow[b] = 1
+        } else if (b == hole) {
+          holeRow[a] = 1
+        }
+      }
+
+      // iterate clockwise and choose the first edge
+      for (let i = 1; i < this.size; i++) {
+        let tail = (hole + i) % this.size
+        if (holeRow[tail]) {
+          this.history = [hole, tail]
+          this.oldFirstEdge = [hole, tail]
+          return
+        }
+      }
+    },
     fast(newFast, oldFast) {
       let oldDuration = this.getDustDuration(oldFast)
       let newDuration = this.getDustDuration(newFast)
@@ -633,32 +659,33 @@ export default {
       </mask>
       <path
         v-for="edge of edges"
+        :key="`${edge.toString()},${size}`"
         :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: ((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail }"
         :d="edgePaths[edge.toString()]"
         fill="none"
         v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
-      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
+      <image v-if="size > 1" x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
         href="../assets/heart.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.7)', 'offset-path': beadOffsetPaths[0] }"
       />
-      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[1]"
+      <image v-if="size > 2" x="-5" y="-5" width="10" height="10" :class="beadClasses[1]"
         href="../assets/butterfly.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.8)', 'offset-path': beadOffsetPaths[1] }"
       />
-      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
+      <image v-if="size > 3" x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
         href="../assets/leaf.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[2] }"
       />
-      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
+      <image v-if="size > 4" x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
         href="../assets/mushroom.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.6)', 'offset-path': beadOffsetPaths[3] }"
       />
-      <image x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
+      <image v-if="size > 5" x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
         href="../assets/flower.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[4] }"
       />
-      <g v-for="(node, id) of beads">
+      <g v-for="(node, id) of beads" :key="id">
         <circle
           :r="2 * beadRadius"
           fill="none"
@@ -666,35 +693,35 @@ export default {
           :style="{ 'offset-path': beadOffsetPaths[id] }"
         />
       </g>
-      <g :transform="`translate(${goalXs[1]},${goalYs[1]})`">
+      <g v-if="size > 1" :transform="`translate(${goalXs[1]},${goalYs[1]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/heart_outline.svg"
           :style="{ 'transform': `scale(2.7)` }"
         />
         <use :class="{ checkmark: true, checked: beads[0] == 1 }" href="#check"></use>
       </g>
-      <g :transform="`translate(${goalXs[2]},${goalYs[2]})`">
+      <g v-if="size > 2" :transform="`translate(${goalXs[2]},${goalYs[2]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/butterfly_outline.svg"
           :style="{ 'transform': 'scale(2.8)' }"
         />
         <use :class="{ checkmark: true, checked: beads[1] == 2 }" href="#check"></use>
       </g>
-      <g :transform="`translate(${goalXs[3]},${goalYs[3]})`">
+      <g v-if="size > 3" :transform="`translate(${goalXs[3]},${goalYs[3]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/leaf_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
         <use :class="{ checkmark: true, checked: beads[2] == 3 }" href="#check"></use>
       </g>
-      <g :transform="`translate(${goalXs[4]},${goalYs[4]})`">
+      <g v-if="size > 4" :transform="`translate(${goalXs[4]},${goalYs[4]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/mushroom_outline.svg"
           :style="{ 'transform': 'scale(2.6)' }"
         />
         <use :class="{ checkmark: true, checked: beads[3] == 4 }" href="#check"></use>
       </g>
-      <g :transform="`translate(${goalXs[5]},${goalYs[5]})`">
+      <g v-if="size > 5" :transform="`translate(${goalXs[5]},${goalYs[5]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/flower_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
