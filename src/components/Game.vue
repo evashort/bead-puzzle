@@ -150,6 +150,7 @@ export default {
       xs[3] = this.nodeXs[3] + 30
       xs[4] = this.nodeXs[4] - 30 * Math.sqrt(0.5)
       xs[5] = this.nodeXs[5] - 30 * Math.sqrt(0.5)
+      xs[6] = this.nodeXs[6] - 30 * Math.sqrt(0.5)
       return xs
     },
     goalYs() {
@@ -160,6 +161,7 @@ export default {
       ys[3] = this.nodeYs[3]
       ys[4] = this.nodeYs[4] + 30 * Math.sqrt(0.5)
       ys[5] = this.nodeYs[5] - 30 * Math.sqrt(0.5)
+      ys[6] = this.nodeYs[6] - 30 * Math.sqrt(0.5)
       return ys
     },
     tangents() {
@@ -676,16 +678,20 @@ export default {
         :style="{ 'transform': 'rotate(90deg) scale(2.8)', 'offset-path': beadOffsetPaths[1] }"
       />
       <image v-if="size > 3" x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
-        href="../assets/leaf.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[2] }"
+        href="../assets/saturn.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(3.35)', 'offset-path': beadOffsetPaths[2] }"
       />
       <image v-if="size > 4" x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
-        href="../assets/mushroom.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.6)', 'offset-path': beadOffsetPaths[3] }"
+        href="../assets/leaf.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[3] }"
       />
       <image v-if="size > 5" x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
+        href="../assets/mushroom.svg"
+        :style="{ 'transform': 'rotate(90deg) scale(2.6)', 'offset-path': beadOffsetPaths[4] }"
+      />
+      <image v-if="size > 6" x="-5" y="-5" width="10" height="10" :class="beadClasses[5]"
         href="../assets/flower.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[4] }"
+        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[5] }"
       />
       <g v-for="(node, id) of beads" :key="id">
         <circle
@@ -711,24 +717,31 @@ export default {
       </g>
       <g v-if="size > 3" :transform="`translate(${goalXs[3]},${goalYs[3]})`">
         <image x="-3" y="-3" width="6" height="6"
-          href="../assets/leaf_outline.svg"
-          :style="{ 'transform': 'scale(2.5)' }"
+          href="../assets/saturn_outline.svg"
+          :style="{ 'transform': 'scale(3.35)' }"
         />
         <use :class="{ checkmark: true, checked: beads[2] == 3 }" href="#check"></use>
       </g>
       <g v-if="size > 4" :transform="`translate(${goalXs[4]},${goalYs[4]})`">
         <image x="-3" y="-3" width="6" height="6"
-          href="../assets/mushroom_outline.svg"
-          :style="{ 'transform': 'scale(2.6)' }"
+          href="../assets/leaf_outline.svg"
+          :style="{ 'transform': 'scale(2.5)' }"
         />
         <use :class="{ checkmark: true, checked: beads[3] == 4 }" href="#check"></use>
       </g>
       <g v-if="size > 5" :transform="`translate(${goalXs[5]},${goalYs[5]})`">
         <image x="-3" y="-3" width="6" height="6"
+          href="../assets/mushroom_outline.svg"
+          :style="{ 'transform': 'scale(2.6)' }"
+        />
+        <use :class="{ checkmark: true, checked: beads[4] == 5 }" href="#check"></use>
+      </g>
+      <g v-if="size > 6" :transform="`translate(${goalXs[6]},${goalYs[6]})`">
+        <image x="-3" y="-3" width="6" height="6"
           href="../assets/flower_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
-        <use :class="{ checkmark: true, checked: beads[4] == 5 }" href="#check"></use>
+        <use :class="{ checkmark: true, checked: beads[5] == 6 }" href="#check"></use>
       </g>
     </svg>
   </button>
