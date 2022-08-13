@@ -142,26 +142,34 @@ export default {
 
       return ys
     },
+    goalAngles() {
+      return [
+        [],
+        [90],
+        [80, 100],
+        [80, 15, -15],
+        [80, 170, 100, 190],
+        [80, 15, 105, 255, -15],
+        [80, 15, 165, 105, 195, -15],
+        [80, 40, 170, 105, 255, 195, -40],
+      ]
+    },
     goalXs() {
       let xs = new Float64Array(this.size)
-      xs[0] = this.nodeXs[0] + 30
-      xs[1] = this.nodeXs[1] + 30 * Math.sqrt(0.5)
-      xs[2] = this.nodeXs[2] + 30 * Math.sqrt(0.5)
-      xs[3] = this.nodeXs[3] + 30
-      xs[4] = this.nodeXs[4] - 30 * Math.sqrt(0.5)
-      xs[5] = this.nodeXs[5] - 30 * Math.sqrt(0.5)
-      xs[6] = this.nodeXs[6] - 30 * Math.sqrt(0.5)
+      let angles = this.goalAngles[this.size]
+      for (let i = 0; i < this.size; i++) {
+        xs[i] = this.nodeXs[i] + 30 * Math.sin(angles[i] * Math.PI / 180)
+      }
+
       return xs
     },
     goalYs() {
       let ys = new Float64Array(this.size)
-      ys[0] = this.nodeYs[0]
-      ys[1] = this.nodeYs[1] - 30 * Math.sqrt(0.5)
-      ys[2] = this.nodeYs[2] + 30 * Math.sqrt(0.5)
-      ys[3] = this.nodeYs[3]
-      ys[4] = this.nodeYs[4] + 30 * Math.sqrt(0.5)
-      ys[5] = this.nodeYs[5] - 30 * Math.sqrt(0.5)
-      ys[6] = this.nodeYs[6] - 30 * Math.sqrt(0.5)
+      let angles = this.goalAngles[this.size]
+      for (let i = 0; i < this.size; i++) {
+        ys[i] = this.nodeYs[i] - 30 * Math.cos(angles[i] * Math.PI / 180)
+      }
+
       return ys
     },
     tangents() {
