@@ -15,8 +15,11 @@ export default {
     startingIndex: Number
   },
   computed: {
+    graphs() {
+      return graphData.graphs
+    },
     graph() {
-      return graphData.graphs[this.index]
+      return this.graphs[this.index]
     },
     nodes() {
       return this.graph.nodes
@@ -48,9 +51,37 @@ export default {
 </script>
 
 <template>
-  <div style="text-align: center">
-    <input type="number" v-model="index"/>
-    <br/>
+  <div style="text-align: center;">
+    <div style="height: 40rem; overflow-y: scroll; display: inline-block;">
+      <fieldset>
+        <legend>Easy</legend>
+        <template v-for="i in 10">
+          <input
+            type="radio"
+            :value="i - 1"
+            v-model="index"
+            :id="`puzzle-${i}`"
+            name="puzzle"
+          />
+          <label :for="`puzzle-${i}`">{{i}}</label>
+          <br/>
+        </template>
+      </fieldset>
+      <fieldset>
+        <legend>Hard</legend>
+        <template v-for="i in graphs.length - 10">
+          <input
+            type="radio"
+            :value="i + 9"
+            v-model="index"
+            :id="`puzzle-${i + 10}`"
+            name="puzzle"
+          />
+          <label :for="`puzzle-${i + 10}`">{{i + 10}}</label>
+          <br/>
+        </template>
+      </fieldset>
+    </div>
     <Game :startingBeads="beads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
   </div>
 </template>
