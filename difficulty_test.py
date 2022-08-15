@@ -1,5 +1,7 @@
+import base64
 import collections
 import json
+import numpy as np
 from pathlib import Path
 import random
 
@@ -63,7 +65,7 @@ for i, src_path in enumerate(src_folder.iterdir()):
                 )
 
             total_difficulty += moves
-        
+
         difficulty = total_difficulty / iterations
         with open(dst_path, mode='w', encoding='utf-8') as f:
             json.dump(difficulty, f)
@@ -73,8 +75,36 @@ for i, src_path in enumerate(src_folder.iterdir()):
             difficulty = json.load(f)
 
     graph['difficulty'] = difficulty
+    n = graph['nodes']
+    triangle = np.zeros(n * (n - 1) // 2, dtype=bool)
+    for a, b in graph['edges']:
+        triangle[b * (b - 1) // 2 + a] = True
+    graph['id'] = base64.b64encode(np.packbits(triangle)).decode('ascii')
     graphs.append(graph)
 
 graphs.sort(key=lambda graph: graph['difficulty'])
+
+names_path = 'graph_names.json'
+id_names = None
+try:
+    f = open(names_path, encoding='utf-8')
+except FileNotFoundError:
+    id_names = {}
+else:
+    with f:
+        id_names = json.load(f)
+
+# sort by difficulty and add new graphs
+for graph in graphs:
+    id_names[graph['id']] = id_names.pop(graph['id'], '')
+
+with open(names_path, mode='w', encoding='utf-8') as f:
+    json.dump(id_names, f, indent=2)
+
+for graph in graphs:
+    graph['name'] = id_names[graph['id']]
+
+graphs = [graph for graph in graphs if graph['name'] is not None]
+
 with open(final_path, mode='w', encoding='utf-8') as f:
     json.dump({'graphs': graphs}, f)
