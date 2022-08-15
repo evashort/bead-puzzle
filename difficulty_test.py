@@ -1,9 +1,11 @@
 import base64
 import collections
+import itertools
 import json
 import numpy as np
 from pathlib import Path
 import random
+import sys
 
 iterations = 1000
 src_folder = Path('graphs')
@@ -83,6 +85,53 @@ for i, src_path in enumerate(src_folder.iterdir()):
     graphs.append(graph)
 
 graphs.sort(key=lambda graph: graph['difficulty'])
+
+size_graphs = {}
+for graph in graphs:
+    size_graphs.setdefault(graph['nodes'], []).append(graph)
+
+if len(sys.argv) > 1:
+    size_matrices = {}
+    size_permutations = {}
+    for size, graph_list in size_graphs.items():
+        matrices = np.zeros((len(graph_list), size, size), dtype=bool)
+        for i, graph in enumerate(graph_list):
+            edges = graph['edges']
+            matrices[
+                i,
+                sum(zip(*edges), start=()),
+                sum(list(zip(*edges))[::-1], start=()),
+            ] = True
+
+        matrices = matrices.reshape(len(graph_list), -1)
+        size_matrices[size] = matrices
+        permutations = np.array(
+            list(itertools.permutations(range(size)))
+        )
+        permutations = (
+            permutations[:, np.newaxis] + permutations[:, :, np.newaxis] * size
+        ).reshape(-1, size * size)
+        size_permutations[size] = permutations
+
+    # find less difficult subgraphs because they are better
+    # subgraphs are guaranteed to have at least as high distance
+    # x is a subgraph of y <=> not any(x & ~y) <=> x dot ~y == 0
+    for size, matrices in size_matrices.items():
+        permutations = size_permutations[size]
+        graph_list = size_graphs[size]
+        for i, matrix in enumerate(matrices):
+            superior = np.logical_not(
+                np.all(
+                    np.matmul(
+                        matrices[:i],
+                        (permutations * np.logical_not(matrix)).T,
+                    ),
+                    axis=1,
+                ),
+            )
+            graph_list[i]['superior'] = [
+                graph_list[j]['id'] for j in np.nonzero(superior)[0]
+            ]
 
 names_path = 'graph_names.json'
 id_names = None

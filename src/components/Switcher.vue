@@ -21,6 +21,14 @@ export default {
     graph() {
       return this.graphs[this.index]
     },
+    graphs_by_id() {
+      let result = {}
+      for (let graph of this.graphs) {
+        result[graph.id] = graph
+      }
+
+      return result
+    },
     nodes() {
       return this.graph.nodes
     },
@@ -52,6 +60,8 @@ export default {
 
 <template>
   <div style="text-align: center;">
+    {{graph.superior.map(id => graphs_by_id[id]?.name || id)}}
+    <br/>
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       <fieldset>
         <legend>Easy</legend>
