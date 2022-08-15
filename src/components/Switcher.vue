@@ -52,7 +52,7 @@ export default {
 
 <template>
   <div style="text-align: center;">
-    <div style="height: 40rem; overflow-y: scroll; display: inline-block;">
+    <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       <fieldset>
         <legend>Easy</legend>
         <template v-for="i in 10">
@@ -63,7 +63,9 @@ export default {
             :id="`puzzle-${i}`"
             name="puzzle"
           />
-          <label :for="`puzzle-${i}`">{{i}}</label>
+          <label :for="`puzzle-${i}`">
+            {{i}} {{graphs[i - 1].name || graphs[i - 1].id}}
+          </label>
           <br/>
         </template>
       </fieldset>
@@ -77,7 +79,9 @@ export default {
             :id="`puzzle-${i + 10}`"
             name="puzzle"
           />
-          <label :for="`puzzle-${i + 10}`">{{i + 10}}</label>
+          <label :for="`puzzle-${i + 10}`">
+            {{i + 10}} {{graphs[i + 9].name || graphs[i + 9].id}}
+          </label>
           <br/>
         </template>
       </fieldset>
