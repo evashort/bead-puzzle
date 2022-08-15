@@ -65,6 +65,7 @@ export default {
           />
           <label :for="`puzzle-${i}`">
             {{i}} {{graphs[i - 1].name || graphs[i - 1].id}}
+            {{graphs[i - 1].distance}}
           </label>
           <br/>
         </template>
@@ -81,6 +82,7 @@ export default {
           />
           <label :for="`puzzle-${i + 10}`">
             {{i + 10}} {{graphs[i + 9].name || graphs[i + 9].id}}
+            {{graphs[i + 9].distance}}
           </label>
           <br/>
         </template>
