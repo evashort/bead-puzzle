@@ -132,6 +132,27 @@ if len(sys.argv) > 1:
             graph_list[i]['superior'] = [
                 graph_list[j]['id'] for j in np.nonzero(superior)[0]
             ]
+else:
+    graphs_by_id = {graph['id']: graph for graph in graphs}
+    old_graphs = None
+    try:
+        f = open(final_path, encoding='utf-8')
+    except FileNotFoundError:
+        pass
+    else:
+        with f:
+            try:
+                old_graphs = json.load(f)
+            except json.decoder.JSONDecodeError:
+                pass
+
+    if old_graphs is not None:
+        for old_graph in old_graphs['graphs']:
+            graph = graphs_by_id[old_graph['id']]
+            try:
+                graph['superior'] = old_graph['superior']
+            except KeyError:
+                pass
 
 names_path = 'graph_names.json'
 id_names = None
