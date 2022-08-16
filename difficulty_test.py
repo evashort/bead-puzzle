@@ -123,7 +123,7 @@ if len(sys.argv) > 1:
                 np.all(
                     np.matmul(
                         matrices[:i],
-                        (permutations * np.logical_not(matrix)).T,
+                        np.logical_not(matrix)[permutations].T,
                     ),
                     axis=1,
                 ),
