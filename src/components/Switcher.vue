@@ -60,6 +60,7 @@ export default {
 
 <template>
   <div style="text-align: center;">
+    {{graph.loop ? 'Loop' : ''}}
     {{graph.superior.map(id => graphs_by_id[id]?.name || id)}}
     <br/>
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">

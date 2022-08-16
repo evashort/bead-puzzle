@@ -134,6 +134,25 @@ if len(sys.argv) > 1:
                 graph_list[j]['id'] for j in np.nonzero(superior)[0]
                 if graph_list[j]['distance'] >= distance
             ]
+
+        # flag graphs with a loop containing all nodes because they can be
+        # solved with a boring algorithm
+        loop_matrix = np.zeros(size * size, dtype=bool)
+        loop_matrix[1::size + 1] = True
+        loop_matrix[size::size + 1] = True
+        loop_matrix[size - 1] = True
+        loop_matrix[size * (size - 1)] = True
+        has_loop = np.logical_not(
+            np.all(
+                np.matmul(
+                    np.logical_not(matrices),
+                    loop_matrix[permutations].T,
+                ),
+                axis=1,
+            ),
+        )
+        for graph, loop in zip(graph_list, has_loop):
+            graph['loop'] = bool(loop)
 else:
     graphs_by_id = {graph['id']: graph for graph in graphs}
     old_graphs = None
