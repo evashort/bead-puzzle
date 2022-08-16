@@ -172,6 +172,7 @@ else:
             graph = graphs_by_id[old_graph['id']]
             try:
                 graph['superior'] = old_graph['superior']
+                graph['loop'] = old_graph['loop']
             except KeyError:
                 pass
 
