@@ -396,6 +396,10 @@ export default {
       return [dx3 * factor, dy3 * factor]
     },
     goForward() {
+      if (this.hole == this.tail) {
+        return
+      }
+
       if (
         !this.showTail && (
           this.history[0] != this.hole || this.history[1] != this.tail ||
@@ -409,6 +413,10 @@ export default {
       this.goForwardHelp()
     },
     goForwardHelp() {
+      if (this.hole == this.tail) {
+        return
+      }
+
       this.oldFirstEdge = this.history.slice(0, 2)
 
       let id = this.beads.indexOf(this.tail)
@@ -477,8 +485,22 @@ export default {
           return
         }
       }
+
+      // dead end
+      this.history.push(this.tail)
+      this.showTail = false
     },
     goBack() {
+      if (this.hole == this.tail) {
+        // tutorial levels have dead ends which cause the tail to be hidden
+        // even when using the keyboard. it's confusing if going back doesn't
+        // cause the tail to be shown again.
+        this.showTail = true
+      }
+
+      this.goBackHelp()
+    },
+    goBackHelp() {
       this.oldFirstEdge = this.history.slice(0, 2)
 
       if (this.history.length > 2) {
@@ -497,7 +519,9 @@ export default {
     selectLeft() {
       if (!this.showTail) {
         this.showTail = true
-        return
+        if (this.hole != this.tail) {
+          return
+        }
       }
 
       this.oldFirstEdge = this.history.slice(0, 2)
@@ -514,7 +538,9 @@ export default {
     selectRight() {
       if (!this.showTail) {
         this.showTail = true
-        return
+        if (this.hole != this.tail) {
+          return
+        }
       }
 
       this.oldFirstEdge = this.history.slice(0, 2)
@@ -542,7 +568,7 @@ export default {
           let dy = this.nodeYs[i] - y
           if (dx * dx + dy * dy < 40 * 40) {
             if (i == this.hole) {
-              this.goBack()
+              this.goBackHelp()
             } else {
               this.history[this.history.length - 1] = i
               this.goForwardHelp()

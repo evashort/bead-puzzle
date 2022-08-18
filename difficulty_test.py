@@ -198,5 +198,9 @@ for graph in graphs:
 
 graphs = [graph for graph in graphs if graph['name'] is not None]
 
+# put tutorial in order
+graphs[0], graphs[1] = graphs[1], graphs[0]
+graphs[2], graphs[3] = graphs[3], graphs[2]
+
 with open(final_path, mode='w', encoding='utf-8') as f:
     json.dump({'graphs': graphs}, f)

@@ -6,34 +6,48 @@ import graphData from '../assets/graphs.json'
 <script>
 export default {
   data() {
+    let groups = [
+      { name: '📖 Tutorial', stop: 3 },
+      { name: '🍰 Piece of cake', stop: 6 },
+      { name: '🍪 Soft baked', stop: 9 },
+      { name: '🥨 Stick with it', stop: 13 },
+      { name: '🥜 Crunch time', stop: 17 },
+      { name: '🌰 Tough nut to crack', stop: 21 },
+      { name: '🪵 Logjam', stop: 24 },
+      { name: '🪨 Rocky road', stop: 28 },
+      { name: '💎 Pure pressure', stop: 32 },
+    ]
+    let start = 0
+    for (let group of groups) {
+      group.start = start
+      start = group.stop
+    }
+
+    let idGraphs = {}
+    for (let graph of graphData.graphs) {
+      idGraphs[graph.id] = graph
+    }
+
     return {
-      index: this.startingIndex,
-      puzzleIndex: 0,
+      id: this.startingId,
+      variation: 0,
+      groups: groups,
+      graphs: graphData.graphs,
+      idGraphs: idGraphs,
     }
   },
   props: {
-    startingIndex: Number
+    startingId: String,
   },
   computed: {
-    graphs() {
-      return graphData.graphs
-    },
     graph() {
-      return this.graphs[this.index]
-    },
-    graphs_by_id() {
-      let result = {}
-      for (let graph of this.graphs) {
-        result[graph.id] = graph
-      }
-
-      return result
+      return this.idGraphs[this.id]
     },
     nodes() {
       return this.graph.nodes
     },
     puzzle() {
-      return this.graph.puzzles[this.puzzleIndex]
+      return this.graph.puzzles[this.variation]
     },
     rotation() {
       return this.puzzle.rotation
@@ -61,39 +75,25 @@ export default {
 <template>
   <div style="text-align: center;">
     {{graph.loop ? 'Loop' : ''}}
-    {{graph.superior.map(id => graphs_by_id[id]?.name || id)}}
+    {{graph.superior.map(id => idGraphs[id]?.name || id)}}
     <br/>
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
-      <fieldset>
-        <legend>Easy</legend>
-        <template v-for="i in 10">
+      <fieldset v-for="group in groups">
+        <legend>{{group.name}}</legend>
+        <template
+          v-for="(graph, j) in graphs.slice(group.start, group.stop)"
+          :key="graph.id"
+        >
           <input
             type="radio"
-            :value="i - 1"
-            v-model="index"
-            :id="`puzzle-${i}`"
-            name="puzzle"
+            :value="graph.id"
+            v-model="id"
+            :id="`level-${group.start + j}`"
+            name="level"
           />
-          <label :for="`puzzle-${i}`">
-            {{i}} {{graphs[i - 1].name || graphs[i - 1].id}}
-            {{graphs[i - 1].distance}}
-          </label>
-          <br/>
-        </template>
-      </fieldset>
-      <fieldset>
-        <legend>Hard</legend>
-        <template v-for="i in graphs.length - 10">
-          <input
-            type="radio"
-            :value="i + 9"
-            v-model="index"
-            :id="`puzzle-${i + 10}`"
-            name="puzzle"
-          />
-          <label :for="`puzzle-${i + 10}`">
-            {{i + 10}} {{graphs[i + 9].name || graphs[i + 9].id}}
-            {{graphs[i + 9].distance}}
+          <label :for="`level-${group.start + j}`">
+            {{group.start + j + 1}} {{graph.name || graph.id}}
+            {{graph.distance}} {{Math.round(graph.difficulty)}}
           </label>
           <br/>
         </template>

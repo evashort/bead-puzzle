@@ -3,7 +3,7 @@ import Switcher from './components/Switcher.vue';
 </script>
 
 <template>
-  <Switcher :startingIndex="0"></Switcher>
+  <Switcher startingId="HEQ="></Switcher>
 </template>
 
 <style>
