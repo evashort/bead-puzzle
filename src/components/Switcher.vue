@@ -8,14 +8,14 @@ export default {
   data() {
     let groups = [
       { name: '📖 Tutorial', stop: 3 },
-      { name: '🍰 Piece of cake', stop: 6 },
-      { name: '🍪 Soft baked', stop: 9 },
-      { name: '🥨 Stick with it', stop: 13 },
-      { name: '🥜 Crunch time', stop: 17 },
-      { name: '🌰 Tough nut to crack', stop: 21 },
-      { name: '🪵 Logjam', stop: 24 },
-      { name: '🪨 Rocky road', stop: 28 },
-      { name: '💎 Pure pressure', stop: 32 },
+      { name: '🍰 Piece of cake', stop: 7 },
+      { name: '🍪 Soft baked', stop: 11 },
+      { name: '🥨 Stick with it', stop: 15 },
+      { name: '🥜 Crunch time', stop: 19 },
+      { name: '🌰 Tough nut to crack', stop: 23 },
+      { name: '🪵 Logjam', stop: 27 },
+      { name: '🪨 Rocky road', stop: 31 },
+      { name: '💎 Pure pressure', stop: 35 },
     ]
     let start = 0
     for (let group of groups) {
