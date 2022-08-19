@@ -299,6 +299,9 @@ export default {
         this,
       )
     },
+    clickRadius() {
+      return 42
+    },
     dustDuration() {
       return this.getDustDuration(this.fast)
     },
@@ -565,7 +568,7 @@ export default {
         if (this.matrix[this.size * this.hole + i] || i == this.hole) {
           let dx = this.nodeXs[i] - x
           let dy = this.nodeYs[i] - y
-          if (dx * dx + dy * dy < 40 * 40) {
+          if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
             this.showTail = false
             if (i == this.hole) {
               this.goBackHelp()
@@ -668,6 +671,14 @@ export default {
           href="../assets/checkmark.svg"
         />
       </defs>
+      <circle
+        v-for="node in size"
+        fill="black"
+        :r="clickRadius"
+        :cx="nodeXs[node - 1]"
+        :cy="nodeYs[node - 1]"
+        :class="{touchCircle: true, active: this.matrix[size * hole + node - 1]}"
+      />
       <path
         v-if="showTail"
         class="head"
@@ -800,6 +811,11 @@ export default {
 .gameView {
   width: 40rem;
   height: 40rem;
+}
+.touchCircle {
+  stroke: var(--color-text);
+  stroke-width: 0.5;
+  stroke-opacity: 0.25;
 }
 .head {
   stroke: var(--color-text);
