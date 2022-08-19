@@ -660,7 +660,7 @@ export default {
           :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
           fill="none"
           stroke="black"
-          stroke-width="18"
+          stroke-width="12"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
@@ -701,13 +701,13 @@ export default {
           :r="edgeTruncated ? 25 : 0"
           fill="black"
           :style="{'transition': 'r 0.5s'}">
-        </circle>
+        </circle> 
         <use v-if="showTail" href="#head-path"></use>
       </mask>
       <path
         v-for="edge of edges"
         :key="`${edge.toString()},${size}`"
-        :class="{ edge: true, active: historyIndices[edge[0] * size + edge[1]] > 0, arrow: ((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail }"
+        :class="{ edge: true, active: (x => x > 0 && x < this.history.length - 1)(historyIndices[edge[0] * size + edge[1]]), arrow: ((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail }"
         :d="edgePaths[edge.toString()]"
         fill="none"
         v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
@@ -803,7 +803,7 @@ export default {
 }
 .head {
   stroke: var(--color-text);
-  stroke-width: 6;
+  stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -811,18 +811,17 @@ export default {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
-  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, stroke-width 0.5s, d 0.5s;
+  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, d 0.5s;
   stroke-dasharray: 4 12;
 }
+.edge.arrow {
+  stroke-dasharray: 8 8;
+  stroke-dashoffset: 2;
+  transition: d 0.5s;
+}
 .edge.active {
-  stroke-width: 3.5;
   stroke-dasharray: 16 0;
   stroke-dashoffset: 6;
-}
-.edge.arrow {
-  stroke-width: 6;
-  stroke-linecap: butt;
-  transition: d 0.5s;
 }
 /*
 tail onPath undo loop reverse offset-rotate
@@ -867,7 +866,7 @@ tail onPath undo loop reverse offset-rotate
   to { offset-distance: 100%; }
 }
 .bead.outline.tail {
-  stroke-width: 4;
+  stroke-width: 3;
   transition: none;
 }
 .bead.tail {
