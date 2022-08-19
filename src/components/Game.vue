@@ -280,7 +280,6 @@ export default {
             reverse: this.animations[id] >= 3,
             undo: this.oldBeads[id] == this.hole,
             loop: this.hole == this.history[0],
-            movable: this.matrix[this.size * this.hole + node],
           }
         },
         this,
@@ -676,6 +675,14 @@ export default {
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
         fill="none"
       />
+      <circle
+        v-if="showTail"
+        class="outline"
+        :r="2 * beadRadius"
+        fill="none"
+        :cx="nodeXs[tail]"
+        :cy="nodeYs[tail]"
+      />
       <g
         v-for="(mote, i) of dust"
         :class="{dust: true, alternate: Math.floor(mote.j / dustCount) % 2 != fast}"
@@ -737,14 +744,6 @@ export default {
         href="../assets/flower.svg"
         :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[5] }"
       />
-      <g v-for="(node, id) of beads" :key="id">
-        <circle
-          :r="2 * beadRadius"
-          fill="none"
-          :class="{ ...beadClasses[id], outline: true }"
-          :style="{ 'offset-path': beadOffsetPaths[id] }"
-        />
-      </g>
       <g v-if="size > 1" :transform="`translate(${goalXs[1]},${goalYs[1]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/heart_outline.svg"
@@ -812,17 +811,19 @@ export default {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
-  transition: stroke-dasharray 0.5s, stroke-dashoffset 0.5s, d 0.5s;
+  transition: d 0.5s;
   stroke-dasharray: 4 12;
 }
 .edge.arrow {
   stroke-dasharray: 8 8;
   stroke-dashoffset: 2;
-  transition: d 0.5s;
 }
 .edge.active {
-  stroke-dasharray: 16 0;
-  stroke-dashoffset: 6;
+  stroke-dasharray: none;
+}
+.outline {
+  stroke-width: 3;
+  stroke: var(--color-text);
 }
 /*
 tail onPath undo loop reverse offset-rotate
@@ -835,17 +836,6 @@ tail onPath undo loop reverse offset-rotate
 1           1    1            reverse
 1    1      0                 auto
 */
-.bead.outline {
-  stroke-width: 0;
-  stroke: var(--color-text);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 2 10;
-  transition: stroke-width 0.5s, stroke-dasharray 0.5s, stroke-dashoffset 0.5s;
-}
-.bead.outline.movable {
-  stroke-width: 3;
-}
 .bead {
   offset-distance: 100%;
   offset-rotate: -90deg;
@@ -855,9 +845,6 @@ tail onPath undo loop reverse offset-rotate
 }
 .bead.onPath.reverse {
   offset-rotate: reverse;
-}
-.bead.onPath.outline {
-  offset-rotate: -90deg;
 }
 .bead.animate {
   animation: slide 0.75s ease forwards;
@@ -872,12 +859,6 @@ tail onPath undo loop reverse offset-rotate
 @keyframes slide2 {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
-}
-.bead.outline.tail {
-  stroke-width: 3;
-  stroke-dasharray: 12 0;
-  stroke-dashoffset: 5;
-  transition: none;
 }
 .bead.tail {
   offset-rotate: reverse;
@@ -896,10 +877,12 @@ tail onPath undo loop reverse offset-rotate
 }
 .checkmark {
   opacity: 0;
-  transition: opacity 0.5s;
+  transition-property: opacity;
+  transition-delay: 0s;
 }
 .checkmark.checked {
   opacity: 1;
+  transition-delay: 0.35s;
 }
 .dust {
   animation-name: dustFade;
