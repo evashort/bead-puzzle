@@ -280,6 +280,7 @@ export default {
             reverse: this.animations[id] >= 3,
             undo: this.oldBeads[id] == this.hole,
             loop: this.hole == this.history[0],
+            movable: this.matrix[this.size * this.hole + node],
           }
         },
         this,
@@ -839,7 +840,11 @@ tail onPath undo loop reverse offset-rotate
   stroke: var(--color-text);
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: stroke-width 0.5s;
+  stroke-dasharray: 2 10;
+  transition: stroke-width 0.5s, stroke-dasharray 0.5s, stroke-dashoffset 0.5s;
+}
+.bead.outline.movable {
+  stroke-width: 3;
 }
 .bead {
   offset-distance: 100%;
@@ -850,6 +855,9 @@ tail onPath undo loop reverse offset-rotate
 }
 .bead.onPath.reverse {
   offset-rotate: reverse;
+}
+.bead.onPath.outline {
+  offset-rotate: -90deg;
 }
 .bead.animate {
   animation: slide 0.75s ease forwards;
@@ -867,6 +875,8 @@ tail onPath undo loop reverse offset-rotate
 }
 .bead.outline.tail {
   stroke-width: 3;
+  stroke-dasharray: 12 0;
+  stroke-dashoffset: 5;
   transition: none;
 }
 .bead.tail {
