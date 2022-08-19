@@ -42,7 +42,7 @@ export default {
           animations: new Uint8Array(this.startingBeads.length),
           oldBeads: [...this.startingBeads],
           oldFirstEdge: [hole, tail],
-          showTail: true,
+          showTail: false,
           now: now,
           dustDelays: dustDelays,
           dustOrigin: dustOrigin,
@@ -558,7 +558,6 @@ export default {
       this.showTail = !this.showTail
     },
     clicked(event) {
-      this.showTail = false
       let gameView = document.getElementById('game-view')
       let x = event.offsetX / gameView.clientWidth * 240 - 120
       let y = event.offsetY / gameView.clientHeight * 240 - 120
@@ -567,6 +566,7 @@ export default {
           let dx = this.nodeXs[i] - x
           let dy = this.nodeYs[i] - y
           if (dx * dx + dy * dy < 40 * 40) {
+            this.showTail = false
             if (i == this.hole) {
               this.goBackHelp()
             } else {
@@ -578,6 +578,15 @@ export default {
           }
         }
       }
+    },
+    buttonClicked() {
+      this.showTail = this.hole != this.tail
+    },
+    onFocus() {
+      this.showTail = this.hole != this.tail
+    },
+    onBlur() {
+      this.showTail = false
     },
     checkWin() {
       for (let [id, node] of this.beads.entries()) {
@@ -642,8 +651,8 @@ export default {
 </script>
 
 <template>
-  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @keydown.space.stop.prevent="showHideTail()" @click.stop.prevent="clicked">
-    <svg class="gameView" id="game-view" viewBox="-120 -120 240 240">
+  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @click="buttonClicked" @focus.native="onFocus" @blur.native="onBlur">
+    <svg class="gameView" id="game-view" viewBox="-120 -120 240 240" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"
