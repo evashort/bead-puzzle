@@ -69,6 +69,11 @@ export default {
   },
   methods: {
   },
+  watch: {
+    id(newId, oldId) {
+      this.variation = 0
+    },
+  },
 }
 </script>
 
@@ -100,5 +105,29 @@ export default {
       </fieldset>
     </div>
     <Game :startingBeads="beads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
+    <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
+      {{graph.name}}<br/>
+      Minimum: {{graph.distance}} moves<br/>
+      Brute force: {{Math.round(graph.difficulty)}} moves<br/>
+      <fieldset>
+        <legend>{{graph.puzzles.length}} variations</legend>
+        <template
+          v-for="(puzzle, i) in graph.puzzles"
+          :key="[graph.id, i]"
+        >
+          <input
+            type="radio"
+            :value="i"
+            v-model="variation"
+            :id="`variation-${i}`"
+            name="variation"
+          />
+          <label :for="`variation-${i}`">
+            V{{i}}
+          </label>
+          <br/>
+        </template>
+      </fieldset>
+    </div>
   </div>
 </template>
