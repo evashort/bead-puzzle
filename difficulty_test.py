@@ -142,7 +142,8 @@ if len(sys.argv) > 1:
         ).reshape(-1, size * size)
         size_permutations[size] = permutations
 
-    # find easier subgraphs with higher distance because they are better
+    # find easier subgraphs with higher distance and more states because they
+    # are better
     # x is a subgraph of y <=> not any(x & ~y) <=> x dot ~y == 0
     for size, matrices in size_matrices.items():
         permutations = size_permutations[size]
@@ -159,9 +160,11 @@ if len(sys.argv) > 1:
             )
             graph = graph_list[i]
             distance = graph['distance']
+            states = graph['states']
             graph['superior'] = [
                 graph_list[j]['id'] for j in np.nonzero(superior)[0]
-                if graph_list[j]['distance'] >= distance
+                if graph_list[j]['distance'] >= distance \
+                    and graph_list[j]['states'] >= states
             ]
 
         # flag graphs with a loop containing all nodes because they can be
