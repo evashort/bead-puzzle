@@ -77,6 +77,35 @@ for i, src_path in enumerate(src_folder.iterdir()):
             difficulty = json.load(f)
 
     graph['difficulty'] = difficulty
+
+    node_count = graph['nodes']
+    edges = {}
+    for a, b in graph['edges']:
+        edges.setdefault(a, set()).add(b)
+        edges.setdefault(b, set()).add(a)
+
+    # depth-first search all states reachable from goal
+    stack = [tuple(range(node_count))]
+    seen = set()
+    while stack:
+        state = stack.pop()
+        if state in seen:
+            continue
+
+        seen.add(state)
+        for node in edges[state.index(0)]:
+            chosen = state[node]
+            stack.append(
+                tuple(
+                    chosen if bead == 0
+                    else 0 if bead == chosen
+                    else bead
+                    for bead in state
+                )
+            )
+
+    graph['states'] = len(seen)
+
     n = graph['nodes']
     triangle = np.zeros(n * (n - 1) // 2, dtype=bool)
     for a, b in graph['edges']:

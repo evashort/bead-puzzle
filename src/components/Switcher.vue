@@ -109,6 +109,7 @@ export default {
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
       Brute force: {{Math.round(graph.difficulty)}} moves<br/>
+      State space: {{graph.states}} states<br/>
       <fieldset>
         <legend>{{graph.puzzles.length}} variations</legend>
         <template
