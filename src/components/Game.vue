@@ -41,7 +41,6 @@ export default {
           history: [hole, tail],
           animations: new Uint8Array(this.startingBeads.length),
           oldBeads: [...this.startingBeads],
-          oldFirstEdge: [hole, tail],
           showTail: false,
           now: now,
           dustDelays: dustDelays,
@@ -420,78 +419,77 @@ export default {
         return
       }
 
-      this.oldFirstEdge = this.history.slice(0, 2)
-
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.checkWin()
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
 
-      // first choice: go back instead
-      if (
-        this.history.length >= 3 &&
+      let wentBack = this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
-      ) {
+      if (wentBack) {
+        let loop = this.history[0] == this.hole
         this.history.pop()
-        if (this.history.length <= 2) {
-          // reached beginning, time to go forward again
-          this.history.pop()
-          this.animations[id] += 2
-        } else if (this.history[0] == this.tail) {
-          // reverse the loop
-          this.history.pop()
+        this.history.pop()
+        if (loop) {
           this.history.reverse()
           this.history.push(this.history[0])
-          this.history.push(this.history[1])
-          return
         } else {
-          // default is to continue going back
-          this.history[this.history.length - 1] =
-            this.history[this.history.length - 3]
           this.animations[id] += 2
-          return
         }
       }
 
-      // second choice: new tail continues the most recent loop
-      for (let offset = this.history.length - 4; offset >= 0; offset--) {
-        if (this.history[offset] == this.tail) {
-          // remove history before the loop
-          this.history = this.history.slice(offset)
-          this.history.push(this.history[1])
-          return
+      this.history = this.removeBeforeLoop(this.history)
+      this.history.push(this.getNextTail(this.history, wentBack))
+      if (this.hole == this.tail) {
+        this.showTail = false
+      }
+    },
+    removeBeforeLoop(history) {
+      let hole = history[history.length - 1]
+      for (let offset = history.length - 4; offset >= 0; offset--) {
+        if (history[offset] == hole) {
+          return history.slice(offset)
         }
+      }
+
+      return history
+    },
+    getNextTail(history, wentBack) {
+      let hole = history[history.length - 1]
+      let oldHole = history[history.length - 2]
+
+      // first choice: continue the loop
+      if (history[0] == hole && history.length >= 4) {
+        return history[1]
+      }
+
+      // second choice: keep going back
+      if (wentBack && history.length >= 2) {
+        return oldHole
       }
 
       // third choice: new tail creates the smallest possible loop
-      for (let i = this.history.length - 3; i >= 0; i--) {
-        let newTail = this.history[i]
+      for (let i = history.length - 3; i >= 0; i--) {
+        let tail = history[i]
         if (
-          newTail != this.hole && // going back shouldn't be the default.
-                                  // happens when old hole is start of loop.
-          this.matrix[this.tail * this.size + newTail]
-        ) {
-          this.history.push(newTail)
-          return
-        }
+          tail != oldHole && // going back shouldn't be the default.
+                             // happens when old hole is start of loop.
+          this.matrix[hole * this.size + tail]
+        ) { return tail }
       }
 
       // fourth choice: iterate clockwise and choose the first edge
       for (let i = 1; i < this.size; i++) {
-        let newTail = (this.tail + i) % this.size
+        let tail = (hole + i) % this.size
         if (
-          newTail != this.hole && // going back shouldn't be the default
-          this.matrix[this.tail * this.size + newTail]
-        ) {
-          this.history.push(newTail)
-          return
-        }
+          tail != oldHole && // going back shouldn't be the default
+          this.matrix[hole * this.size + tail]
+        ) { return tail }
       }
 
-      // dead end
-      this.history.push(this.tail)
-      this.showTail = false
+      // fifth choice: dead end
+      return hole
     },
     goBack() {
       if (this.hole == this.tail) {
@@ -504,8 +502,6 @@ export default {
       this.goBackHelp()
     },
     goBackHelp() {
-      this.oldFirstEdge = this.history.slice(0, 2)
-
       if (this.history.length > 2) {
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
@@ -527,8 +523,6 @@ export default {
         }
       }
 
-      this.oldFirstEdge = this.history.slice(0, 2)
-
       // iterate counterclockwise and choose the first edge
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
@@ -545,8 +539,6 @@ export default {
           return
         }
       }
-
-      this.oldFirstEdge = this.history.slice(0, 2)
 
       // iterate counterclockwise and choose the first edge
       for (let i = 1; i <= this.size; i++) {
@@ -626,7 +618,6 @@ export default {
         let tail = (hole + i) % this.size
         if (holeRow[tail]) {
           this.history = [hole, tail]
-          this.oldFirstEdge = [hole, tail]
           return
         }
       }
@@ -715,12 +706,12 @@ export default {
       <mask id="truncate-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <circle
-          :cx="nodeXs[oldFirstEdge[0]]"
-          :cy="nodeYs[oldFirstEdge[0]]"
+          :cx="nodeXs[history[0]]"
+          :cy="nodeYs[history[0]]"
           :r="edgeTruncated ? 25 : 0"
           fill="black"
           :style="{'transition': 'r 0.5s'}">
-        </circle> 
+        </circle>
         <use v-if="showTail" href="#head-path"></use>
       </mask>
       <path
@@ -729,7 +720,7 @@ export default {
         :class="{ edge: true, active: (x => x > 0 && x < this.history.length - 1)(historyIndices[edge[0] * size + edge[1]]), arrow: ((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail }"
         :d="edgePaths[edge.toString()]"
         fill="none"
-        v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == oldFirstEdge[0] && edge[1] == oldFirstEdge[1]) || (edge[0] == oldFirstEdge[1] && edge[1] == oldFirstEdge[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
+        v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <image v-if="size > 1" x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
         href="../assets/heart.svg"
