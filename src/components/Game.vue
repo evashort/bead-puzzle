@@ -247,6 +247,25 @@ export default {
       let r = this.headRadius, hr = 0.5 * this.headHeight
       return `M ${hr} ${-r} L ${-hr} ${0} L ${hr} ${r}`
     },
+    showHead() {
+      return this.hole != this.tail &&
+        this.matrix[this.hole * this.size + this.tail]
+    },
+    crossRadius() {
+      return 15
+    },
+    crossPath() {
+      let d = this.crossRadius * Math.sqrt(0.5)
+      return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
+    },
+    showCross() {
+      return (
+        this.hole != this.tail &&
+          !this.matrix[this.hole * this.size + this.tail]
+      ) || (
+        this.holeClicked && this.history.length <= 2
+      )
+    },
     arrowPath() {
       return this.edgePaths[[this.hole, this.tail].toString()]
     },
@@ -477,6 +496,7 @@ export default {
       return hole
     },
     goBack() {
+      this.holeClicked = false
       if (this.history.length > 2) {
         let hideTail = false
         if (this.hole == this.tail) {
@@ -506,7 +526,6 @@ export default {
         }
 
         this.chosenTail = this.tail
-        this.holeClicked = false
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
@@ -688,6 +707,16 @@ export default {
           stroke-linecap="round"
           stroke-linejoin="round"
         />
+        <path
+          id="cross-path"
+          :d="crossPath"
+          :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
+          fill="none"
+          stroke="black"
+          stroke-width="12"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
         <image id="check" x="-10" y="-10" width="20" height="20"
           href="../assets/checkmark.svg"
         />
@@ -701,10 +730,17 @@ export default {
         :class="{touchCircle: true, active: this.matrix[size * hole + node - 1]}"
       />
       <path
-        v-if="hole != tail"
+        v-if="showHead"
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
+        fill="none"
+      />
+      <path
+        v-if="showCross"
+        class="head"
+        :d="crossPath"
+        :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
         fill="none"
       />
       <circle
@@ -731,7 +767,8 @@ export default {
       </g>
       <mask id="head-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
-        <use v-if="hole != tail" href="#head-path"></use>
+        <use v-if="showHead" href="#head-path"></use>
+        <use v-if="showCross" href="#cross-path"></use>
       </mask>
       <mask id="truncate-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
@@ -742,7 +779,8 @@ export default {
           fill="black"
           :style="{'transition': 'r 0.5s'}">
         </circle>
-        <use v-if="hole != tail" href="#head-path"></use>
+        <use v-if="showHead" href="#head-path"></use>
+        <use v-if="showCross" href="#cross-path"></use>
       </mask>
       <path
         v-for="edge of edges"
