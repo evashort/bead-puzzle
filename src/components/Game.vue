@@ -26,6 +26,7 @@ export default {
       beads: [...this.startingBeads],
       history: [hole, hole],
       chosenTail: null,
+      holeClicked: false,
       animations: new Uint8Array(this.startingBeads.length),
       oldBeads: [...this.startingBeads],
       now: now,
@@ -190,37 +191,39 @@ export default {
       let edgePaths = {}
       let [dxs, dys] = this.tangents
       let offset = this.loopStart
-      for (let edge of this.edges) {
-        let [a, b] = edge
-        let backEdge = edge.slice().reverse()
-        let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
-        let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
-        let i = this.historyIndices[a * this.size + b]
-        if (i <= 0) {
-          edgePaths[edge.toString()] =
-            `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
-          edgePaths[backEdge.toString()] =
-            `M ${x2} ${y2} C ${x2} ${y2}, ${x1} ${y1}, ${x1} ${y1}`
-          continue
+      for (let a = 0; a < this.size; a++) {
+        for (let b = a; b < this.size; b++) {
+          let name = [a, b].toString()
+          let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
+          if (a == b) {
+            edgePaths[name] = `M ${x1} ${y1}`
+            continue
+          }
+
+          let backName = [b, a].toString()
+          let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
+          let i = this.historyIndices[a * this.size + b]
+          if (i <= 0) {
+            edgePaths[name] =
+              `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
+            edgePaths[backName] =
+              `M ${x2} ${y2} C ${x2} ${y2}, ${x1} ${y1}, ${x1} ${y1}`
+            continue
+          }
+
+          let dx1 = dxs[i - offset - 1], dy1 = dys[i - offset - 1]
+          let dx2 = -dxs[i - offset], dy2 = -dys[i - offset]
+          if ((this.history[i - 1] < this.history[i]) != (a < b)) {
+            [dx1, dy1, dx2, dy2] = [dx2, dy2, dx1, dy1]
+          }
+
+          let x0 = x1 + dx1 * controlLength, y0 = y1 + dy1 * controlLength
+          let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
+          edgePaths[name] =
+            `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
+          edgePaths[backName] =
+            `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
         }
-
-        let dx1 = dxs[i - offset - 1], dy1 = dys[i - offset - 1]
-        let dx2 = -dxs[i - offset], dy2 = -dys[i - offset]
-        if ((this.history[i - 1] < this.history[i]) != (a < b)) {
-          [dx1, dy1, dx2, dy2] = [dx2, dy2, dx1, dy1]
-        }
-
-        let x0 = x1 + dx1 * controlLength, y0 = y1 + dy1 * controlLength
-        let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
-        edgePaths[edge.toString()] =
-          `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
-        edgePaths[backEdge.toString()] =
-          `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
-      }
-
-      for (let node = 0; node < this.size; node++) {
-        edgePaths[[node, node].toString()] =
-          `M ${this.nodeXs[node]} ${this.nodeYs[node]}`
       }
 
       return edgePaths
@@ -392,7 +395,7 @@ export default {
           this.goForwardHelp()
           this.history.push(this.tail)
         }
-      } else {
+      } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history, this.chosenTail))
       }
@@ -404,6 +407,7 @@ export default {
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.chosenTail = null
+      this.holeClicked = false
       if (
         this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
@@ -502,6 +506,7 @@ export default {
         }
 
         this.chosenTail = this.tail
+        this.holeClicked = false
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
@@ -518,6 +523,7 @@ export default {
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
           this.chosenTail = newTail
+          this.holeClicked = false
           return
         }
       }
@@ -533,43 +539,79 @@ export default {
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
           this.chosenTail = newTail
+          this.holeClicked = false
           return
         }
       }
     },
     ensureTail() {
       if (this.hole == this.tail) {
-        this.history[this.history.length - 1] =
-          this.getNextTail(this.history, this.chosenTail)
+        if (this.holeClicked && this.history.length >= 3) {
+          this.history[this.history.length - 1] =
+            this.history[this.history.length - 3]
+        } else {
+          this.holeClicked = false
+          this.history[this.history.length - 1] =
+            this.getNextTail(this.history, this.chosenTail)
+        }
+
         return true
       }
 
       return false
     },
-    clicked(event) {
+    onMouseDown(event) {
       let gameView = document.getElementById('game-view')
       let x = event.offsetX / gameView.clientWidth * 240 - 120
       let y = event.offsetY / gameView.clientHeight * 240 - 120
+      this.holeClicked = false
       for (let i = 0; i < this.size; i++) {
-        if (this.matrix[this.size * this.hole + i] || i == this.hole) {
-          let dx = this.nodeXs[i] - x
-          let dy = this.nodeYs[i] - y
-          if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-            if (i == this.hole) {
-              this.goBack()
-              this.history[this.history.length - 1] = this.hole
-            } else {
-              this.history[this.history.length - 1] = i
-              this.goForwardHelp()
-              this.history.push(this.tail)
+        let dx = this.nodeXs[i] - x
+        let dy = this.nodeYs[i] - y
+        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+          if (i == this.hole) {
+            this.holeClicked = true
+            this.history[this.history.length - 1] = this.history.length >= 3 ?
+              this.history[this.history.length - 3] : this.hole
+          } else {
+            this.history[this.history.length - 1] = i
+            if (this.matrix[this.size * this.hole + i]) {
+              this.chosenTail = i
             }
-
-            return
           }
+
+          return
         }
       }
+    },
+    clicked(event) {
+      let i = this.holeClicked ? this.hole : this.tail
+      if (!this.holeClicked && !this.matrix[this.size * this.hole + i]) {
+        this.history[this.history.length - 1] = this.hole
+        return
+      }
 
-      this.history[this.history.length - 1] = this.hole
+      let gameView = document.getElementById('game-view')
+      let x = event.offsetX / gameView.clientWidth * 240 - 120
+      let y = event.offsetY / gameView.clientHeight * 240 - 120
+      let dx = this.nodeXs[i] - x
+      let dy = this.nodeYs[i] - y
+      if (dx * dx + dy * dy >= this.clickRadius * this.clickRadius) {
+        if (this.holeClicked) {
+          this.history[this.history.length - 1] = this.hole
+          this.holeClicked = false
+        }
+
+        return
+      }
+
+      if (this.holeClicked) {
+        this.goBack()
+        this.history[this.history.length - 1] = this.hole
+      } else {
+        this.goForwardHelp()
+        this.history.push(this.tail)
+      }
     },
     buttonClicked() {
       if (!this.ensureTail()) {
@@ -577,9 +619,12 @@ export default {
       }
     },
     onFocus() {
-      this.ensureTail()
+      if (!this.holeClicked) {
+        this.ensureTail()
+      }
     },
     onBlur() {
+      this.holeClicked = false
       this.history[this.history.length - 1] = this.hole
     },
     checkWin() {
@@ -603,7 +648,9 @@ export default {
       for (; beadSet.has(hole); hole++) { }
 
       this.history = [hole, hole]
-      this.wentBack = false
+      this.chosenTail = null
+      this.holeClicked = false
+      this.checkWin()
     },
     fast(newFast, oldFast) {
       let oldDuration = this.getDustDuration(oldFast)
@@ -629,7 +676,7 @@ export default {
 
 <template>
   <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @click="buttonClicked" @focus.native="onFocus" @blur.native="onBlur">
-    <svg class="gameView" id="game-view" viewBox="-120 -120 240 240" @click.stop.prevent="clicked">
+    <svg class="gameView" id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"
