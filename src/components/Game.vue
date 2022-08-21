@@ -9,16 +9,6 @@ export default {
     let hole = 0
     for (; beadSet.has(hole); hole++) { }
 
-    let size = this.startingBeads.length + 1
-    let holeRow = new Uint8Array(size)
-    for (let [a, b] of this.edges) {
-      if (a == hole) {
-        holeRow[b] = 1
-      } else if (b == hole) {
-        holeRow[a] = 1
-      }
-    }
-
     let dustDelays = new Float64Array(this.dustCount)
     // higher origin reduces numerical instability introduced by going fast
     let dustOrigin = 946713600000 // year 2000
@@ -32,22 +22,16 @@ export default {
       dustDelays[j % this.dustCount] = startTime - (now - dustOrigin) * 0.001
     }
 
-    // iterate clockwise and choose the first edge
-    for (let i = 1; i < size; i++) {
-      let tail = (hole + i) % size
-      if (holeRow[tail]) {
-        return {
-          beads: [...this.startingBeads],
-          history: [hole, tail],
-          animations: new Uint8Array(this.startingBeads.length),
-          oldBeads: [...this.startingBeads],
-          showTail: false,
-          now: now,
-          dustDelays: dustDelays,
-          dustOrigin: dustOrigin,
-          fast: false,
-        }
-      }
+    return {
+      beads: [...this.startingBeads],
+      history: [hole, hole],
+      wentBack: false,
+      animations: new Uint8Array(this.startingBeads.length),
+      oldBeads: [...this.startingBeads],
+      now: now,
+      dustDelays: dustDelays,
+      dustOrigin: dustOrigin,
+      fast: false,
     }
   },
   props: {
@@ -90,8 +74,12 @@ export default {
       return this.history[this.history.length - 1]
     },
     loopEnd() {
+      if (this.hole == this.tail) {
+        return this.history.length - 2
+      }
+  
       if (this.history.length <= 2) {
-        return this.history.length - 1 - !this.showTail
+        return this.history.length - 1
       }
 
       if (this.tail == this.history[this.history.length - 3]) {
@@ -102,7 +90,7 @@ export default {
         return this.history.length - 2 // continuing loop
       }
 
-      return this.history.length - 1 - !this.showTail
+      return this.history.length - 1
     },
     loopStart() {
       let sentinel = this.history[this.loopEnd]
@@ -270,7 +258,7 @@ export default {
         function(node, id, beads) {
           return {
             bead: true,
-            tail: node == this.tail && this.showTail,
+            tail: node == this.tail && this.hole != this.tail,
             onPath: this.historyIndices[
               node * this.size + this.oldBeads[id]
             ] > 0,
@@ -398,36 +386,27 @@ export default {
       return [dx3 * factor, dy3 * factor]
     },
     goForward() {
-      if (this.hole == this.tail) {
-        return
+      if (this.ensureTail()) {
+        if (this.history.length >= 4 && this.hole == this.history[0]) {
+          // continue going around the loop with the tail hidden
+          this.goForwardHelp()
+          this.history.push(this.tail)
+        }
+      } else {
+        this.goForwardHelp()
+        this.history.push(this.getNextTail(this.history, this.wentBack))
       }
-
-      if (
-        !this.showTail && (
-          this.history[0] != this.hole || this.history[1] != this.tail ||
-          this.history.length <= 2
-        )
-      ) {
-        this.showTail = true
-        return
-      }
-
-      this.goForwardHelp()
     },
     goForwardHelp() {
-      if (this.hole == this.tail) {
-        return
-      }
-
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.checkWin()
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
 
-      let wentBack = this.history.length >= 3 &&
+      this.wentBack = this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
-      if (wentBack) {
+      if (this.wentBack) {
         let loop = this.history[0] == this.hole
         this.history.pop()
         this.history.pop()
@@ -440,10 +419,6 @@ export default {
       }
 
       this.history = this.removeBeforeLoop(this.history)
-      this.history.push(this.getNextTail(this.history, wentBack))
-      if (this.hole == this.tail) {
-        this.showTail = false
-      }
     },
     removeBeforeLoop(history) {
       let hole = history[history.length - 1]
@@ -456,21 +431,26 @@ export default {
       return history
     },
     getNextTail(history, wentBack) {
-      let hole = history[history.length - 1]
-      let oldHole = history[history.length - 2]
+      let end = history.length - 1
+      if (end >= 1 && history[end - 1] == history[end]) {
+        end--
+      }
+
+      let hole = history[end]
+      let oldHole = history[end - 1]
 
       // first choice: continue the loop
-      if (history[0] == hole && history.length >= 4) {
+      if (history[0] == hole && end >= 3) {
         return history[1]
       }
 
       // second choice: keep going back
-      if (wentBack && history.length >= 2) {
+      if (wentBack && end >= 1) {
         return oldHole
       }
 
       // third choice: new tail creates the smallest possible loop
-      for (let i = history.length - 3; i >= 0; i--) {
+      for (let i = end - 2; i >= 0; i--) {
         let tail = history[i]
         if (
           tail != oldHole && // going back shouldn't be the default.
@@ -492,35 +472,42 @@ export default {
       return hole
     },
     goBack() {
-      if (this.hole == this.tail) {
-        // tutorial levels have dead ends which cause the tail to be hidden
-        // even when using the keyboard. it's confusing if going back doesn't
-        // cause the tail to be shown again.
-        this.showTail = true
-      }
-
-      this.goBackHelp()
-    },
-    goBackHelp() {
       if (this.history.length > 2) {
+        let hideTail = false
+        if (this.hole == this.tail) {
+          // tutorial levels have dead ends which cause the tail to be hidden
+          // even when using the keyboard. it's confusing if going back
+          // doesn't cause the tail to be shown again.
+          let edges = 0
+          for (let i = 0; i < this.size; i++) {
+            edges += this.matrix[this.hole * this.size + i]
+            if (edges > 1) {
+              hideTail = true // not a dead end, ok to hide tail
+              break
+            }
+          }
+        }
+
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
         this.checkWin()
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
+        this.wentBack = false // wentBack only applies to going forward
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
         }
+
+        if (hideTail) {
+          this.history[this.history.length - 1] = this.hole
+        }
       }
     },
     selectLeft() {
-      if (!this.showTail) {
-        this.showTail = true
-        if (this.hole != this.tail) {
-          return
-        }
+      if (this.ensureTail() && this.hole != this.tail) {
+        return
       }
 
       // iterate counterclockwise and choose the first edge
@@ -533,11 +520,8 @@ export default {
       }
     },
     selectRight() {
-      if (!this.showTail) {
-        this.showTail = true
-        if (this.hole != this.tail) {
-          return
-        }
+      if (this.ensureTail() && this.hole != this.tail) {
+        return
       }
 
       // iterate counterclockwise and choose the first edge
@@ -549,8 +533,14 @@ export default {
         }
       }
     },
-    showHideTail() {
-      this.showTail = !this.showTail
+    ensureTail() {
+      if (this.hole == this.tail) {
+        this.history[this.history.length - 1] =
+          this.getNextTail(this.history, this.wentBack)
+        return true
+      }
+
+      return false
     },
     clicked(event) {
       let gameView = document.getElementById('game-view')
@@ -561,27 +551,32 @@ export default {
           let dx = this.nodeXs[i] - x
           let dy = this.nodeYs[i] - y
           if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-            this.showTail = false
             if (i == this.hole) {
-              this.goBackHelp()
+              this.goBack()
+              this.history[this.history.length - 1] = this.hole
             } else {
               this.history[this.history.length - 1] = i
               this.goForwardHelp()
+              this.history.push(this.tail)
             }
 
             return
           }
         }
       }
+
+      this.history[this.history.length - 1] = this.hole
     },
     buttonClicked() {
-      this.showTail = this.hole != this.tail
+      if (!this.ensureTail()) {
+        this.history[this.history.length - 1] = this.hole
+      }
     },
     onFocus() {
-      this.showTail = this.hole != this.tail
+      this.ensureTail()
     },
     onBlur() {
-      this.showTail = false
+      this.history[this.history.length - 1] = this.hole
     },
     checkWin() {
       for (let [id, node] of this.beads.entries()) {
@@ -602,25 +597,9 @@ export default {
       let beadSet = new Set(this.beads)
       let hole = 0
       for (; beadSet.has(hole); hole++) { }
-      let holeRow = new Uint8Array(this.size)
-      for (let [a, b] of this.edges) {
-        if (a == hole) {
-          holeRow[b] = 1
-        } else if (b == hole) {
-          holeRow[a] = 1
-        }
-      }
 
-      this.checkWin()
-
-      // iterate clockwise and choose the first edge
-      for (let i = 1; i < this.size; i++) {
-        let tail = (hole + i) % this.size
-        if (holeRow[tail]) {
-          this.history = [hole, tail]
-          return
-        }
-      }
+      this.history = [hole, hole]
+      this.wentBack = false
     },
     fast(newFast, oldFast) {
       let oldDuration = this.getDustDuration(oldFast)
@@ -671,14 +650,14 @@ export default {
         :class="{touchCircle: true, active: this.matrix[size * hole + node - 1]}"
       />
       <path
-        v-if="showTail"
+        v-if="hole != tail"
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
         fill="none"
       />
       <circle
-        v-if="showTail"
+        v-if="hole != tail"
         class="outline"
         :r="2 * beadRadius"
         fill="none"
@@ -701,7 +680,7 @@ export default {
       </g>
       <mask id="head-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
-        <use v-if="showTail" href="#head-path"></use>
+        <use v-if="hole != tail" href="#head-path"></use>
       </mask>
       <mask id="truncate-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
@@ -712,15 +691,15 @@ export default {
           fill="black"
           :style="{'transition': 'r 0.5s'}">
         </circle>
-        <use v-if="showTail" href="#head-path"></use>
+        <use v-if="hole != tail" href="#head-path"></use>
       </mask>
       <path
         v-for="edge of edges"
         :key="`${edge.toString()},${size}`"
-        :class="{ edge: true, active: (x => x > 0 && x < this.history.length - 1)(historyIndices[edge[0] * size + edge[1]]), arrow: ((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail }"
+        :class="{ edge: true, active: (x => x > 0 && x < this.history.length - 1)(historyIndices[edge[0] * size + edge[1]]), arrow: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) }"
         :d="edgePaths[edge.toString()]"
         fill="none"
-        v-bind:mask="((edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole)) && showTail ? 'none' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
+        v-bind:mask="(edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) ? 'none' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <image v-if="size > 1" x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
         href="../assets/heart.svg"
