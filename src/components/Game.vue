@@ -25,7 +25,7 @@ export default {
     return {
       beads: [...this.startingBeads],
       history: [hole, hole],
-      wentBack: false,
+      chosenTail: null,
       animations: new Uint8Array(this.startingBeads.length),
       oldBeads: [...this.startingBeads],
       now: now,
@@ -394,7 +394,7 @@ export default {
         }
       } else {
         this.goForwardHelp()
-        this.history.push(this.getNextTail(this.history, this.wentBack))
+        this.history.push(this.getNextTail(this.history, this.chosenTail))
       }
     },
     goForwardHelp() {
@@ -403,10 +403,11 @@ export default {
       this.checkWin()
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
-
-      this.wentBack = this.history.length >= 3 &&
+      this.chosenTail = null
+      if (
+        this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
-      if (this.wentBack) {
+      ) {
         let loop = this.history[0] == this.hole
         this.history.pop()
         this.history.pop()
@@ -415,6 +416,7 @@ export default {
           this.history.push(this.history[0])
         } else {
           this.animations[id] += 2
+          this.chosenTail = this.hole // keep going back
         }
       }
 
@@ -430,26 +432,25 @@ export default {
 
       return history
     },
-    getNextTail(history, wentBack) {
+    getNextTail(history, chosenTail) {
+      // first choice: restore chosen tail
+      if (chosenTail != null) {
+        return chosenTail
+      }
+
       let end = history.length - 1
       if (end >= 1 && history[end - 1] == history[end]) {
         end--
       }
 
+      // second choice: continue the loop
       let hole = history[end]
-      let oldHole = history[end - 1]
-
-      // first choice: continue the loop
       if (history[0] == hole && end >= 3) {
         return history[1]
       }
 
-      // second choice: keep going back
-      if (wentBack && end >= 1) {
-        return oldHole
-      }
-
       // third choice: new tail creates the smallest possible loop
+      let oldHole = history[end - 1]
       for (let i = end - 2; i >= 0; i--) {
         let tail = history[i]
         if (
@@ -500,6 +501,7 @@ export default {
           this.history.unshift(this.hole)
         }
 
+        this.chosenTail = this.tail
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
@@ -515,6 +517,7 @@ export default {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
+          this.chosenTail = newTail
           return
         }
       }
@@ -529,6 +532,7 @@ export default {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
+          this.chosenTail = newTail
           return
         }
       }
@@ -536,7 +540,7 @@ export default {
     ensureTail() {
       if (this.hole == this.tail) {
         this.history[this.history.length - 1] =
-          this.getNextTail(this.history, this.wentBack)
+          this.getNextTail(this.history, this.chosenTail)
         return true
       }
 
