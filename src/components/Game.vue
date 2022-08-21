@@ -27,6 +27,7 @@ export default {
       history: [hole, hole],
       chosenTail: null,
       holeClicked: false,
+      oldHole: null,
       animations: new Uint8Array(this.startingBeads.length),
       oldBeads: [...this.startingBeads],
       now: now,
@@ -78,7 +79,7 @@ export default {
       if (this.hole == this.tail) {
         return this.history.length - 2
       }
-  
+
       if (this.history.length <= 2) {
         return this.history.length - 1
       }
@@ -266,8 +267,17 @@ export default {
         this.holeClicked && this.history.length <= 2
       )
     },
+    arrowEdge() {
+      let a = this.hole, b = this.tail
+      if (a == b || !this.matrix[a * this.size + b]) {
+        b = a
+        a = this.oldHole
+      }
+
+      return [a, b]
+    },
     arrowPath() {
-      return this.edgePaths[[this.hole, this.tail].toString()]
+      return this.edgePaths[this.arrowEdge.toString()]
     },
     beadRadius() {
       return 10
@@ -427,6 +437,7 @@ export default {
       this.oldBeads[id] = this.tail
       this.chosenTail = null
       this.holeClicked = false
+      this.oldHole = this.hole
       if (
         this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
@@ -513,6 +524,7 @@ export default {
           }
         }
 
+        this.oldHole = this.hole
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
@@ -565,6 +577,7 @@ export default {
     },
     ensureTail() {
       if (this.hole == this.tail) {
+        this.oldHole = null
         if (this.holeClicked && this.history.length >= 3) {
           this.history[this.history.length - 1] =
             this.history[this.history.length - 3]
@@ -617,6 +630,7 @@ export default {
       let dy = this.nodeYs[i] - y
       if (dx * dx + dy * dy >= this.clickRadius * this.clickRadius) {
         if (this.holeClicked) {
+          this.oldHole = null
           this.history[this.history.length - 1] = this.hole
           this.holeClicked = false
         }
@@ -634,6 +648,7 @@ export default {
     },
     buttonClicked() {
       if (!this.ensureTail()) {
+        this.oldHole = null
         this.history[this.history.length - 1] = this.hole
       }
     },
@@ -644,6 +659,7 @@ export default {
     },
     onBlur() {
       this.holeClicked = false
+      this.oldHole = null
       this.history[this.history.length - 1] = this.hole
     },
     checkWin() {
@@ -669,6 +685,7 @@ export default {
       this.history = [hole, hole]
       this.chosenTail = null
       this.holeClicked = false
+      this.oldHole = null
       this.checkWin()
     },
     fast(newFast, oldFast) {
@@ -730,26 +747,29 @@ export default {
         :class="{touchCircle: true, active: this.matrix[size * hole + node - 1]}"
       />
       <path
-        v-if="showHead"
+        :opacity="showHead ? 1 : 0"
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
+        :class="{ghost: hole == tail && oldHole != null}"
         fill="none"
       />
       <path
-        v-if="showCross"
+        :opacity="showCross ? 1 : 0"
         class="head"
         :d="crossPath"
         :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
+        :class="{ghost: hole == tail && !holeClicked}"
         fill="none"
       />
       <circle
-        v-if="hole != tail"
+        :opacity="hole != tail ? 1 : 0"
         class="outline"
         :r="2 * beadRadius"
         fill="none"
         :cx="nodeXs[tail]"
         :cy="nodeYs[tail]"
+        :class="{ghost: hole == tail && oldHole != null}"
       />
       <g
         v-for="(mote, i) of dust"
@@ -765,10 +785,26 @@ export default {
           >
         </circle>
       </g>
+      <mask id="cross-mask">
+        <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
+        <use
+          href="#cross-path"
+          :opacity="showCross ? 1 : 0"
+          :class="{ghost: hole == tail && !holeClicked}"
+        />
+      </mask>
       <mask id="head-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
-        <use v-if="showHead" href="#head-path"></use>
-        <use v-if="showCross" href="#cross-path"></use>
+        <use
+          href="#head-path"
+          :opacity="showHead ? 1 : 0"
+          :class="{ghost: hole == tail && oldHole != null}"
+        />
+        <use
+          href="#cross-path"
+          :opacity="showCross ? 1 : 0"
+          :class="{ghost: hole == tail && !holeClicked}"
+        />
       </mask>
       <mask id="truncate-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
@@ -779,8 +815,16 @@ export default {
           fill="black"
           :style="{'transition': 'r 0.5s'}">
         </circle>
-        <use v-if="showHead" href="#head-path"></use>
-        <use v-if="showCross" href="#cross-path"></use>
+        <use
+          href="#head-path"
+          :opacity="showHead ? 1 : 0"
+          :class="{ghost: hole == tail && oldHole != null}"
+        />
+        <use
+          href="#cross-path"
+          :opacity="showCross ? 1 : 0"
+          :class="{ghost: hole == tail && !holeClicked}"
+        />
       </mask>
       <path
         v-for="edge of edges"
@@ -788,7 +832,7 @@ export default {
         :class="{ edge: true, active: (x => x > 0 && x < this.history.length - 1)(historyIndices[edge[0] * size + edge[1]]), arrow: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) }"
         :d="edgePaths[edge.toString()]"
         fill="none"
-        v-bind:mask="(edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) ? 'none' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
+        v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <image v-if="size > 1" x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
         href="../assets/heart.svg"
@@ -899,6 +943,9 @@ export default {
 .outline {
   stroke-width: 3;
   stroke: var(--color-text);
+}
+.ghost {
+  transition: opacity 0s 0.35s, cx 0s 0.5s, cy 0s 0.5s;
 }
 /*
 tail onPath undo loop reverse offset-rotate
