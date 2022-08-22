@@ -323,8 +323,14 @@ export default {
     clickRadius() {
       return 42
     },
+    spinButtonY() {
+      return 15
+    },
     smallClickRadius() {
       return 20
+    },
+    smallSpinButtonY() {
+      return this.smallClickRadius - this.clickRadius - this.spinButtonY
     },
     dustDuration() {
       return this.getDustDuration(this.fast)
@@ -756,14 +762,14 @@ export default {
         fill="black"
         :r="clickRadius"
         :cx="0"
-        :cy="15"
+        :cy="spinButtonY"
         :class="{touchCircle: true, active: this.history.length >= 4 && this.hole == this.history[0]}"
       />
       <circle
         fill="black"
         :r="smallClickRadius"
         :cx="0"
-        :cy="smallClickRadius - clickRadius - 15"
+        :cy="smallSpinButtonY"
         :class="{touchCircle: true, active: this.history.length >= 4 && this.hole == this.history[0]}"
       />
       <path
