@@ -27,7 +27,7 @@ export default {
       history: [hole, hole],
       chosenTail: null,
       holeClicked: false,
-      oldHole: null,
+      ghostHole: null,
       animations: new Uint8Array(this.startingBeads.length),
       oldBeads: [...this.startingBeads],
       now: now,
@@ -269,9 +269,11 @@ export default {
     },
     arrowEdge() {
       let a = this.hole, b = this.tail
-      if (a == b || !this.matrix[a * this.size + b]) {
+      if (this.ghostHole != null) {
         b = a
-        a = this.oldHole
+        a = this.ghostHole
+      } else if (a == b && this.history.length >= 3) {
+        a = this.history[this.history.length - 3]
       }
 
       return [a, b]
@@ -427,6 +429,7 @@ export default {
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history, this.chosenTail))
+        this.ghostHole = null
       }
     },
     goForwardHelp() {
@@ -437,7 +440,6 @@ export default {
       this.oldBeads[id] = this.tail
       this.chosenTail = null
       this.holeClicked = false
-      this.oldHole = this.hole
       if (
         this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
@@ -524,20 +526,19 @@ export default {
           }
         }
 
-        this.oldHole = this.hole
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
         this.checkWin()
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
-        this.wentBack = false // wentBack only applies to going forward
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
         }
 
         this.chosenTail = this.tail
+        this.ghostHole = null
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
@@ -577,12 +578,12 @@ export default {
     },
     ensureTail() {
       if (this.hole == this.tail) {
-        this.oldHole = null
         if (this.holeClicked && this.history.length >= 3) {
           this.history[this.history.length - 1] =
             this.history[this.history.length - 3]
         } else {
           this.holeClicked = false
+          this.ghostHole = null
           this.history[this.history.length - 1] =
             this.getNextTail(this.history, this.chosenTail)
         }
@@ -612,6 +613,7 @@ export default {
             }
           }
 
+          this.ghostHole = null
           return
         }
       }
@@ -619,6 +621,7 @@ export default {
     clicked(event) {
       let i = this.holeClicked ? this.hole : this.tail
       if (!this.holeClicked && !this.matrix[this.size * this.hole + i]) {
+        this.ghostHole = this.hole
         this.history[this.history.length - 1] = this.hole
         return
       }
@@ -630,7 +633,6 @@ export default {
       let dy = this.nodeYs[i] - y
       if (dx * dx + dy * dy >= this.clickRadius * this.clickRadius) {
         if (this.holeClicked) {
-          this.oldHole = null
           this.history[this.history.length - 1] = this.hole
           this.holeClicked = false
         }
@@ -638,6 +640,7 @@ export default {
         return
       }
 
+      let oldHole = this.hole
       if (this.holeClicked) {
         this.goBack()
         this.history[this.history.length - 1] = this.hole
@@ -645,10 +648,11 @@ export default {
         this.goForwardHelp()
         this.history.push(this.tail)
       }
+
+      this.ghostHole = oldHole
     },
     buttonClicked() {
       if (!this.ensureTail()) {
-        this.oldHole = null
         this.history[this.history.length - 1] = this.hole
       }
     },
@@ -659,7 +663,6 @@ export default {
     },
     onBlur() {
       this.holeClicked = false
-      this.oldHole = null
       this.history[this.history.length - 1] = this.hole
     },
     checkWin() {
@@ -685,7 +688,7 @@ export default {
       this.history = [hole, hole]
       this.chosenTail = null
       this.holeClicked = false
-      this.oldHole = null
+      this.ghostHole = null
       this.checkWin()
     },
     fast(newFast, oldFast) {
@@ -751,7 +754,7 @@ export default {
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        :class="{ghost: hole == tail && oldHole != null}"
+        :class="{ghost: ghostHole != null}"
         fill="none"
       />
       <path
@@ -759,7 +762,7 @@ export default {
         class="head"
         :d="crossPath"
         :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
-        :class="{ghost: hole == tail && !holeClicked}"
+        :class="{ghost: ghostHole != null}"
         fill="none"
       />
       <circle
@@ -769,7 +772,7 @@ export default {
         fill="none"
         :cx="nodeXs[tail]"
         :cy="nodeYs[tail]"
-        :class="{ghost: hole == tail && oldHole != null}"
+        :class="{ghost: ghostHole != null}"
       />
       <g
         v-for="(mote, i) of dust"
@@ -790,7 +793,7 @@ export default {
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
-          :class="{ghost: hole == tail && !holeClicked}"
+          :class="{ghost: ghostHole != null}"
         />
       </mask>
       <mask id="head-mask">
@@ -798,12 +801,12 @@ export default {
         <use
           href="#head-path"
           :opacity="showHead ? 1 : 0"
-          :class="{ghost: hole == tail && oldHole != null}"
+          :class="{ghost: ghostHole != null}"
         />
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
-          :class="{ghost: hole == tail && !holeClicked}"
+          :class="{ghost: ghostHole != null}"
         />
       </mask>
       <mask id="truncate-mask">
@@ -818,12 +821,12 @@ export default {
         <use
           href="#head-path"
           :opacity="showHead ? 1 : 0"
-          :class="{ghost: hole == tail && oldHole != null}"
+          :class="{ghost: ghostHole != null}"
         />
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
-          :class="{ghost: hole == tail && !holeClicked}"
+          :class="{ghost: ghostHole != null}"
         />
       </mask>
       <path
