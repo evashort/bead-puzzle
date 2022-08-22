@@ -323,6 +323,9 @@ export default {
     clickRadius() {
       return 42
     },
+    smallClickRadius() {
+      return 20
+    },
     dustDuration() {
       return this.getDustDuration(this.fast)
     },
@@ -748,6 +751,20 @@ export default {
         :cx="nodeXs[node - 1]"
         :cy="nodeYs[node - 1]"
         :class="{touchCircle: true, active: this.matrix[size * hole + node - 1]}"
+      />
+      <circle
+        fill="black"
+        :r="clickRadius"
+        :cx="0"
+        :cy="15"
+        :class="{touchCircle: true, active: this.history.length >= 4 && this.hole == this.history[0]}"
+      />
+      <circle
+        fill="black"
+        :r="smallClickRadius"
+        :cx="0"
+        :cy="smallClickRadius - clickRadius - 15"
+        :class="{touchCircle: true, active: this.history.length >= 4 && this.hole == this.history[0]}"
       />
       <path
         :opacity="showHead ? 1 : 0"
