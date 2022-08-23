@@ -119,94 +119,73 @@ size_graphs = {}
 for graph in graphs:
     size_graphs.setdefault(graph['nodes'], []).append(graph)
 
-if len(sys.argv) > 1:
-    size_matrices = {}
-    size_permutations = {}
-    for size, graph_list in size_graphs.items():
-        matrices = np.zeros((len(graph_list), size, size), dtype=bool)
-        for i, graph in enumerate(graph_list):
-            edges = graph['edges']
-            matrices[
-                i,
-                sum(zip(*edges), start=()),
-                sum(list(zip(*edges))[::-1], start=()),
-            ] = True
+size_matrices = {}
+size_permutations = {}
+for size, graph_list in size_graphs.items():
+    matrices = np.zeros((len(graph_list), size, size), dtype=bool)
+    for i, graph in enumerate(graph_list):
+        edges = graph['edges']
+        matrices[
+            i,
+            sum(zip(*edges), start=()),
+            sum(list(zip(*edges))[::-1], start=()),
+        ] = True
 
-        matrices = matrices.reshape(len(graph_list), -1)
-        size_matrices[size] = matrices
-        permutations = np.array(
-            list(itertools.permutations(range(size)))
-        )
-        permutations = (
-            permutations[:, np.newaxis] + permutations[:, :, np.newaxis] * size
-        ).reshape(-1, size * size)
-        size_permutations[size] = permutations
+    matrices = matrices.reshape(len(graph_list), -1)
+    size_matrices[size] = matrices
+    permutations = np.array(
+        list(itertools.permutations(range(size)))
+    )
+    permutations = (
+        permutations[:, np.newaxis] + permutations[:, :, np.newaxis] * size
+    ).reshape(-1, size * size)
+    size_permutations[size] = permutations
 
-    # find easier subgraphs with higher distance and more states because they
-    # are better
-    # x is a subgraph of y <=> not any(x & ~y) <=> x dot ~y == 0
-    for size, matrices in size_matrices.items():
-        permutations = size_permutations[size]
-        graph_list = size_graphs[size]
-        for i, matrix in enumerate(matrices):
-            superior = np.logical_not(
-                np.all(
-                    np.matmul(
-                        matrices[:i],
-                        np.logical_not(matrix)[permutations].T,
-                    ),
-                    axis=1,
-                ),
-            )
-            graph = graph_list[i]
-            distance = graph['distance']
-            states = graph['states']
-            graph['superior'] = [
-                graph_list[j]['id'] for j in np.nonzero(superior)[0]
-                if graph_list[j]['distance'] >= distance \
-                    and graph_list[j]['states'] >= states
-            ]
-
-        # flag graphs with a loop containing all nodes because they can be
-        # solved with a boring algorithm
-        loop_matrix = np.zeros(size * size, dtype=bool)
-        loop_matrix[1::size + 1] = True
-        loop_matrix[size::size + 1] = True
-        loop_matrix[size - 1] = True
-        loop_matrix[size * (size - 1)] = True
-        has_loop = np.logical_not(
+# find easier subgraphs with higher distance and more states because they
+# are better
+# x is a subgraph of y <=> not any(x & ~y) <=> x dot ~y == 0
+for size, matrices in size_matrices.items():
+    permutations = size_permutations[size]
+    graph_list = size_graphs[size]
+    for i, matrix in enumerate(matrices):
+        superior = np.logical_not(
             np.all(
                 np.matmul(
-                    np.logical_not(matrices),
-                    loop_matrix[permutations].T,
+                    matrices[:i],
+                    np.logical_not(matrix)[permutations].T,
                 ),
                 axis=1,
             ),
         )
-        for graph, loop in zip(graph_list, has_loop):
-            graph['loop'] = bool(loop)
-else:
-    graphs_by_id = {graph['id']: graph for graph in graphs}
-    old_graphs = None
-    try:
-        f = open(final_path, encoding='utf-8')
-    except FileNotFoundError:
-        pass
-    else:
-        with f:
-            try:
-                old_graphs = json.load(f)
-            except json.decoder.JSONDecodeError:
-                pass
+        graph = graph_list[i]
+        distance = graph['distance']
+        states = graph['states']
+        graph['superior'] = [
+            graph_list[j]['id'] for j in np.nonzero(superior)[0]
+            if graph_list[j]['distance'] >= distance \
+                and graph_list[j]['states'] >= states
+        ]
 
-    if old_graphs is not None:
-        for old_graph in old_graphs['graphs']:
-            graph = graphs_by_id[old_graph['id']]
-            try:
-                graph['superior'] = old_graph['superior']
-                graph['loop'] = old_graph['loop']
-            except KeyError:
-                pass
+    # flag graphs with a loop containing all nodes and an edge between two
+    # consecutive nodes because they can be solved with a boring algorithm
+    loop_matrix = np.zeros(size * size, dtype=bool)
+    loop_matrix[1::size + 1] = True
+    loop_matrix[size::size + 1] = True
+    loop_matrix[size - 1] = True
+    loop_matrix[size * (size - 1)] = True
+    loop_matrix[2] = True
+    loop_matrix[2 * size] = True
+    has_loop = np.logical_not(
+        np.all(
+            np.matmul(
+                np.logical_not(matrices),
+                loop_matrix[permutations].T,
+            ),
+            axis=1,
+        ),
+    )
+    for graph, loop in zip(graph_list, has_loop):
+        graph['loop'] = bool(loop)
 
 names_path = 'graph_names.json'
 id_names = None
@@ -228,7 +207,10 @@ with open(names_path, mode='w', encoding='utf-8') as f:
 for graph in graphs:
     graph['name'] = id_names[graph['id']]
 
-graphs = [graph for graph in graphs if graph['name'] is not None]
+graphs = [
+    graph for graph in graphs
+    if graph['name'] is not None and not graph['name'].startswith('#')
+]
 
 # put tutorial in order
 graphs[0], graphs[1] = graphs[1], graphs[0]

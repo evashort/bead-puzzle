@@ -15,7 +15,7 @@ export default {
       { name: '🌰 Tough nut to crack', stop: 23 },
       { name: '🪵 Logjam', stop: 27 },
       { name: '🪨 Rocky road', stop: 31 },
-      { name: '💎 Pure pressure', stop: 35 },
+      { name: '💎 Pure pressure', stop: 3000 },
     ]
     let start = 0
     for (let group of groups) {
