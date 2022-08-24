@@ -320,6 +320,12 @@ export default {
         this,
       )
     },
+    normalBeadScale() {
+      return 1
+    },
+    activeBeadScale() {
+      return 2
+    },
     clickRadius() {
       return 42
     },
@@ -862,27 +868,27 @@ export default {
       />
       <image v-if="size > 1" x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
         href="../assets/heart.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.7)', 'offset-path': beadOffsetPaths[0] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[0] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[0] }"
       />
       <image v-if="size > 2" x="-5" y="-5" width="10" height="10" :class="beadClasses[1]"
         href="../assets/butterfly.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.8)', 'offset-path': beadOffsetPaths[1] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[1] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[1] }"
       />
       <image v-if="size > 3" x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
         href="../assets/saturn.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(3.35)', 'offset-path': beadOffsetPaths[2] }"
+        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[2] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[2] }"
       />
       <image v-if="size > 4" x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
         href="../assets/leaf.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[3] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[3] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[3] }"
       />
       <image v-if="size > 5" x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
         href="../assets/mushroom.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.6)', 'offset-path': beadOffsetPaths[4] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[4] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[4] }"
       />
       <image v-if="size > 6" x="-5" y="-5" width="10" height="10" :class="beadClasses[5]"
         href="../assets/flower.svg"
-        :style="{ 'transform': 'rotate(90deg) scale(2.5)', 'offset-path': beadOffsetPaths[5] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[5] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[5] }"
       />
       <g v-if="size > 1" :transform="`translate(${goalXs[1]},${goalYs[1]})`">
         <image x="-3" y="-3" width="6" height="6"
