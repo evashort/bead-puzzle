@@ -306,6 +306,8 @@ export default {
             reverse: this.animations[id] >= 3,
             undo: this.oldBeads[id] == this.hole,
             loop: this.hole == this.history[0],
+            moving: this.oldBeads[id] == this.hole ||
+              this.oldBeads[id] == this.tail,
             ghost: this.ghostHole != null,
           }
         },
@@ -956,6 +958,9 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.ghost {
+  transition: opacity 0s 0.35s;
+}
 .edge {
   stroke: var(--color-text);
   stroke-width: 4;
@@ -973,9 +978,6 @@ export default {
 .outline {
   stroke-width: 3;
   stroke: var(--color-text);
-}
-.ghost {
-  transition: opacity 0s 0.35s, transform 0s 0.35s;
 }
 /*
 tail onPath undo loop reverse offset-rotate
@@ -1026,6 +1028,12 @@ tail onPath undo loop reverse offset-rotate
 }
 .bead.tail.undo.loop {
   offset-rotate: reverse;
+}
+.bead.ghost {
+  transition: transform 0s 0.35s;
+}
+.bead.ghost.moving {
+  transition: transform 0s 0.05s;
 }
 .checkmark {
   opacity: 0;
