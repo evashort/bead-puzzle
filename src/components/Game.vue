@@ -794,15 +794,6 @@ export default {
         :class="{ghost: ghostHole != null}"
         fill="none"
       />
-      <circle
-        :opacity="hole != tail ? 1 : 0"
-        class="outline"
-        :r="2 * beadRadius"
-        fill="none"
-        :cx="nodeXs[tail]"
-        :cy="nodeYs[tail]"
-        :class="{ghost: ghostHole != null}"
-      />
       <g
         v-for="(mote, i) of dust"
         :class="{dust: true, alternate: Math.floor(mote.j / dustCount) % 2 != fast}"
@@ -977,7 +968,7 @@ export default {
   stroke: var(--color-text);
 }
 .ghost {
-  transition: opacity 0s 0.35s, cx 0s 0.5s, cy 0s 0.5s;
+  transition: opacity 0s 0.35s;
 }
 /*
 tail onPath undo loop reverse offset-rotate
