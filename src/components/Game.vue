@@ -80,6 +80,10 @@ export default {
         return this.history.length - 2
       }
 
+      if (!this.matrix[this.hole * this.size + this.tail]) {
+        return this.history.length - 2 // forbidden path
+      }
+
       if (this.history.length <= 2) {
         return this.history.length - 1
       }
@@ -292,7 +296,8 @@ export default {
         function(node, id, beads) {
           return {
             bead: true,
-            tail: node == this.tail && this.hole != this.tail,
+            tail: node == this.tail && this.hole != this.tail &&
+              this.matrix[this.hole * this.size + this.tail],
             onPath: this.historyIndices[
               node * this.size + this.oldBeads[id]
             ] > 0,
@@ -301,6 +306,7 @@ export default {
             reverse: this.animations[id] >= 3,
             undo: this.oldBeads[id] == this.hole,
             loop: this.hole == this.history[0],
+            ghost: this.ghostHole != null,
           }
         },
         this,
@@ -311,7 +317,8 @@ export default {
         function(node, id, beads) {
           let edge =
             this.historyIndices[node * this.size + this.oldBeads[id]] <= 0 &&
-            node == this.tail ?
+            node == this.tail &&
+            this.matrix[this.hole * this.size + this.tail] ?
             [this.hole, this.tail] :
             [this.oldBeads[id], node]
           let path = this.edgePaths[edge.toString()]
@@ -968,7 +975,7 @@ export default {
   stroke: var(--color-text);
 }
 .ghost {
-  transition: opacity 0s 0.35s;
+  transition: opacity 0s 0.35s, transform 0s 0.35s;
 }
 /*
 tail onPath undo loop reverse offset-rotate
