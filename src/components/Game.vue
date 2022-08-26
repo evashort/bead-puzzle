@@ -26,8 +26,10 @@ export default {
       beads: [...this.startingBeads],
       history: [hole, hole],
       chosenTail: null,
-      holeClicked: false,
-      ghostHole: null,
+      // if clickTarget is null, clicking is treated as false no matter its
+      // actual value
+      clicking: false,
+      clickTarget: null,
       animations: new Uint8Array(this.startingBeads.length),
       oldBeads: [...this.startingBeads],
       now: now,
@@ -264,23 +266,27 @@ export default {
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
     },
     showCross() {
-      return (
-        this.hole != this.tail &&
-          !this.matrix[this.hole * this.size + this.tail]
-      ) || (
-        this.holeClicked && this.history.length <= 2
+      return this.clickTarget != null && this.clicking && (
+        !this.matrix[this.hole * this.size + this.tail] ||
+          this.clickTarget == -1
       )
     },
     arrowEdge() {
       let a = this.hole, b = this.tail
-      if (this.ghostHole != null) {
+      if (
+        this.clickTarget != null && this.clickTarget >= 0 && !this.clicking
+      ) {
         b = a
-        a = this.ghostHole
+        a = this.beads[this.clickTarget]
       } else if (a == b && this.history.length >= 3) {
         a = this.history[this.history.length - 3]
       }
 
-      return [a, b]
+      if (this.matrix[a * this.size + b]) {
+        return [a, b]
+      }
+
+      return[a, a]
     },
     arrowPath() {
       return this.edgePaths[this.arrowEdge.toString()]
@@ -308,7 +314,7 @@ export default {
             loop: this.hole == this.history[0],
             moving: this.oldBeads[id] == this.hole ||
               this.oldBeads[id] == this.tail,
-            ghost: this.ghostHole != null,
+            ghost: this.clickTarget != null && !this.clicking,
           }
         },
         this,
@@ -453,17 +459,21 @@ export default {
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history, this.chosenTail))
-        this.ghostHole = null
       }
     },
     goForwardHelp() {
+      if (!this.matrix[this.hole * this.size + this.tail]) {
+        this.history.pop()
+        return
+      }
+
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.checkWin()
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.chosenTail = null
-      this.holeClicked = false
+      this.clickTarget = null
       if (
         this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
@@ -533,7 +543,7 @@ export default {
       return hole
     },
     goBack() {
-      this.holeClicked = false
+      this.clickTarget = null
       if (this.history.length > 2) {
         let hideTail = false
         if (this.hole == this.tail) {
@@ -562,7 +572,6 @@ export default {
         }
 
         this.chosenTail = this.tail
-        this.ghostHole = null
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
@@ -579,7 +588,7 @@ export default {
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
           this.chosenTail = newTail
-          this.holeClicked = false
+          this.clickTarget = null
           return
         }
       }
@@ -595,22 +604,16 @@ export default {
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
           this.chosenTail = newTail
-          this.holeClicked = false
+          this.clickTarget = null
           return
         }
       }
     },
     ensureTail() {
       if (this.hole == this.tail) {
-        if (this.holeClicked && this.history.length >= 3) {
-          this.history[this.history.length - 1] =
-            this.history[this.history.length - 3]
-        } else {
-          this.holeClicked = false
-          this.ghostHole = null
-          this.history[this.history.length - 1] =
-            this.getNextTail(this.history, this.chosenTail)
-        }
+        this.clickTarget = null
+        this.history[this.history.length - 1] =
+          this.getNextTail(this.history, this.chosenTail)
 
         return true
       }
@@ -618,62 +621,75 @@ export default {
       return false
     },
     onMouseDown(event) {
+      if (event.button != 0) {
+        return
+      }
+
       let gameView = document.getElementById('game-view')
       let x = event.offsetX / gameView.clientWidth * 240 - 120
       let y = event.offsetY / gameView.clientHeight * 240 - 120
-      this.holeClicked = false
+      this.clickTarget = null
       for (let i = 0; i < this.size; i++) {
         let dx = this.nodeXs[i] - x
         let dy = this.nodeYs[i] - y
         if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+          this.clicking = true
           if (i == this.hole) {
-            this.holeClicked = true
-            this.history[this.history.length - 1] = this.history.length >= 3 ?
-              this.history[this.history.length - 3] : this.hole
-          } else {
-            this.history[this.history.length - 1] = i
-            if (this.matrix[this.size * this.hole + i]) {
-              this.chosenTail = i
+            if (this.history.length <= 2 && this.hole == this.tail) {
+              this.clickTarget = -1
+              return
             }
+
+            i = this.history[this.history.length - 3]
           }
 
-          this.ghostHole = null
+          this.clickTarget = this.beads.indexOf(i)
+          this.history[this.history.length - 1] = i
+          if (this.matrix[this.size * this.hole + i]) {
+            this.chosenTail = i
+          }
+
           return
         }
       }
     },
     clicked(event) {
-      let i = this.holeClicked ? this.hole : this.tail
-      if (!this.holeClicked && !this.matrix[this.size * this.hole + i]) {
-        this.ghostHole = this.hole
-        this.history[this.history.length - 1] = this.hole
+      if (event.button != 0) {
         return
       }
 
       let gameView = document.getElementById('game-view')
       let x = event.offsetX / gameView.clientWidth * 240 - 120
       let y = event.offsetY / gameView.clientHeight * 240 - 120
-      let dx = this.nodeXs[i] - x
-      let dy = this.nodeYs[i] - y
-      if (dx * dx + dy * dy >= this.clickRadius * this.clickRadius) {
-        if (this.holeClicked) {
+      let oldTarget = this.clickTarget
+      this.clicking = false
+      if (
+        this.clickTarget == -1 || (
+          this.history.length >= 3 &&
+            this.beads[this.clickTarget] ==
+              this.history[this.history.length - 3]
+        )
+      ) {
+        let dx = this.nodeXs[this.hole] - x
+        let dy = this.nodeYs[this.hole] - y
+        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+          this.goBack()
           this.history[this.history.length - 1] = this.hole
-          this.holeClicked = false
+          this.clickTarget = oldTarget
+          return
         }
+      }
 
+      let dx = this.nodeXs[this.beads[this.clickTarget]] - x
+      let dy = this.nodeYs[this.beads[this.clickTarget]] - y
+      if (dx * dx + dy * dy >= this.clickRadius * this.clickRadius) {
+        this.clickTarget = null
         return
       }
 
-      let oldHole = this.hole
-      if (this.holeClicked) {
-        this.goBack()
-        this.history[this.history.length - 1] = this.hole
-      } else {
-        this.goForwardHelp()
-        this.history.push(this.tail)
-      }
-
-      this.ghostHole = oldHole
+      this.goForwardHelp()
+      this.history.push(this.tail)
+      this.clickTarget = oldTarget
     },
     buttonClicked() {
       if (!this.ensureTail()) {
@@ -681,12 +697,10 @@ export default {
       }
     },
     onFocus() {
-      if (!this.holeClicked) {
-        this.ensureTail()
-      }
+      this.ensureTail()
     },
     onBlur() {
-      this.holeClicked = false
+      this.clickTarget = null
       this.history[this.history.length - 1] = this.hole
     },
     checkWin() {
@@ -711,8 +725,7 @@ export default {
 
       this.history = [hole, hole]
       this.chosenTail = null
-      this.holeClicked = false
-      this.ghostHole = null
+      this.clickTarget = null
       this.checkWin()
     },
     fast(newFast, oldFast) {
@@ -792,7 +805,7 @@ export default {
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        :class="{ghost: ghostHole != null}"
+        :class="{ghost: clickTarget != null && !clicking}"
         fill="none"
       />
       <path
@@ -800,7 +813,7 @@ export default {
         class="head"
         :d="crossPath"
         :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
-        :class="{ghost: ghostHole != null}"
+        :class="{ghost: clickTarget != null && !clicking}"
         fill="none"
       />
       <g
@@ -822,7 +835,7 @@ export default {
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
-          :class="{ghost: ghostHole != null}"
+          :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
       <mask id="head-mask">
@@ -830,12 +843,12 @@ export default {
         <use
           href="#head-path"
           :opacity="showHead ? 1 : 0"
-          :class="{ghost: ghostHole != null}"
+          :class="{ghost: clickTarget != null && !clicking}"
         />
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
-          :class="{ghost: ghostHole != null}"
+          :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
       <mask id="truncate-mask">
@@ -850,12 +863,12 @@ export default {
         <use
           href="#head-path"
           :opacity="showHead ? 1 : 0"
-          :class="{ghost: ghostHole != null}"
+          :class="{ghost: clickTarget != null && !clicking}"
         />
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
-          :class="{ghost: ghostHole != null}"
+          :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
       <path
@@ -1033,7 +1046,10 @@ tail onPath undo loop reverse offset-rotate
   transition: transform 0s 0.35s;
 }
 .bead.ghost.moving {
-  transition: transform 0s 0.05s;
+  /* this timing function approximates a delay, since actual delay caused
+   * beads to stay BIG sometimes due to browser bug
+   */
+  transition: transform 0.06s cubic-bezier(1,0,1,0);
 }
 .checkmark {
   opacity: 0;
