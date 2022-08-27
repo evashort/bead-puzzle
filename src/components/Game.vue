@@ -266,10 +266,11 @@ export default {
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
     },
     showCross() {
-      return this.clickTarget != null && this.clicking && (
-        !this.matrix[this.hole * this.size + this.tail] ||
-          this.clickTarget == -1
-      )
+      return this.clickTarget != null && this.clicking &&
+        this.hole != this.tail && (
+          !this.matrix[this.hole * this.size + this.tail] ||
+            this.clickTarget == -1
+        )
     },
     arrowEdge() {
       let a = this.hole, b = this.tail
@@ -632,6 +633,8 @@ export default {
         if (this.matrix[this.size * this.hole + newTail]) {
           this.chosenTail = newTail
         }
+      } else if (this.clickTarget == -2 || this.clickTarget == -3) {
+        this.history[this.history.length - 1] = this.hole
       }
     },
     clicked(event) {
@@ -661,6 +664,21 @@ export default {
         } else {
           this.history[this.history.length - 1] = this.hole
         }
+      } else if (
+        this.clickTarget == -2 && this.history.length >= 4 &&
+          this.hole == this.history[0]
+      ) {
+        this.history[this.history.length - 1] = this.history[1]
+        this.goForwardHelp()
+        this.history.push(this.tail)
+        this.clickTarget = -2
+      } else if (
+        this.clickTarget == -3 && this.history.length >= 4 &&
+          this.hole == this.history[0]
+      ) {
+        this.goBack()
+        this.history[this.history.length - 1] = this.hole
+        this.clickTarget = -3
       }
     },
     getClickTarget(offsetX, offsetY) {
@@ -676,15 +694,15 @@ export default {
       }
 
       let dx = 0 - x
-      let dy = this.spinButtonY - y
-      if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-        return -2
+      let dy = this.smallSpinButtonY - y
+      if (dx * dx + dy * dy < this.smallClickRadius * this.smallClickRadius) {
+        return -3
       }
 
       dx = 0 - x
-      dy = this.smallSpinButtonY - y
-      if (dx * dx + dy * dy < this.smallClickRadius * this.smallClickRadius) {
-        return -3
+      dy = this.spinButtonY - y
+      if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+        return -2
       }
 
       return null
@@ -695,7 +713,9 @@ export default {
       }
     },
     onFocus() {
-      this.ensureTail()
+      if (this.clickTarget != -2 && this.clickTarget != -3) {
+        this.ensureTail()
+      }
     },
     onBlur() {
       this.clickTarget = null
