@@ -347,13 +347,13 @@ export default {
       return 42
     },
     spinButtonY() {
-      return 15
+      return -15
     },
     smallClickRadius() {
       return 20
     },
     smallSpinButtonY() {
-      return this.smallClickRadius - this.clickRadius - this.spinButtonY
+      return this.clickRadius - this.smallClickRadius - this.spinButtonY
     },
     dustDuration() {
       return this.getDustDuration(this.fast)
