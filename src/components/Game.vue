@@ -266,11 +266,12 @@ export default {
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
     },
     showCross() {
-      return this.clickTarget != null && this.clicking &&
-        this.hole != this.tail && (
-          !this.matrix[this.hole * this.size + this.tail] ||
-            this.clickTarget == -1
+      return this.clickTarget != null && this.clicking && (
+        this.clickTarget == -1 || (
+          this.hole != this.tail &&
+            !this.matrix[this.hole * this.size + this.tail]
         )
+      )
     },
     arrowEdge() {
       let a = this.hole, b = this.tail
@@ -693,16 +694,20 @@ export default {
         }
       }
 
-      let dx = 0 - x
-      let dy = this.smallSpinButtonY - y
-      if (dx * dx + dy * dy < this.smallClickRadius * this.smallClickRadius) {
-        return -3
-      }
+      if (this.history.length >= 4 && this.hole == this.history[0]) {
+        let dx = 0 - x
+        let dy = this.smallSpinButtonY - y
+        if (
+          dx * dx + dy * dy < this.smallClickRadius * this.smallClickRadius
+        ) {
+          return -3
+        }
 
-      dx = 0 - x
-      dy = this.spinButtonY - y
-      if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-        return -2
+        dx = 0 - x
+        dy = this.spinButtonY - y
+        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+          return -2
+        }
       }
 
       return null
@@ -713,7 +718,10 @@ export default {
       }
     },
     onFocus() {
-      if (this.clickTarget != -2 && this.clickTarget != -3) {
+      if (
+        this.clickTarget != -2 && this.clickTarget != -1 &&
+          this.clickTarget != -3
+      ) {
         this.ensureTail()
       }
     },
