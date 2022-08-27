@@ -650,12 +650,13 @@ export default {
       ) {
         let oldTarget = this.hole
         this.goBack()
-        this.clickTarget = oldTarget // TODO: arrowPath is messed up
+        this.clickTarget = oldTarget
         this.history[this.history.length - 1] = this.hole
       } else if (this.clickTarget != null && this.clickTarget == this.tail) {
         if (this.matrix[this.hole * this.size + this.tail]) {
+          let oldTarget = this.hole
           this.goForwardHelp()
-          this.clickTarget = this.hole
+          this.clickTarget = oldTarget
           this.history.push(this.tail)
         } else {
           this.history[this.history.length - 1] = this.hole
