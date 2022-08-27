@@ -277,7 +277,7 @@ export default {
         this.clickTarget != null && this.clickTarget >= 0 && !this.clicking
       ) {
         b = a
-        a = this.beads[this.clickTarget]
+        a = this.clickTarget
       } else if (a == b && this.history.length >= 3) {
         a = this.history[this.history.length - 3]
       }
@@ -462,11 +462,6 @@ export default {
       }
     },
     goForwardHelp() {
-      if (!this.matrix[this.hole * this.size + this.tail]) {
-        this.history.pop()
-        return
-      }
-
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.checkWin()
@@ -625,31 +620,17 @@ export default {
         return
       }
 
-      let gameView = document.getElementById('game-view')
-      let x = event.offsetX / gameView.clientWidth * 240 - 120
-      let y = event.offsetY / gameView.clientHeight * 240 - 120
-      this.clickTarget = null
-      for (let i = 0; i < this.size; i++) {
-        let dx = this.nodeXs[i] - x
-        let dy = this.nodeYs[i] - y
-        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-          this.clicking = true
-          if (i == this.hole) {
-            if (this.history.length <= 2 && this.hole == this.tail) {
-              this.clickTarget = -1
-              return
-            }
-
-            i = this.history[this.history.length - 3]
-          }
-
-          this.clickTarget = this.beads.indexOf(i)
-          this.history[this.history.length - 1] = i
-          if (this.matrix[this.size * this.hole + i]) {
-            this.chosenTail = i
-          }
-
-          return
+      this.clickTarget = this.getClickTarget(event.offsetX, event.offsetY)
+      this.clicking = true
+      if (this.clickTarget == this.hole && this.history.length <= 2) {
+        this.clickTarget = -1
+        this.history[this.history.length - 1] = this.hole
+      } else if (this.clickTarget != null && this.clickTarget >= 0) {
+        let newTail = this.clickTarget == this.hole ?
+          this.history[this.history.length - 3] : this.clickTarget
+        this.history[this.history.length - 1] = newTail
+        if (this.matrix[this.size * this.hole + newTail]) {
+          this.chosenTail = newTail
         }
       }
     },
@@ -658,38 +639,54 @@ export default {
         return
       }
 
-      let gameView = document.getElementById('game-view')
-      let x = event.offsetX / gameView.clientWidth * 240 - 120
-      let y = event.offsetY / gameView.clientHeight * 240 - 120
-      let oldTarget = this.clickTarget
       this.clicking = false
-      if (
-        this.clickTarget == -1 || (
-          this.history.length >= 3 &&
-            this.beads[this.clickTarget] ==
-              this.history[this.history.length - 3]
-        )
+      let newTarget = this.getClickTarget(event.offsetX, event.offsetY)
+      if (newTarget == this.hole && this.clickTarget == -1) {
+      } else if (newTarget != this.clickTarget) {
+        this.clickTarget = null
+      } else if (
+        this.clickTarget == this.hole && this.history.length >= 3 &&
+          this.history[this.history.length - 3] == this.tail
       ) {
-        let dx = this.nodeXs[this.hole] - x
-        let dy = this.nodeYs[this.hole] - y
-        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-          this.goBack()
+        let oldTarget = this.hole
+        this.goBack()
+        this.clickTarget = oldTarget // TODO: arrowPath is messed up
+        this.history[this.history.length - 1] = this.hole
+      } else if (this.clickTarget != null && this.clickTarget == this.tail) {
+        if (this.matrix[this.hole * this.size + this.tail]) {
+          this.goForwardHelp()
+          this.clickTarget = this.hole
+          this.history.push(this.tail)
+        } else {
           this.history[this.history.length - 1] = this.hole
-          this.clickTarget = oldTarget
-          return
+        }
+      }
+    },
+    getClickTarget(offsetX, offsetY) {
+      let gameView = document.getElementById('game-view')
+      let x = offsetX / gameView.clientWidth * 240 - 120
+      let y = offsetY / gameView.clientHeight * 240 - 120
+      for (let i = 0; i < this.size; i++) {
+        let dx = this.nodeXs[i] - x
+        let dy = this.nodeYs[i] - y
+        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+          return i
         }
       }
 
-      let dx = this.nodeXs[this.beads[this.clickTarget]] - x
-      let dy = this.nodeYs[this.beads[this.clickTarget]] - y
-      if (dx * dx + dy * dy >= this.clickRadius * this.clickRadius) {
-        this.clickTarget = null
-        return
+      let dx = 0 - x
+      let dy = this.spinButtonY - y
+      if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
+        return -2
       }
 
-      this.goForwardHelp()
-      this.history.push(this.tail)
-      this.clickTarget = oldTarget
+      dx = 0 - x
+      dy = this.smallSpinButtonY - y
+      if (dx * dx + dy * dy < this.smallClickRadius * this.smallClickRadius) {
+        return -3
+      }
+
+      return null
     },
     buttonClicked() {
       if (!this.ensureTail()) {
