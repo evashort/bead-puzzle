@@ -801,31 +801,34 @@ export default {
           stroke-linecap="round"
           stroke-linejoin="round"
         />
-        <image id="check" x="-15" y="-15" width="30" height="30"
-          href="../assets/checkmark.svg"
-        />
+        <radialGradient r="0.55" id="checked-1"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#b51d14"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-2"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#ddb310"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-3"> <stop offset="72%" stop-color="black"/> <stop offset="100%" stop-color="#00b25d"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-4"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#00beff"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-5"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#4053d3"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-6"> <stop offset="74%" stop-color="black"/> <stop offset="100%" stop-color="#fb49b0"/> </radialGradient>
       </defs>
       <circle
         v-for="node in size"
-        fill="black"
+        :fill="node >= 2 && beads[node - 2] == node - 1 ? `url('#checked-${node - 1}')` : 'black'"
         :r="clickRadius"
         :cx="nodeXs[node - 1]"
         :cy="nodeYs[node - 1]"
-        :class="{touchCircle: true, active: this.matrix[size * hole + node - 1]}"
+        :class="{touchCircle: true, checked: node >= 2 && beads[node - 2] == node - 1}"
       />
       <circle
         fill="black"
         :r="clickRadius"
         :cx="0"
         :cy="spinButtonY"
-        :class="{touchCircle: true, active: this.history.length >= 4 && this.hole == this.history[0]}"
+        :class="{touchCircle: true}"
       />
       <circle
         fill="black"
         :r="smallClickRadius"
         :cx="0"
         :cy="smallSpinButtonY"
-        :class="{touchCircle: true, active: this.history.length >= 4 && this.hole == this.history[0]}"
+        :class="{touchCircle: true}"
       />
       <path
         :opacity="showHead ? 1 : 0"
@@ -966,12 +969,6 @@ export default {
           :style="{ 'transform': 'scale(2.5)' }"
         />
       </g>
-      <use
-        v-for="(node, id) of beads"
-        :style="{'offset-path': beadOffsetPaths[id]}"
-        :class="{ checkmark: true, checked: node == id + 1, animate: this.animations[id] > 0, alternate: this.animations[id] % 2 }"
-        href="#check"
-      />
     </svg>
   </button>
 </template>
@@ -991,6 +988,10 @@ export default {
   stroke: var(--color-text);
   stroke-width: 0.5;
   stroke-opacity: 0.25;
+}
+.touchCircle.checked {
+  stroke-width: 0.75;
+  stroke-opacity: 1;
 }
 .head {
   stroke: var(--color-text);
@@ -1040,14 +1041,14 @@ tail onPath undo loop reverse offset-rotate
 .bead.onPath.reverse {
   offset-rotate: reverse;
 }
-.checkmark.animate, .bead.animate {
+.bead.animate {
   animation: slide 0.75s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.checkmark.alternate, .bead.alternate {
+.bead.alternate {
   animation-name: slide2
 }
 @keyframes slide2 {
@@ -1077,17 +1078,6 @@ tail onPath undo loop reverse offset-rotate
    * beads to stay BIG sometimes due to browser bug
    */
   transition: transform 0.06s cubic-bezier(1,0,1,0);
-}
-.checkmark {
-  opacity: 0;
-  transition-property: opacity;
-  transition-delay: 0s;
-  offset-distance: 100%;
-  offset-rotate: 0deg;
-}
-.checkmark.checked {
-  opacity: 1;
-  transition-delay: 0.35s;
 }
 .dust {
   animation-name: dustFade;
