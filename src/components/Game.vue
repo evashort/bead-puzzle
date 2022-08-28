@@ -644,7 +644,7 @@ export default {
       let newTarget = this.getClickTarget(event.offsetX, event.offsetY)
       if (newTarget == this.hole && this.clickTarget == -1) {
       } else if (newTarget != this.clickTarget) {
-        this.clickTarget = null
+        this.clicking = true
       } else if (
         this.clickTarget == this.hole && this.history.length >= 3 &&
           this.history[this.history.length - 3] == this.tail
