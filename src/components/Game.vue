@@ -5,10 +5,6 @@ import seedrandom from 'seedrandom'
 <script>
 export default {
   data() {
-    let beadSet = new Set(this.startingBeads)
-    let hole = 0
-    for (; beadSet.has(hole); hole++) { }
-
     let dustDelays = new Float64Array(this.dustCount)
     // higher origin reduces numerical instability introduced by going fast
     let dustOrigin = 946713600000 // year 2000
@@ -23,15 +19,15 @@ export default {
     }
 
     return {
-      beads: [...this.startingBeads],
-      history: [hole, hole],
+      beads: [],
+      history: [],
       chosenTail: null,
       // if clickTarget is null, clicking is treated as false no matter its
       // actual value
       clicking: false,
       clickTarget: null,
-      animations: new Uint8Array(this.startingBeads.length),
-      oldBeads: [...this.startingBeads],
+      animations: new Uint8Array(0),
+      oldBeads: [],
       now: now,
       dustDelays: dustDelays,
       dustOrigin: dustOrigin,
@@ -44,6 +40,7 @@ export default {
     baseDustDuration: Number,
     dustCount: Number,
   },
+  emits: ['update:beads'],
   created() {
     // https://newbedev.com/make-computed-vue-properties-dependent-on-current-time
     var self = this
@@ -730,6 +727,7 @@ export default {
       this.history[this.history.length - 1] = this.hole
     },
     checkWin() {
+      this.$emit('update:beads', [...this.beads])
       for (let [id, node] of this.beads.entries()) {
         if (node != id + 1) {
           this.fast = false
@@ -741,18 +739,21 @@ export default {
     },
   },
   watch: {
-    startingBeads(newStartingBeads, oldStartingBeads) {
-      this.beads = [...newStartingBeads]
-      this.oldBeads = [...newStartingBeads]
-      this.animations = new Uint8Array(this.beads.length)
-      let beadSet = new Set(this.beads)
-      let hole = 0
-      for (; beadSet.has(hole); hole++) { }
+    startingBeads: {
+      handler(newStartingBeads, oldStartingBeads) {
+        this.beads = [...newStartingBeads]
+        this.oldBeads = [...newStartingBeads]
+        this.animations = new Uint8Array(this.beads.length)
+        let beadSet = new Set(this.beads)
+        let hole = 0
+        for (; beadSet.has(hole); hole++) { }
 
-      this.history = [hole, hole]
-      this.chosenTail = null
-      this.clickTarget = null
-      this.checkWin()
+        this.history = [hole, hole]
+        this.chosenTail = null
+        this.clickTarget = null
+        this.checkWin()
+      },
+      immediate: true,
     },
     fast(newFast, oldFast) {
       let oldDuration = this.getDustDuration(oldFast)

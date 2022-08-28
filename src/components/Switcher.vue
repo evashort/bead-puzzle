@@ -34,6 +34,7 @@ export default {
       groups: groups,
       graphs: graphData.graphs,
       idGraphs: idGraphs,
+      beads: [],
     }
   },
   props: {
@@ -52,7 +53,7 @@ export default {
     rotation() {
       return this.puzzle.rotation
     },
-    beads() {
+    startingBeads() {
       return this.puzzle.beads
     },
     edges() {
@@ -104,12 +105,13 @@ export default {
         </template>
       </fieldset>
     </div>
-    <Game :startingBeads="beads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
+    <Game v-model:beads="beads" :startingBeads="startingBeads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
       Brute force: {{Math.round(graph.difficulty)}} moves<br/>
       State space: {{graph.states}} states<br/>
+      {{beads}}
       <fieldset>
         <legend>{{graph.puzzles.length}} variations</legend>
         <template
