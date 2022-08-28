@@ -801,7 +801,7 @@ export default {
           stroke-linecap="round"
           stroke-linejoin="round"
         />
-        <image id="check" x="-10" y="-10" width="20" height="20"
+        <image id="check" x="-15" y="-15" width="30" height="30"
           href="../assets/checkmark.svg"
         />
       </defs>
@@ -935,43 +935,43 @@ export default {
           href="../assets/heart_outline.svg"
           :style="{ 'transform': `scale(2.7)` }"
         />
-        <use :class="{ checkmark: true, checked: beads[0] == 1 }" href="#check"></use>
       </g>
       <g v-if="size > 2" :transform="`translate(${goalXs[2]},${goalYs[2]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/butterfly_outline.svg"
           :style="{ 'transform': 'scale(2.8)' }"
         />
-        <use :class="{ checkmark: true, checked: beads[1] == 2 }" href="#check"></use>
       </g>
       <g v-if="size > 3" :transform="`translate(${goalXs[3]},${goalYs[3]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/saturn_outline.svg"
           :style="{ 'transform': 'scale(3.35)' }"
         />
-        <use :class="{ checkmark: true, checked: beads[2] == 3 }" href="#check"></use>
       </g>
       <g v-if="size > 4" :transform="`translate(${goalXs[4]},${goalYs[4]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/leaf_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
-        <use :class="{ checkmark: true, checked: beads[3] == 4 }" href="#check"></use>
       </g>
       <g v-if="size > 5" :transform="`translate(${goalXs[5]},${goalYs[5]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/mushroom_outline.svg"
           :style="{ 'transform': 'scale(2.6)' }"
         />
-        <use :class="{ checkmark: true, checked: beads[4] == 5 }" href="#check"></use>
       </g>
       <g v-if="size > 6" :transform="`translate(${goalXs[6]},${goalYs[6]})`">
         <image x="-3" y="-3" width="6" height="6"
           href="../assets/flower_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
-        <use :class="{ checkmark: true, checked: beads[5] == 6 }" href="#check"></use>
       </g>
+      <use
+        v-for="(node, id) of beads"
+        :style="{'offset-path': beadOffsetPaths[id]}"
+        :class="{ checkmark: true, checked: node == id + 1, animate: this.animations[id] > 0, alternate: this.animations[id] % 2 }"
+        href="#check"
+      />
     </svg>
   </button>
 </template>
@@ -1040,14 +1040,14 @@ tail onPath undo loop reverse offset-rotate
 .bead.onPath.reverse {
   offset-rotate: reverse;
 }
-.bead.animate {
+.checkmark.animate, .bead.animate {
   animation: slide 0.75s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.bead.alternate {
+.checkmark.alternate, .bead.alternate {
   animation-name: slide2
 }
 @keyframes slide2 {
@@ -1082,6 +1082,8 @@ tail onPath undo loop reverse offset-rotate
   opacity: 0;
   transition-property: opacity;
   transition-delay: 0s;
+  offset-distance: 100%;
+  offset-rotate: 0deg;
 }
 .checkmark.checked {
   opacity: 1;
