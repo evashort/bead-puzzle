@@ -358,6 +358,23 @@ export default {
     smallSpinPath() {
       return this.getSpinPath(7, 9)
     },
+    clockwise() {
+      let minA = Infinity, minB = Infinity
+      let clockwise = false
+      for (let i = 0; i < this.history.length - 2; i++) {
+        let node1 = this.history[i], node2 = this.history[i + 1]
+        let a = this.getHeightRank(node1)
+        let b = this.getHeightRank(node2)
+        if (b < a) { [a, b] = [b, a] }
+        if (a < minA || (a == minA && b < minB)) {
+          minA = a
+          minB = b
+          clockwise = this.nodeXs[node1] < this.nodeXs[node2]
+        }
+      }
+
+      return clockwise
+    },
     dustDuration() {
       return this.getDustDuration(this.fast)
     },
@@ -468,6 +485,10 @@ export default {
       let dx1 = s * (0.5 * w * u + h * v), dy1 = s * (0.5 * w * v - h * u)
       let dx2 = s * (-.5 * w * u + h * v), dy2 = s * (-.5 * w * v - h * u)
       return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
+    },
+    getHeightRank(node) {
+      let c = Math.floor(0.5 * this.size)
+      return Math.abs((node + c) % this.size - c)
     },
     goForward() {
       if (this.ensureTail()) {
@@ -932,14 +953,14 @@ export default {
       />
       <template v-if="history.length >= 4 && this.hole == this.history[0]">
         <g
-          :style="{transform: `translate(0,${spinButtonY}px) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
+          :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
           :class="{spinIconGhost: clickTarget == -2 && !clicking}"
         >
           <path :d="spinPath" class="spinIcon shadow"/>
           <path :d="spinPath" class="spinIcon"/>
         </g>
         <g
-          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(-1,1) scale(${clicking && clickTarget == -3 ? activeBeadScale : normalBeadScale})`}"
+          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(${clockwise ? -1 : 1},1) scale(${clicking && clickTarget == -3 ? activeBeadScale : normalBeadScale})`}"
           :class="{spinIconGhost: clickTarget == -3 && !clicking}"
         >
           <path :d="smallSpinPath" class="spinIcon shadow"/>
