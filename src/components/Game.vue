@@ -242,7 +242,7 @@ export default {
       return next >= 0 && next < this.loopEnd
     },
     headRadius() {
-      return 10
+      return 12
     },
     headHeight() {
       return this.headRadius * Math.sqrt(1.5)
@@ -256,7 +256,7 @@ export default {
         this.matrix[this.hole * this.size + this.tail]
     },
     crossRadius() {
-      return 15
+      return 18
     },
     crossPath() {
       let d = this.crossRadius * Math.sqrt(0.5)
@@ -338,7 +338,7 @@ export default {
       return 1
     },
     activeBeadScale() {
-      return 2
+      return 5/3
     },
     clickRadius() {
       return 42
@@ -353,19 +353,10 @@ export default {
       return this.clickRadius - this.smallClickRadius - this.spinButtonY
     },
     spinPath() {
-      let tailAngle = 160, headAngle = -30, r = 11, sweep = 0, largeArc = 1
-      let s = -1 + 2 * sweep
-      let x1 = r * Math.sin(tailAngle * Math.PI / 180)
-      let y1 = -r * Math.cos(tailAngle * Math.PI / 180)
-      let u = Math.sin(headAngle * Math.PI / 180)
-      let v = -Math.cos(headAngle * Math.PI / 180)
-      let x2 = r * u, y2 = r * v
-      let neck = 6, w = 12
-      let h = w * Math.sqrt(0.375)
-      let nx = s * -neck * v, ny = s * neck * u
-      let dx1 = s * (0.5 * w * u + h * v), dy1 = s * (0.5 * w * v - h * u)
-      let dx2 = s * (-.5 * w * u + h * v), dy2 = s * (-.5 * w * v - h * u)
-      return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
+      return this.getSpinPath(10, 11)
+    },
+    smallSpinPath() {
+      return this.getSpinPath(7, 9)
     },
     dustDuration() {
       return this.getDustDuration(this.fast)
@@ -462,6 +453,21 @@ export default {
 
       let factor = len3 > 0 ? 1 / len3 : 0
       return [dx3 * factor, dy3 * factor]
+    },
+    getSpinPath(r, w) {
+      let tailAngle = 160, headAngle = -30, sweep = 0, largeArc = 1
+      let s = -1 + 2 * sweep
+      let x1 = r * Math.sin(tailAngle * Math.PI / 180)
+      let y1 = -r * Math.cos(tailAngle * Math.PI / 180)
+      let u = Math.sin(headAngle * Math.PI / 180)
+      let v = -Math.cos(headAngle * Math.PI / 180)
+      let x2 = r * u, y2 = r * v
+      let h = w * Math.sqrt(0.375)
+      let neck = 4.5
+      let nx = s * -neck * v, ny = s * neck * u
+      let dx1 = s * (0.5 * w * u + h * v), dy1 = s * (0.5 * w * v - h * u)
+      let dx2 = s * (-.5 * w * u + h * v), dy2 = s * (-.5 * w * v - h * u)
+      return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
     },
     goForward() {
       if (this.ensureTail()) {
@@ -875,11 +881,6 @@ export default {
           >
         </circle>
       </g>
-      <path
-        class="head"
-        :d="spinPath"
-        fill="none"
-      />
       <mask id="cross-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use
@@ -929,62 +930,78 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
-      <image v-if="size > 1" x="-5" y="-5" width="10" height="10" :class="beadClasses[0]"
+      <template v-if="history.length >= 4 && this.hole == this.history[0]">
+        <g
+          :style="{transform: `translate(0,${spinButtonY}px) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
+          :class="{spinIconGhost: clickTarget == -2 && !clicking}"
+        >
+          <path :d="spinPath" class="spinIcon shadow"/>
+          <path :d="spinPath" class="spinIcon"/>
+        </g>
+        <g
+          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(-1,1) scale(${clicking && clickTarget == -3 ? activeBeadScale : normalBeadScale})`}"
+          :class="{spinIconGhost: clickTarget == -3 && !clicking}"
+        >
+          <path :d="smallSpinPath" class="spinIcon shadow"/>
+          <path :d="smallSpinPath" class="spinIcon"/>
+        </g>
+      </template>
+      <image v-if="size > 1" x="-6" y="-6" width="12" height="12" :class="beadClasses[0]"
         href="../assets/heart.svg"
         :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[0] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[0] }"
       />
-      <image v-if="size > 2" x="-5" y="-5" width="10" height="10" :class="beadClasses[1]"
+      <image v-if="size > 2" x="-6" y="-6" width="12" height="12" :class="beadClasses[1]"
         href="../assets/butterfly.svg"
         :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[1] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[1] }"
       />
-      <image v-if="size > 3" x="-5" y="-5" width="10" height="10" :class="beadClasses[2]"
+      <image v-if="size > 3" x="-6" y="-6" width="12" height="12" :class="beadClasses[2]"
         href="../assets/saturn.svg"
         :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[2] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[2] }"
       />
-      <image v-if="size > 4" x="-5" y="-5" width="10" height="10" :class="beadClasses[3]"
+      <image v-if="size > 4" x="-6" y="-6" width="12" height="12" :class="beadClasses[3]"
         href="../assets/leaf.svg"
         :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[3] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[3] }"
       />
-      <image v-if="size > 5" x="-5" y="-5" width="10" height="10" :class="beadClasses[4]"
+      <image v-if="size > 5" x="-6" y="-6" width="12" height="12" :class="beadClasses[4]"
         href="../assets/mushroom.svg"
         :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[4] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[4] }"
       />
-      <image v-if="size > 6" x="-5" y="-5" width="10" height="10" :class="beadClasses[5]"
+      <image v-if="size > 6" x="-6" y="-6" width="12" height="12" :class="beadClasses[5]"
         href="../assets/flower.svg"
         :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[5] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[5] }"
       />
       <g v-if="size > 1" :transform="`translate(${goalXs[1]},${goalYs[1]})`">
-        <image x="-3" y="-3" width="6" height="6"
+        <image x="-4" y="-4" width="8" height="8"
           href="../assets/heart_outline.svg"
           :style="{ 'transform': `scale(2.7)` }"
         />
       </g>
       <g v-if="size > 2" :transform="`translate(${goalXs[2]},${goalYs[2]})`">
-        <image x="-3" y="-3" width="6" height="6"
+        <image x="-4" y="-4" width="8" height="8"
           href="../assets/butterfly_outline.svg"
           :style="{ 'transform': 'scale(2.8)' }"
         />
       </g>
       <g v-if="size > 3" :transform="`translate(${goalXs[3]},${goalYs[3]})`">
-        <image x="-3" y="-3" width="6" height="6"
+        <image x="-4" y="-4" width="8" height="8"
           href="../assets/saturn_outline.svg"
           :style="{ 'transform': 'scale(3.35)' }"
         />
       </g>
       <g v-if="size > 4" :transform="`translate(${goalXs[4]},${goalYs[4]})`">
-        <image x="-3" y="-3" width="6" height="6"
+        <image x="-4" y="-4" width="8" height="8"
           href="../assets/leaf_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
       </g>
       <g v-if="size > 5" :transform="`translate(${goalXs[5]},${goalYs[5]})`">
-        <image x="-3" y="-3" width="6" height="6"
+        <image x="-4" y="-4" width="8" height="8"
           href="../assets/mushroom_outline.svg"
           :style="{ 'transform': 'scale(2.6)' }"
         />
       </g>
       <g v-if="size > 6" :transform="`translate(${goalXs[6]},${goalYs[6]})`">
-        <image x="-3" y="-3" width="6" height="6"
+        <image x="-4" y="-4" width="8" height="8"
           href="../assets/flower_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
@@ -1021,6 +1038,20 @@ export default {
 }
 .ghost {
   transition: opacity 0s 0.35s;
+}
+.spinIcon {
+  stroke: var(--color-text);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.spinIcon.shadow {
+  stroke: black;
+  stroke-width: 9;
+}
+.spinIconGhost {
+  transition: transform 0s 0.05s;
 }
 .edge {
   stroke: var(--color-text);
