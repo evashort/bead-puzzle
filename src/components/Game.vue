@@ -363,13 +363,32 @@ export default {
       let clockwise = false
       for (let i = 0; i < this.history.length - 2; i++) {
         let node1 = this.history[i], node2 = this.history[i + 1]
-        let a = this.getHeightRank(node1)
-        let b = this.getHeightRank(node2)
-        if (b < a) { [a, b] = [b, a] }
-        if (a < minA || (a == minA && b < minB)) {
-          minA = a
-          minB = b
-          clockwise = this.nodeXs[node1] < this.nodeXs[node2]
+        let y1 = this.getHeightRank(node1)
+        let y2 = this.getHeightRank(node2)
+        let minY = Math.min(y1, y2)
+        let maxY = Math.max(y1, y2)
+        if (minY < minA || (minY == minA && maxY < minB)) {
+          minA = minY
+          minB = maxY
+          let x1 = this.getXRank(node1)
+          let x2 = this.getXRank(node2)
+          if (x1 == x2) {
+            if (y1 < y2) {
+              let node0 = this.history[
+                i <= 0 ? this.history.length - 3 : i - 1
+              ]
+              let x0 = this.getXRank(node0)
+              clockwise = x0 < x1
+            } else {
+              let node3 = this.history[
+                i >= this.history.length - 3 ? 1 : i + 2
+              ]
+              let x3 = this.getXRank(node3)
+              clockwise = x2 < x3
+            }
+          } else {
+            clockwise = x1 < x2
+          }
         }
       }
 
@@ -487,8 +506,12 @@ export default {
       return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
     },
     getHeightRank(node) {
-      let c = Math.floor(0.5 * this.size)
-      return Math.abs((node + c) % this.size - c)
+      return Math.abs((node + this.size/2) % this.size - this.size/2)
+    },
+    getXRank(node) {
+      let a = (node + this.size/2) % this.size - this.size/2 // top half
+      let b = this.size/2 - node // bottom half
+      return Math.abs(a) < Math.abs(b) ? a : b
     },
     goForward() {
       if (this.ensureTail()) {
