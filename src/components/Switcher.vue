@@ -105,7 +105,7 @@ export default {
         </template>
       </fieldset>
     </div>
-    <Game v-model:beads="beads" :startingBeads="startingBeads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
+    <Game :startingBeads="startingBeads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
