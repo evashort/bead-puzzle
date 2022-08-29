@@ -352,6 +352,21 @@ export default {
     smallSpinButtonY() {
       return this.clickRadius - this.smallClickRadius - this.spinButtonY
     },
+    spinPath() {
+      let tailAngle = 160, headAngle = -30, r = 11, sweep = 0, largeArc = 1
+      let s = -1 + 2 * sweep
+      let x1 = r * Math.sin(tailAngle * Math.PI / 180)
+      let y1 = -r * Math.cos(tailAngle * Math.PI / 180)
+      let u = Math.sin(headAngle * Math.PI / 180)
+      let v = -Math.cos(headAngle * Math.PI / 180)
+      let x2 = r * u, y2 = r * v
+      let neck = 6, w = 12
+      let h = w * Math.sqrt(0.375)
+      let nx = s * -neck * v, ny = s * neck * u
+      let dx1 = s * (0.5 * w * u + h * v), dy1 = s * (0.5 * w * v - h * u)
+      let dx2 = s * (-.5 * w * u + h * v), dy2 = s * (-.5 * w * v - h * u)
+      return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
+    },
     dustDuration() {
       return this.getDustDuration(this.fast)
     },
@@ -860,6 +875,11 @@ export default {
           >
         </circle>
       </g>
+      <path
+        class="head"
+        :d="spinPath"
+        fill="none"
+      />
       <mask id="cross-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use
