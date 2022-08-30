@@ -3,7 +3,7 @@ import Switcher from './components/Switcher.vue';
 </script>
 
 <template>
-  <Switcher startingId="pEI="></Switcher>
+  <Switcher startingId="pEA="></Switcher>
 </template>
 
 <style>
