@@ -130,6 +130,13 @@ export default {
 
       return ys
     },
+    won() {
+      for (let [id, node] of this.beads.entries()) {
+        if (node != id + 1) { return false }
+      }
+
+      return true
+    },
     tangents() {
       let count = this.loopEnd + 1 - this.loopStart
       let xs = new Float64Array(count)
@@ -782,6 +789,8 @@ export default {
           stroke-linecap="round"
           stroke-linejoin="round"
         />
+        <!-- http://tsitsul.in/blog/coloropt/ -->
+        <radialGradient r="0.55" id="checked-0"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#cacaca"/> </radialGradient>
         <radialGradient r="0.55" id="checked-1"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#b51d14"/> </radialGradient>
         <radialGradient r="0.55" id="checked-2"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#ddb310"/> </radialGradient>
         <radialGradient r="0.55" id="checked-3"> <stop offset="72%" stop-color="black"/> <stop offset="100%" stop-color="#00b25d"/> </radialGradient>
@@ -791,11 +800,11 @@ export default {
       </defs>
       <circle
         v-for="node in size"
-        :fill="node >= 2 && beads[node - 2] == node - 1 ? `url('#checked-${node - 1}')` : 'black'"
+        :fill="(node >= 2 ? beads[node - 2] == node - 1 : won) ? `url('#checked-${node - 1}')` : 'black'"
         :r="clickRadius"
         :cx="nodeXs[node - 1]"
         :cy="nodeYs[node - 1]"
-        :class="{touchCircle: true, checked: node >= 2 && beads[node - 2] == node - 1}"
+        :class="{touchCircle: true, checked: node >= 2 ? beads[node - 2] == node - 1 : won}"
       />
       <circle
         fill="black"
