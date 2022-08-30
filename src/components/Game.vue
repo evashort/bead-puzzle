@@ -5,19 +5,6 @@ import seedrandom from 'seedrandom'
 <script>
 export default {
   data() {
-    let dustDelays = new Float64Array(this.dustCount)
-    // higher origin reduces numerical instability introduced by going fast
-    let dustOrigin = 946713600000 // year 2000
-    let now = Date.now()
-    let dustIndex = Math.floor(
-      (now - dustOrigin) * 0.001 / this.baseDustDuration * this.dustCount
-    )
-    for (let i = 0; i < this.dustCount; i++) {
-      let j = dustIndex - i
-      let startTime = j * this.baseDustDuration / this.dustCount
-      dustDelays[j % this.dustCount] = startTime - (now - dustOrigin) * 0.001
-    }
-
     return {
       beads: [],
       history: [],
@@ -28,34 +15,13 @@ export default {
       clickTarget: null,
       animations: new Uint8Array(0),
       oldBeads: [],
-      now: now,
-      dustDelays: dustDelays,
-      dustOrigin: dustOrigin,
-      fast: false,
     }
   },
   props: {
     startingBeads: Array,
     edges: Array,
-    baseDustDuration: Number,
-    dustCount: Number,
   },
   emits: ['update:beads'],
-  created() {
-    // https://newbedev.com/make-computed-vue-properties-dependent-on-current-time
-    var self = this
-    setInterval(function () {
-      let oldDustIndex = self.dustIndex
-      self.now = Date.now()
-      let j = self.dustIndex
-      if (j > oldDustIndex) {
-        let startTime = j * self.dustDuration / self.dustCount
-        self.dustDelays[j % self.dustCount] = startTime - 0.001 * (
-          self.now - self.dustOrigin
-        )
-      }
-    }, 100)
-  },
   computed: {
     size() {
       return this.startingBeads.length + 1
@@ -420,84 +386,8 @@ export default {
 
       return clockwise
     },
-    dustDuration() {
-      return this.getDustDuration(this.fast)
-    },
-    dustIndex() {
-      return this.getDustIndex(this.dustDuration)
-    },
-    dust() {
-      let dust = new Array(this.dustCount)
-      for (let i = 0; i < this.dustCount; i++) {
-        let j = this.dustIndex - i
-        let generator = new seedrandom(j)
-        let angle = generator.quick() * 2 * Math.PI
-        let distance = 80 * Math.sqrt(generator.quick())
-        dust[j % this.dustCount] = {
-          j: j,
-          cx: distance * Math.cos(angle),
-          cy: distance * Math.sin(angle),
-          r: 3 + 5 * generator.quick(),
-          color: this.getDustColor(j, generator)
-        }
-      }
-
-      return dust
-    },
   },
   methods: {
-    getDustDuration(fast) {
-      return this.baseDustDuration * (fast ? 0.02 : 1)
-    },
-    getDustIndex(dustDuration) {
-      return Math.floor(
-        (this.now - this.dustOrigin) * 0.001 / dustDuration * this.dustCount
-      )
-    },
-    getDustColor(j, generator) {
-      let duration = 20
-      let uniformFraction = 0.3
-      let realms = [
-        {
-          chartreuse: 4,
-          yellow: 1,
-        },
-        {
-          red: 1,
-          orange: 2,
-        },
-        {
-          lightskyblue: 1,
-          fuchsia: 1,
-        },
-      ]
-      let realmIndex = Math.floor(j / duration)
-      let threshold = 1
-      let phase = j % duration - uniformFraction * duration
-      if (phase > 0) {
-        let remaining = duration * (1 - uniformFraction)
-        threshold = 0.5 * (1 + Math.cos(phase * Math.PI / remaining))
-      }
-
-      let sample = generator.quick()
-      if (sample > threshold) {
-        realmIndex++
-        sample = (sample - threshold) / (1 - threshold)
-      } else {
-        sample /= threshold
-      }
-      let realm = realms[realmIndex % realms.length]
-      sample *= Object.values(realm).reduce((a, b) => a + b)
-      let color, weight
-      for ([color, weight] of Object.entries(realm)) {
-        sample -= weight
-        if (sample < 0) {
-          break
-        }
-      }
-
-      return color
-    },
     getTangent(i, j, k) {
       let x1 = this.nodeXs[i], y1 = this.nodeYs[i]
       let x2 = this.nodeXs[j], y2 = this.nodeYs[j]
@@ -832,14 +722,6 @@ export default {
     },
     checkWin() {
       this.$emit('update:beads', [...this.beads])
-      for (let [id, node] of this.beads.entries()) {
-        if (node != id + 1) {
-          this.fast = false
-          return
-        }
-      }
-
-      this.fast = true
     },
   },
   watch: {
@@ -859,24 +741,6 @@ export default {
       },
       immediate: true,
     },
-    fast(newFast, oldFast) {
-      let oldDuration = this.getDustDuration(oldFast)
-      let newDuration = this.getDustDuration(newFast)
-      let oldIndex = this.getDustIndex(oldDuration)
-      let oldOrigin = this.dustOrigin
-      this.now = Date.now()
-      // change dustOrigin to keep dustIndex constant
-      // dustIndex = (now - dustOrigin) / dustDuration
-      // dustOrigin = now - dustIndex * newDuration
-      let factor = newDuration / oldDuration
-      this.dustOrigin = this.now * (1 - factor) + this.dustOrigin * factor
-      for (let i = 0; i < this.dustCount; i++) {
-        let j = oldIndex - i
-        let startTime = j * oldDuration / this.dustCount
-        let oldDelay = startTime - 0.001 * (this.now - oldOrigin)
-        this.dustDelays[j % this.dustCount] = oldDelay * factor
-      }
-    }
   },
 }
 </script>
@@ -963,20 +827,6 @@ export default {
         :class="{ghost: clickTarget != null && !clicking}"
         fill="none"
       />
-      <g
-        v-for="(mote, i) of dust"
-        :class="{dust: true, alternate: Math.floor(mote.j / dustCount) % 2 != fast}"
-        :style="{'animation-duration': `${dustDuration}s`, 'animation-delay': `${dustDelays[i]}s`}"
-      >
-        <circle
-          :cx="mote.cx"
-          :cy="mote.cy"
-          :r="mote.r"
-          :fill="mote.color"
-          :style="{'transition-property': 'filter', 'transition-duration': '2s', 'filter': `brightness(${fast ? 100 : 50}%)`}"
-          >
-        </circle>
-      </g>
       <mask id="cross-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use
@@ -1225,32 +1075,5 @@ tail onPath undo loop reverse offset-rotate
    * beads to stay BIG sometimes due to browser bug
    */
   transition: transform 0.06s cubic-bezier(1,0,1,0);
-}
-.dust {
-  animation-name: dustFade;
-  animation-fill-mode: forwards;
-}
-.dust.alternate {
-  animation-name: dustFade2;
-}
-@keyframes dustFade {
-  from { opacity: 0.00785; }
-  3% { opacity: 0.00785; }
-  10% { opacity: 0.01; }
-  45% { opacity: 1; }
-  65% { opacity: 1; }
-  90% { opacity: 0.01; }
-  97% { opacity: 0; }
-  to { opacity: 0; }
-}
-@keyframes dustFade2 {
-  from { opacity: 0.00785; }
-  3% { opacity: 0.00785; }
-  10% { opacity: 0.01; }
-  45% { opacity: 1; }
-  65% { opacity: 1; }
-  90% { opacity: 0.01; }
-  97% { opacity: 0; }
-  to { opacity: 0; }
 }
 </style>
