@@ -358,11 +358,37 @@ export default {
     smallSpinPath() {
       return this.getSpinPath(7, 9)
     },
+    forcedLoop() {
+      if (this.history.length <= 2) {
+        return []
+      }
+
+      let loop = [...this.history]
+      loop.pop()
+      loop.pop()
+      let seen = new Set(loop)
+      let prev = loop[loop.length - 1]
+      let node = this.hole
+      while (node >= 0 && !seen.has(node)) {
+        loop.push(node)
+        let next = this.getForcedTail(prev, node)
+        prev = node
+        node = next
+      }
+
+      if (node >= 0) {
+        loop = loop.slice(loop.indexOf(node))
+        loop.push(node)
+        return loop
+      } else {
+        return []
+      }
+    },
     clockwise() {
       let minA = Infinity, minB = Infinity
       let clockwise = false
-      for (let i = 0; i < this.history.length - 2; i++) {
-        let node1 = this.history[i], node2 = this.history[i + 1]
+      for (let i = 0; i < this.forcedLoop.length - 1; i++) {
+        let node1 = this.forcedLoop[i], node2 = this.forcedLoop[i + 1]
         let y1 = this.getHeightRank(node1)
         let y2 = this.getHeightRank(node2)
         let minY = Math.min(y1, y2)
@@ -374,14 +400,14 @@ export default {
           let x2 = this.getXRank(node2)
           if (x1 == x2) {
             if (y1 < y2) {
-              let node0 = this.history[
-                i <= 0 ? this.history.length - 3 : i - 1
+              let node0 = this.forcedLoop[
+                i <= 0 ? this.forcedLoop.length - 2 : i - 1
               ]
               let x0 = this.getXRank(node0)
               clockwise = x0 < x1
             } else {
-              let node3 = this.history[
-                i >= this.history.length - 3 ? 1 : i + 2
+              let node3 = this.forcedLoop[
+                i >= this.forcedLoop.length - 2 ? 1 : i + 2
               ]
               let x3 = this.getXRank(node3)
               clockwise = x2 < x3
@@ -507,6 +533,18 @@ export default {
     },
     getHeightRank(node) {
       return Math.abs((node + this.size/2) % this.size - this.size/2)
+    },
+    getForcedTail(prev, hole) {
+      let start = hole * this.size
+      let tail = -1
+      for (let i = 0; i < this.size; i++) {
+        if (i != prev && this.matrix[start + i]) {
+          if (tail != -1) { return -1 }
+          tail = i
+        }
+      }
+
+      return tail
     },
     getXRank(node) {
       let a = (node + this.size/2) % this.size - this.size/2 // top half
@@ -727,18 +765,19 @@ export default {
         } else {
           this.history[this.history.length - 1] = this.hole
         }
-      } else if (
-        this.clickTarget == -2 && this.history.length >= 4 &&
-          this.hole == this.history[0]
-      ) {
-        this.history[this.history.length - 1] = this.history[1]
+      } else if (this.clickTarget == -2 && this.forcedLoop.length) {
+        if (this.history[0] == this.hole) {
+          this.history[this.history.length - 1] = this.history[1]
+        } else {
+          this.history[this.history.length - 1] = this.getForcedTail(
+            this.history[this.history.length - 3],
+            this.hole,
+          )
+        }
         this.goForwardHelp()
         this.history.push(this.tail)
         this.clickTarget = -2
-      } else if (
-        this.clickTarget == -3 && this.history.length >= 4 &&
-          this.hole == this.history[0]
-      ) {
+      } else if (this.clickTarget == -3 && this.forcedLoop.length) {
         this.goBack()
         this.history[this.history.length - 1] = this.hole
         this.clickTarget = -3
@@ -756,7 +795,7 @@ export default {
         }
       }
 
-      if (this.history.length >= 4 && this.hole == this.history[0]) {
+      if (this.forcedLoop.length) {
         let dx = 0 - x
         let dy = this.smallSpinButtonY - y
         if (
@@ -974,7 +1013,7 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
-      <template v-if="history.length >= 4 && this.hole == this.history[0]">
+      <template v-if="forcedLoop.length">
         <g
           :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
           :class="{spinIconGhost: clickTarget == -2 && !clicking}"
