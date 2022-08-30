@@ -1,6 +1,7 @@
 <script setup>
 import Game from './Game.vue'
 import graphData from '../assets/graphs.json'
+import Markdown from 'vue3-markdown-it'
 </script>
 
 <script>
@@ -67,6 +68,37 @@ export default {
         this,
       )
     },
+    instructions() {
+      // https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/term-collections/keys-keyboard-shortcuts
+      return {
+        'pGA=': `
+## Moving
+### Pointing device
+- Select each bead to move it into the empty space.
+- Select the empty space to undo.
+### Keyboard
+- Navigate to the puzzle by selecting it with your pointing device or using the **Tab** key.
+- Select **Up arrow** or **W** to move each bead into the empty space.
+- Select **Down arrow** or **S** to undo.
+`,
+        'ZIA=': `
+## Selecting
+### Pointing device
+- Select a bead to move it into the empty space.
+### Keyboard
+- Use **Left arrow** and **Right arrow** or **A** and **D** to select a bead.
+- Select **Up arrow** or **W** to move it into the empty space.
+`,
+        'pkA=': `
+## Spinning
+### Pointing device
+- Select a bead to move it into the empty space. Two arrows will appear in the center.
+- Select the arrows to move the beads around the loop.
+### Keyboard
+- Select **Up arrow** or **W** to move the beads around the loop.
+`,
+      }[this.id]
+    },
   },
   methods: {
   },
@@ -82,7 +114,7 @@ export default {
   <div style="text-align: center;">
     {{graph.loop ? 'Loop' : ''}}
     {{graph.superior.map(id => idGraphs[id]?.name || id)}}
-    <br/>
+    <Markdown :source="instructions" style="text-align: start;" />
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       <fieldset v-for="group in groups">
         <legend>{{group.name}}</legend>
@@ -109,7 +141,7 @@ export default {
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
-      Brute force: {{Math.round(graph.difficulty)}} moves<br/>
+      Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
       State space: {{graph.states}} states<br/>
       {{beads}}
       <fieldset>

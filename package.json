@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "seedrandom": "^3.0.5",
-    "vue": "^3.2.31"
+    "vue": "^3.2.31",
+    "vue3-markdown-it": "^1.0.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",

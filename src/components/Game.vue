@@ -882,7 +882,20 @@ export default {
 </script>
 
 <template>
-  <button class="tabStop" @keydown.up.stop.prevent="goForward()" @keydown.down.stop.prevent="goBack()" @keydown.left.stop.prevent="selectLeft()" @keydown.right.stop.prevent="selectRight()" @click="buttonClicked" @focus.native="onFocus" @blur.native="onBlur">
+  <button
+    class="tabStop"
+    @keydown.up.stop.prevent="goForward()"
+    @keydown.down.stop.prevent="goBack()"
+    @keydown.left.stop.prevent="selectLeft()"
+    @keydown.right.stop.prevent="selectRight()"
+    @keydown.w.stop.prevent="goForward()"
+    @keydown.s.stop.prevent="goBack()"
+    @keydown.a.stop.prevent="selectLeft()"
+    @keydown.d.stop.prevent="selectRight()"
+    @click="buttonClicked"
+    @focus.native="onFocus"
+    @blur.native="onBlur"
+  >
     <svg class="gameView" id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
       <defs>
         <path
