@@ -34,6 +34,26 @@ export default {
 
       return matrix
     },
+    idColors() {
+      return [
+        [],
+        [],
+        [4],
+        [1, 4],
+        [0, 1, 4],
+        [0, 1, 3, 4],
+        [0, 1, 3, 4, 5],
+        [0, 1, 2, 3, 4, 5],
+      ][this.size]
+    },
+    colorIds() {
+      let colorIds = new Int8Array(6).fill(-1)
+      for (let [id, color] of this.idColors.entries()) {
+        colorIds[color] = id
+      }
+
+      return colorIds
+    },
     hole() {
       return this.history[this.history.length - 2]
     },
@@ -800,7 +820,7 @@ export default {
       </defs>
       <circle
         v-for="node in size"
-        :fill="(node >= 2 ? beads[node - 2] == node - 1 : won) ? `url('#checked-${node - 1}')` : 'black'"
+        :fill="node >= 2 && beads[node - 2] == node - 1 ? `url('#checked-${idColors[node - 2] + 1}')` : won ? `url('#checked-0')` : 'black'"
         :r="clickRadius"
         :cx="nodeXs[node - 1]"
         :cy="nodeYs[node - 1]"
@@ -901,61 +921,61 @@ export default {
           <path :d="smallSpinPath" class="spinIcon"/>
         </g>
       </template>
-      <image v-if="size > 1" x="-6" y="-6" width="12" height="12" :class="beadClasses[0]"
+      <image v-if="colorIds[0] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[0]]"
         href="../assets/heart.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[0] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[0] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[colorIds[0]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[0]] }"
       />
-      <image v-if="size > 2" x="-6" y="-6" width="12" height="12" :class="beadClasses[1]"
+      <image v-if="colorIds[1] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[1]]"
         href="../assets/butterfly.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[1] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[1] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[colorIds[1]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[1]] }"
       />
-      <image v-if="size > 3" x="-6" y="-6" width="12" height="12" :class="beadClasses[2]"
+      <image v-if="colorIds[2] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[2]]"
         href="../assets/saturn.svg"
-        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[2] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[2] }"
+        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[colorIds[2]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[2]] }"
       />
-      <image v-if="size > 4" x="-6" y="-6" width="12" height="12" :class="beadClasses[3]"
+      <image v-if="colorIds[3] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[3]]"
         href="../assets/leaf.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[3] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[3] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[3]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[3]] }"
       />
-      <image v-if="size > 5" x="-6" y="-6" width="12" height="12" :class="beadClasses[4]"
+      <image v-if="colorIds[4] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[4]]"
         href="../assets/mushroom.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[4] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[4] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[colorIds[4]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[4]] }"
       />
-      <image v-if="size > 6" x="-6" y="-6" width="12" height="12" :class="beadClasses[5]"
+      <image v-if="colorIds[5] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[5]]"
         href="../assets/flower.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[5] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[5] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[5]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[5]] }"
       />
-      <g v-if="size > 1" :transform="`translate(${goalXs[1]},${goalYs[1]})`">
+      <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/heart_outline.svg"
           :style="{ 'transform': `scale(2.7)` }"
         />
       </g>
-      <g v-if="size > 2" :transform="`translate(${goalXs[2]},${goalYs[2]})`">
+      <g v-if="colorIds[1] >= 0" :transform="`translate(${goalXs[colorIds[1] + 1]},${goalYs[colorIds[1] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/butterfly_outline.svg"
           :style="{ 'transform': 'scale(2.8)' }"
         />
       </g>
-      <g v-if="size > 3" :transform="`translate(${goalXs[3]},${goalYs[3]})`">
+      <g v-if="colorIds[2] >= 0" :transform="`translate(${goalXs[colorIds[2] + 1]},${goalYs[colorIds[2] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/saturn_outline.svg"
           :style="{ 'transform': 'scale(3.35)' }"
         />
       </g>
-      <g v-if="size > 4" :transform="`translate(${goalXs[4]},${goalYs[4]})`">
+      <g v-if="colorIds[3] >= 0" :transform="`translate(${goalXs[colorIds[3] + 1]},${goalYs[colorIds[3] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/leaf_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
         />
       </g>
-      <g v-if="size > 5" :transform="`translate(${goalXs[5]},${goalYs[5]})`">
+      <g v-if="colorIds[4] >= 0" :transform="`translate(${goalXs[colorIds[4] + 1]},${goalYs[colorIds[4] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/mushroom_outline.svg"
           :style="{ 'transform': 'scale(2.6)' }"
         />
       </g>
-      <g v-if="size > 6" :transform="`translate(${goalXs[6]},${goalYs[6]})`">
+      <g v-if="colorIds[5] >= 0" :transform="`translate(${goalXs[colorIds[5] + 1]},${goalYs[colorIds[5] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/flower_outline.svg"
           :style="{ 'transform': 'scale(2.5)' }"
