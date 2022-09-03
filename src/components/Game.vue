@@ -61,28 +61,12 @@ export default {
       return this.history[this.history.length - 1]
     },
     loopEnd() {
-      if (this.hole == this.tail) {
-        return this.history.length - 2
-      }
-
-      if (!this.matrix[this.hole * this.size + this.tail]) {
-        return this.history.length - 2 // forbidden path
-      }
-
-      if (this.history.length <= 2) {
-        return this.history.length - 1
-      }
-
-      if (this.tail == this.history[this.history.length - 3]) {
-        return this.history.length - 2 // going back
-      }
-
-      return this.history.length - 1
+      return this.extra.length - 1
     },
     loopStart() {
-      let sentinel = this.history[this.loopEnd]
+      let sentinel = this.extra[this.loopEnd]
       for (let i = this.loopEnd - 2; i > 0; i--) {
-        if (this.history[i] == sentinel) {
+        if (this.extra[i] == sentinel) {
           return i
         }
       }
@@ -169,17 +153,17 @@ export default {
       }
 
       let endTangent = [0, 0]
-      if (this.history[this.loopStart] == this.history[this.loopEnd]) {
-        let a = this.history[this.loopEnd - 1], b = this.history[this.loopEnd]
-        endTangent = this.getTangent(this.history[this.loopStart + 1], b, a)
+      if (this.extra[this.loopStart] == this.extra[this.loopEnd]) {
+        let a = this.extra[this.loopEnd - 1], b = this.extra[this.loopEnd]
+        endTangent = this.getTangent(this.extra[this.loopStart + 1], b, a)
       }
 
       let lastTangent = [-endTangent[0], -endTangent[1]]
       for (let i = this.loopStart + 1; i <= this.loopEnd; i++) {
-        let a = this.history[i - 1], b = this.history[i]
+        let a = this.extra[i - 1], b = this.extra[i]
         let tangent = endTangent
         if (i < this.loopEnd) {
-          tangent = this.getTangent(this.history[i + 1], b, a)
+          tangent = this.getTangent(this.extra[i + 1], b, a)
         }
 
         let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
@@ -220,12 +204,12 @@ export default {
       return edgeClasses
     },
     edgeTruncated() {
-      let startNode = this.history[this.loopStart]
-      if (this.history[this.loopEnd] == startNode) {
+      let startNode = this.extra[this.loopStart]
+      if (this.extra[this.loopEnd] == startNode) {
         return false
       }
 
-      let next = this.history.indexOf(startNode, this.loopStart + 1)
+      let next = this.extra.indexOf(startNode, this.loopStart + 1)
       return next >= 0 && next < this.loopEnd
     },
     headRadius() {
@@ -286,7 +270,7 @@ export default {
     beadClasses() {
       return this.beads.map(
         function(node, id, beads) {
-          let historyIndex = this.history.indexOf(node, this.activeStart)
+          let historyIndex = this.extra.indexOf(node, this.activeStart)
           return {
             bead: true,
             tail: node == this.tail && this.hole != this.tail &&
@@ -309,7 +293,7 @@ export default {
       return this.beads.map(
         function(node, id, beads) {
           let edge =
-            node != this.history[this.loopStart] &&
+            node != this.extra[this.loopStart] &&
             node == this.tail &&
             this.matrix[this.hole * this.size + this.tail] ?
             [this.hole, this.tail] :
@@ -344,9 +328,11 @@ export default {
     smallSpinPath() {
       return this.getSpinPath(7, 9)
     },
-    forcedLoop() {
+    extra() {
+      // extrapolate history to the future if there's no choice of moves
       if (this.history.length <= 2) {
-        return []
+        return this.matrix[this.hole * this.size + this.tail] ?
+          this.history : [this.hole]
       }
 
       let loop = [...this.history]
@@ -355,26 +341,45 @@ export default {
       let seen = new Set(loop)
       let prev = loop[loop.length - 1]
       let node = this.hole
-      while (node >= 0 && !seen.has(node)) {
+      while (node >= 0) {
         loop.push(node)
+        if (seen.has(node)) {
+          break
+        }
+
         let next = this.getForcedTail(prev, node)
         prev = node
         node = next
       }
 
-      if (node >= 0) {
-        loop = loop.slice(loop.indexOf(node))
-        loop.push(node)
-        return loop
-      } else {
-        return []
+      if (
+        loop.length == this.history.length - 1 &&
+        this.tail != this.history[this.history.length - 3] &&
+        this.matrix[this.hole * this.size + this.tail]
+      ) {
+        loop.push(this.tail)
       }
+
+      return loop
+    },
+    canSpin() {
+      return this.history.length >= 3 && ( // must be 3 and not 4
+        this.hole == this.history[0] || (
+          this.extra[this.loopStart] == this.extra[this.loopEnd] && (
+            this.extra.length > this.history.length ||
+            this.getForcedTail(
+              this.history[this.history.length - 3],
+              this.hole,
+            ) >= 0
+          )
+        )
+      )
     },
     clockwise() {
       let minA = Infinity, minB = Infinity
       let clockwise = false
-      for (let i = 0; i < this.forcedLoop.length - 1; i++) {
-        let node1 = this.forcedLoop[i], node2 = this.forcedLoop[i + 1]
+      for (let i = this.loopStart; i < this.loopEnd; i++) {
+        let node1 = this.extra[i], node2 = this.extra[i + 1]
         let y1 = this.getHeightRank(node1)
         let y2 = this.getHeightRank(node2)
         let minY = Math.min(y1, y2)
@@ -386,14 +391,14 @@ export default {
           let x2 = this.getXRank(node2)
           if (x1 == x2) {
             if (y1 < y2) {
-              let node0 = this.forcedLoop[
-                i <= 0 ? this.forcedLoop.length - 2 : i - 1
+              let node0 = this.extra[
+                i <= this.loopStart ? this.loopEnd - 1 : i - 1
               ]
               let x0 = this.getXRank(node0)
               clockwise = x0 < x1
             } else {
-              let node3 = this.forcedLoop[
-                i >= this.forcedLoop.length - 2 ? 1 : i + 2
+              let node3 = this.extra[
+                i >= this.loopEnd - 1 ? this.loopStart + 1 : i + 2
               ]
               let x3 = this.getXRank(node3)
               clockwise = x2 < x3
@@ -463,7 +468,7 @@ export default {
     },
     goForward() {
       if (this.ensureTail()) {
-        if (this.history.length >= 4 && this.hole == this.history[0]) {
+        if (this.canSpin) {
           // continue going around the loop with the tail hidden
           this.goForwardHelp()
           this.history.push(this.tail)
@@ -675,7 +680,7 @@ export default {
         } else {
           this.history[this.history.length - 1] = this.hole
         }
-      } else if (this.clickTarget == -2 && this.forcedLoop.length) {
+      } else if (this.clickTarget == -2 && this.canSpin) {
         if (this.history[0] == this.hole) {
           this.history[this.history.length - 1] = this.history[1]
         } else {
@@ -687,7 +692,7 @@ export default {
         this.goForwardHelp()
         this.history.push(this.tail)
         this.clickTarget = -2
-      } else if (this.clickTarget == -3 && this.forcedLoop.length) {
+      } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
         this.history[this.history.length - 1] = this.hole
         this.clickTarget = -3
@@ -705,7 +710,7 @@ export default {
         }
       }
 
-      if (this.forcedLoop.length) {
+      if (this.canSpin) {
         let dx = 0 - x
         let dy = this.smallSpinButtonY - y
         if (
@@ -898,7 +903,7 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
-      <template v-if="forcedLoop.length">
+      <template v-if="canSpin">
         <g
           :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
           :class="{spinIconGhost: clickTarget == -2 && !clicking}"
