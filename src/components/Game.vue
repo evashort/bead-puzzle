@@ -77,10 +77,6 @@ export default {
         return this.history.length - 2 // going back
       }
 
-      if (this.hole == this.history[0] && this.tail == this.history[1]) {
-        return this.history.length - 2 // continuing loop
-      }
-
       return this.history.length - 1
     },
     loopStart() {
@@ -93,15 +89,13 @@ export default {
 
       return 0
     },
-    historyIndices() {
-      let result = new Uint16Array(this.size * this.size)
-      for (let i = this.loopStart; i < this.loopEnd; i++) {
-        let a = this.history[i]
-        let b = this.history[i + 1]
-        result[a * this.size + b] = result[b * this.size + a] = i + 1
-      }
-
-      return result
+    activeEnd() {
+      return this.history.length - 2
+    },
+    activeStart() {
+      return this.history.length > 2 &&
+        this.hole == this.history[0] && this.tail == this.history[1] ?
+        0 : this.loopStart
     },
     nodeXs() {
       let xs = new Float64Array(this.size)
@@ -157,73 +151,73 @@ export default {
 
       return true
     },
-    tangents() {
-      let count = this.loopEnd + 1 - this.loopStart
-      let xs = new Float64Array(count)
-      let ys = new Float64Array(count)
-      if (this.history[this.loopStart] == this.history[this.loopEnd]) {
-        let [x, y] = this.getTangent(
-          this.history[this.loopEnd - 1],
-          this.history[this.loopStart],
-          this.history[this.loopStart + 1],
-        )
-        xs[0] = xs[count - 1] = x
-        ys[0] = ys[count - 1] = y
-      }
-
-      for (let i = this.loopStart + 1; i < this.loopEnd; i++) {
-        let [x, y] = this.getTangent(
-          this.history[i - 1],
-          this.history[i],
-          this.history[i + 1],
-        )
-        xs[i - this.loopStart] = x
-        ys[i - this.loopStart] = y
-      }
-
-      return [xs, ys]
-    },
     edgePaths() {
       let controlLength = 30
       let edgePaths = {}
-      let [dxs, dys] = this.tangents
-      let offset = this.loopStart
       for (let a = 0; a < this.size; a++) {
-        for (let b = a; b < this.size; b++) {
+        edgePaths[[a, a].toString()] = `M ${this.nodeXs[a]} ${this.nodeYs[a]}`
+      }
+
+      for (let [baseA, baseB] of this.edges) {
+        for (let [a, b] of [[baseA, baseB], [baseB, baseA]]) {
           let name = [a, b].toString()
           let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
-          if (a == b) {
-            edgePaths[name] = `M ${x1} ${y1}`
-            continue
-          }
-
-          let backName = [b, a].toString()
           let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
-          let i = this.historyIndices[a * this.size + b]
-          if (i <= 0) {
-            edgePaths[name] =
-              `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
-            edgePaths[backName] =
-              `M ${x2} ${y2} C ${x2} ${y2}, ${x1} ${y1}, ${x1} ${y1}`
-            continue
-          }
-
-          let dx1 = dxs[i - offset - 1], dy1 = dys[i - offset - 1]
-          let dx2 = -dxs[i - offset], dy2 = -dys[i - offset]
-          if ((this.history[i - 1] < this.history[i]) != (a < b)) {
-            [dx1, dy1, dx2, dy2] = [dx2, dy2, dx1, dy1]
-          }
-
-          let x0 = x1 + dx1 * controlLength, y0 = y1 + dy1 * controlLength
-          let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
           edgePaths[name] =
-            `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
-          edgePaths[backName] =
-            `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
+              `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
         }
       }
 
+      let endTangent = [0, 0]
+      if (this.history[this.loopStart] == this.history[this.loopEnd]) {
+        let a = this.history[this.loopEnd - 1], b = this.history[this.loopEnd]
+        endTangent = this.getTangent(this.history[this.loopStart + 1], b, a)
+      }
+
+      let lastTangent = [-endTangent[0], -endTangent[1]]
+      for (let i = this.loopStart + 1; i <= this.loopEnd; i++) {
+        let a = this.history[i - 1], b = this.history[i]
+        let tangent = endTangent
+        if (i < this.loopEnd) {
+          tangent = this.getTangent(this.history[i + 1], b, a)
+        }
+
+        let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
+        let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
+        let [dx1, dy1] = lastTangent, [dx2, dy2] = tangent
+        let x0 = x1 + dx1 * controlLength, y0 = y1 + dy1 * controlLength
+        let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
+        edgePaths[[a, b].toString()] =
+          `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
+        edgePaths[[b, a].toString()] =
+          `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
+        lastTangent = [-tangent[0], -tangent[1]]
+      }
+
       return edgePaths
+    },
+    edgeClasses() {
+      let edgeClasses = {}
+      for (let [a, b] of this.edges) {
+        edgeClasses[[a, b].toString()] = {edge: true}
+        edgeClasses[[b, a].toString()] = {edge: true}
+      }
+
+      for (let i = this.activeStart; i < this.activeEnd; i++) {
+        let a = this.history[i], b = this.history[i + 1]
+        edgeClasses[[a, b].toString()]['active'] = true
+        edgeClasses[[b, a].toString()]['active'] = true
+      }
+
+      if (
+        this.hole != this.tail &&
+          this.matrix[this.hole * this.size + this.tail]
+      ) {
+        edgeClasses[[this.hole, this.tail].toString()]['arrow'] = true
+        edgeClasses[[this.tail, this.hole].toString()]['arrow'] = true
+      }
+
+      return edgeClasses
     },
     edgeTruncated() {
       let startNode = this.history[this.loopStart]
@@ -292,13 +286,12 @@ export default {
     beadClasses() {
       return this.beads.map(
         function(node, id, beads) {
+          let historyIndex = this.history.indexOf(node, this.activeStart)
           return {
             bead: true,
             tail: node == this.tail && this.hole != this.tail &&
               this.matrix[this.hole * this.size + this.tail],
-            onPath: this.historyIndices[
-              node * this.size + this.oldBeads[id]
-            ] > 0,
+            onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
             animate: this.animations[id] > 0,
             alternate: this.animations[id] % 2,
             reverse: this.animations[id] >= 3,
@@ -316,7 +309,7 @@ export default {
       return this.beads.map(
         function(node, id, beads) {
           let edge =
-            this.historyIndices[node * this.size + this.oldBeads[id]] <= 0 &&
+            node != this.history[this.loopStart] &&
             node == this.tail &&
             this.matrix[this.hole * this.size + this.tail] ?
             [this.hole, this.tail] :
@@ -900,7 +893,7 @@ export default {
       <path
         v-for="edge of edges"
         :key="`${edge.toString()},${size}`"
-        :class="{ edge: true, active: (x => x > 0 && x < this.history.length - 1)(historyIndices[edge[0] * size + edge[1]]), arrow: (edge[0] == hole && edge[1] == tail) || (edge[0] == tail && edge[1] == hole) }"
+        :class="edgeClasses[edge.toString()]"
         :d="edgePaths[edge.toString()]"
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
