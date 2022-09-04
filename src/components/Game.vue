@@ -1,5 +1,4 @@
 <script setup>
-import seedrandom from 'seedrandom'
 </script>
 
 <script>
