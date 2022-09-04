@@ -531,9 +531,10 @@ export default {
         return history[1]
       }
 
-      // third choice: new tail creates the smallest possible loop
+      // third choice: new tail creates the longest possible loop
       let oldHole = history[end - 1]
-      for (let i = end - 2; i >= 0; i--) {
+      let longest = history.indexOf(history[0], 1) >= 0 ? 1 : 0
+      for (let i = longest; i < end - 1; i++) {
         let tail = history[i]
         if (
           tail != oldHole && // going back shouldn't be the default.
