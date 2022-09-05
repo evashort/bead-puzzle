@@ -205,7 +205,16 @@ with open(names_path, mode='w', encoding='utf-8') as f:
     json.dump(id_names, f, indent=2)
 
 for graph in graphs:
-    graph['name'] = id_names[graph['id']]
+    random.seed(graph['id'])
+    random.shuffle(graph['puzzles'])
+    name = id_names[graph['id']]
+    if isinstance(name, list):
+        name, *puzzle_order = name
+        puzzles = graph['puzzles']
+        for i in puzzle_order:
+            puzzles.insert(0, puzzles.pop(i))
+
+    graph['name'] = name
 
 graphs = [
     graph for graph in graphs

@@ -16,7 +16,10 @@
   "4GcI": "#split",
   "8mY=": "#split",
   "rCMQ": "#split",
-  "toA=": "\ud83e\udd8a Fox",
+  "toA=": [
+    "\ud83e\udd8a Fox",
+    24
+  ],
   "8EMI": "#split",
   "8mI=": "#split",
   "/8A=": "#loop",
@@ -25,7 +28,10 @@
   "/0A=": "#loop",
   "5EeA": "#split",
   "90A=": "#loop",
-  "9oA=": "\ud83e\udd35 Bow tie",
+  "9oA=": [
+    "\ud83e\udd35 Bow tie",
+    2
+  ],
   "tCMQ": "#split",
   "/kA=": "#loop like Bow tie",
   "7kA=": "#loop",
@@ -34,7 +40,10 @@
   "8GOA": "#split",
   "/CMQ": "#split",
   "8GMQ": "#split",
-  "tkA=": "\ud83c\udf6f Pot",
+  "tkA=": [
+    "\ud83c\udf6f Pot",
+    2
+  ],
   "rSMQ": "#split",
   "/iMY": "#split",
   "/iMI": "#split",
@@ -50,18 +59,27 @@
   "8mMQ": "#split",
   "8GcY": "#split",
   "/EeA": "#split",
-  "Z3Q=": "\ud83c\udfc0 Half court",
+  "Z3Q=": [
+    "\ud83c\udfc0 Half court",
+    16
+  ],
   "fEeA": "#split",
   "8mMI": "#split",
   "4GeI": "#split",
   "8GcI": "#split",
   "5PGA": "#split",
   "8GMY": "#split",
-  "zmQ=": "\u2666\ufe0f Frog base",
+  "zmQ=": [
+    "\u2666\ufe0f Frog base",
+    6
+  ],
   "5MeA": "#split",
   "8EcY": "#split",
   "//4=": "#loop",
-  "ZnQ=": "\ud83d\udd2d Lens",
+  "ZnQ=": [
+    "\ud83d\udd2d Lens",
+    5
+  ],
   "4Gc4": "#split",
   "8GMI": "#split",
   "//Y=": "#loop",
@@ -83,11 +101,17 @@
   "7nY=": "#loop",
   "/nQ=": "#loop",
   "/nI=": "#loop",
-  "/mQ=": "\ud83c\udf09 Bridge",
+  "/mQ=": [
+    "\ud83c\udf09 Bridge",
+    7
+  ],
   "7+Q=": "#loop",
   "53Q=": "#loop",
   "+nI=": "#loop",
-  "3mQ=": "\ud83e\udda2 Bird base",
+  "3mQ=": [
+    "\ud83e\udda2 Bird base",
+    4
+  ],
   "7nQ=": "#loop",
   "7uI=": "#loop",
   "7nI=": "#loop",
@@ -96,7 +120,10 @@
   "7mY=": "#loop",
   "7nA=": "#loop",
   "/PA=": "#loop",
-  "7mQ=": "\ud83d\udc31 Cat",
+  "7mQ=": [
+    "\ud83d\udc31 Cat",
+    2
+  ],
   "5nQ=": "#loop",
   "53A=": "#loop",
   "bnI=": "#loop",
@@ -107,26 +134,44 @@
   "/GI=": "#loop",
   "5uI=": "#loop",
   "/mI=": "#loop like Floodlight",
-  "6nA=": "\ud83c\udf44 Mushroom",
+  "6nA=": [
+    "\ud83c\udf44 Mushroom",
+    4
+  ],
   "puQ=": "#loop",
   "5mI=": "#loop",
-  "5mQ=": "\ud83c\udf6b Cutting corners",
+  "5mQ=": "\ud83d\udcf1 Pocket calculator",
   "5nA=": "#loop",
-  "7mI=": "#loop like Cutting corners",
+  "7mI=": "#loop like Pocket calculator",
   "rmI=": "#loop",
   "7GI=": "#loop",
   "pmQ=": "\ud83d\ude3d Cat ears",
   "pmI=": "#loop",
-  "pGMg": "\ud83d\udc1a Nautilus",
-  "ePOQ": "\ud83c\udfad Marionette",
-  "zmUg": "\ud83d\udca0 Cootie catcher",
-  "eOOQ": "\u26bd Corner kick",
+  "pGMg": [
+    "\ud83d\udc1a Nautilus",
+    5
+  ],
+  "ePOQ": [
+    "\ud83c\udfad Marionette",
+    20
+  ],
+  "zmUg": [
+    "\ud83d\udca0 Cootie catcher",
+    19
+  ],
+  "eOOQ": [
+    "\u26bd Corner kick",
+    80
+  ],
   "///4": "#loop",
   "///Y": "#loop",
   "/vfY": "#loop",
   "/ueY": "#loop",
   "//OY": "#loop",
-  "zlMI": "\ud83d\udd73\ufe0f Cave entrance",
+  "zlMI": [
+    "\ud83d\udd73\ufe0f Cave entrance",
+    2
+  ],
   "/veY": "#loop",
   "/++I": "#loop",
   "//+Y": "#loop",
@@ -134,7 +179,10 @@
   "/muY": "#loop",
   "//fY": "#loop",
   "//ew": "#loop",
-  "tWMQ": "\ud83e\udd9d Raccoon",
+  "tWMQ": [
+    "\ud83e\udd9d Raccoon",
+    10
+  ],
   "//+I": "#loop",
   "/veQ": "#loop",
   "/++Y": "#loop",
@@ -148,26 +196,35 @@
   "/eeY": "#loop",
   "/PeY": "#loop",
   "/8eA": "#loop",
-  "+/OQ": "\u2728 Three lights",
+  "+/OQ": [
+    "\u2728 Three lights",
+    22
+  ],
   "/me4": "#loop",
-  "9+MQ": "\ud83d\ude45 Mt. Forbidden",
+  "9+MQ": "\ud83d\udc5a Do not bleach",
   "/vOQ": "#loop",
   "/PeQ": "#loop",
-  "/+eY": "#loop like Mt. Forbidden",
+  "/+eY": "#loop like Do not bleach",
   "/LeA": "#loop",
   "7vew": "#loop",
   "+eOY": "#loop",
-  "/meo": "#loop like Mt. Forbidden",
+  "/meo": "#loop like Do not bleach",
   "+u+Y": "#loop",
   "/HvQ": "#loop",
-  "zFMI": "\ud83d\udc94 Broken heart",
+  "zFMI": [
+    "\ud83d\udc94 Broken heart",
+    10
+  ],
   "/u8Y": "#loop",
-  "++OY": "#loop like Mt. Forbidden",
+  "++OY": "#loop like Do not bleach",
   "+O+Y": "#loop",
-  "+vOQ": "\ud83c\udf5f Last French fry",
+  "+vOQ": [
+    "\ud83c\udf5f Last French fry",
+    7
+  ],
   "7meo": "#loop",
   "9u8I": "#loop",
-  "/ueo": "#loop like Mt. Forbidden",
+  "/ueo": "#loop like Do not bleach",
   "72eo": "#loop",
   "7ueY": "#loop",
   "/2Oo": "#loop",
@@ -177,17 +234,17 @@
   "//cI": "#loop",
   "7u8Y": "#loop",
   "/POY": "#loop",
-  "//8I": "#loop like Mt. Forbidden",
+  "//8I": "#loop like Do not bleach",
   "/meY": "#loop",
   "/neI": "#loop",
   "/eeQ": "#loop",
-  "/+MQ": "#like Mt. Forbidden",
+  "/+MQ": "#like Do not bleach",
   "/mOY": "#loop",
   "7me4": "#loop",
-  "/2eo": "#loop like Mt. Forbidden",
+  "/2eo": "#loop like Do not bleach",
   "/2eI": "#loop",
   "72e4": "#loop",
-  "/3eI": "#loop like Mt. Forbidden",
+  "/3eI": "#loop like Do not bleach",
   "92uI": "#loop",
   "/8MI": "#loop",
   "/O+Q": "#loop",
@@ -195,16 +252,19 @@
   "7seA": "#loop",
   "7aeQ": "#loop",
   "9OcQ": "#loop",
-  "/mc4": "#loop like Mt. Forbidden",
+  "/mc4": "#loop like Do not bleach",
   "/2WI": "#loop",
   "7nOY": "#loop",
   "/ucY": "#loop",
   "7meY": "#loop",
-  "9+OQ": "#loop like Mt. Forbidden",
+  "9+OQ": "#loop like Do not bleach",
   "/uOI": "#loop",
   "fPeQ": "#loop",
   "/OeQ": "#loop",
-  "tGMQ": "\ud83d\udc98 Cupid's arrow",
+  "tGMQ": [
+    "\ud83d\udc98 Cupid's arrow",
+    1
+  ],
   "72eY": "#loop",
   "/9cI": "#loop",
   "7mc4": "#loop like Hamster",
@@ -213,19 +273,25 @@
   "7scI": "#loop",
   "/f8Q": "#loop like Hamster",
   "+uOY": "#loop",
-  "/mUg": "\ud83e\udd73 Party cat",
+  "/mUg": [
+    "\ud83e\udd73 Party cat",
+    3
+  ],
   "72eI": "#loop",
   "/O8Q": "#loop",
   "/POA": "#loop",
   "+ueY": "#loop",
   "/HcY": "#loop",
   "+OeY": "#loop",
-  "/mco": "#loop like Mt. Forbidden and Party cat",
+  "/mco": "#loop like Do not bleach and Party cat",
   "+uMY": "#loop",
   "7OeY": "#loop",
   "/2OI": "#loop",
   "7OfQ": "#loop",
-  "3ncI": "\ud83c\udff4 Anarchy symbol",
+  "3ncI": [
+    "\ud83c\udff4 Anarchy symbol",
+    31
+  ],
   "7+MI": "#loop",
   "/P+A": "#loop",
   "/HOA": "#loop",
@@ -235,9 +301,15 @@
   "/mcg": "#like Party cat",
   "/HuQ": "#loop",
   "bmeY": "#loop",
-  "+POQ": "\ud83c\udf5f French fry box",
+  "+POQ": [
+    "\ud83c\udf5f French fry box",
+    212
+  ],
   "/HeA": "#loop",
-  "/uMQ": "\ud83c\udfde\ufe0f Hiking trail",
+  "/uMQ": [
+    "\ud83c\udfde\ufe0f Hiking trail",
+    12
+  ],
   "+OOY": "#loop",
   "5Pew": "#loop",
   "92OI": "#loop",
@@ -246,8 +318,11 @@
   "/seI": "#loop",
   "53eI": "#loop",
   "7OeQ": "#loop",
-  "++OQ": "#loop like Mt. Forbidden, Hamster, Party cat, Anarchy symbol",
-  "3mUg": "\ud83e\ude82 Parachute",
+  "++OQ": "#loop like Do not bleach, Hamster, Party cat, Anarchy symbol",
+  "3mUg": [
+    "\ud83e\ude82 Parachute",
+    177
+  ],
   "7veI": "#loop",
   "/u8I": "#loop like Anarchy symbol and Hiking trail",
   "/GcY": "#loop",
@@ -257,7 +332,10 @@
   "/eOA": "#loop",
   "/eMQ": "#like Hamster",
   "/mOI": "#loop",
-  "+uOQ": "\u26a1 Microwave",
+  "+uOQ": [
+    "\u26a1 Microwave",
+    5
+  ],
   "7O8Y": "#loop",
   "/ueI": "#loop",
   "eOeY": "#loop",
@@ -273,7 +351,10 @@
   "5ucQ": "#loop",
   "72OI": "#loop",
   "/ncI": "#loop like Anarchy symbol, Hiking trail, Headlamp",
-  "9qcI": "\ud83d\udca1 Ceiling light",
+  "9qcI": [
+    "\ud83d\udca1 Ceiling light",
+    5
+  ],
   "+GeI": "#loop",
   "7O8Q": "#loop",
   "7aOQ": "#loop",
@@ -286,7 +367,10 @@
   "/uWQ": "#loop like Headlamp",
   "/sMI": "#loop",
   "//eI": "#loop like 9 things",
-  "9uMg": "\ud83c\udfd6\ufe0f Folding chair",
+  "9uMg": [
+    "\ud83c\udfd6\ufe0f Folding chair",
+    36
+  ],
   "9eOQ": "#loop like Hamster",
   "7u8I": "#loop",
   "fPOQ": "#loop",
