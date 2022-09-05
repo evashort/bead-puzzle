@@ -1,4 +1,5 @@
 <script setup>
+import SmallGame from './SmallGame.vue'
 </script>
 
 <script>
@@ -12,6 +13,16 @@ export default {
       // actual value
       clicking: false,
       clickTarget: null,
+      /*
+      animation legend:
+      0 = static  forward primary
+      1 = animate forward alternate
+      2 = animate forward primary
+      3 = animate reverse alternate
+      4 = animate reverse primary
+
+      6 = static  reverse primary
+      */
       animations: new Uint8Array(0),
       oldBeads: [],
     }
@@ -19,6 +30,8 @@ export default {
   props: {
     startingBeads: Array,
     edges: Array,
+    small: Boolean,
+    buttonId: String,
   },
   emits: ['update:beads'],
   computed: {
@@ -275,7 +288,7 @@ export default {
             tail: node == this.tail && this.hole != this.tail &&
               this.matrix[this.hole * this.size + this.tail],
             onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
-            animate: this.animations[id] > 0,
+            animate: this.animations[id] % 6,
             alternate: this.animations[id] % 2,
             reverse: this.animations[id] >= 3,
             undo: this.oldBeads[id] == this.hole,
@@ -766,12 +779,23 @@ export default {
       },
       immediate: true,
     },
+    small(newSmall, oldSmall) {
+      if (newSmall) {
+        let newAnimations = new Uint8Array(this.beads.length)
+        for (let [i, animation] of this.animations.entries()) {
+          newAnimations[i] = animation >= 3 ? 6 : 0
+        }
+
+        this.animations = newAnimations
+      }
+    },
   },
 }
 </script>
 
 <template>
   <button
+    :id="buttonId"
     class="tabStop"
     @keydown.up.stop.prevent="goForward()"
     @keydown.down.stop.prevent="goBack()"
@@ -785,7 +809,8 @@ export default {
     @focus.native="onFocus"
     @blur.native="onBlur"
   >
-    <svg class="gameView" id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
+    <SmallGame v-if="small" :beads="beads" :edges="edges" :colorIds="colorIds"/>
+    <svg v-else class="gameView" id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"
@@ -946,7 +971,7 @@ export default {
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/heart_outline.svg"
-          :style="{ 'transform': `scale(2.7)` }"
+          :style="{ 'transform': 'scale(2.7)' }"
         />
       </g>
       <g v-if="colorIds[1] >= 0" :transform="`translate(${goalXs[colorIds[1] + 1]},${goalYs[colorIds[1] + 1]})`">

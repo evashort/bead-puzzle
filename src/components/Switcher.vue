@@ -36,6 +36,7 @@ export default {
       graphs: graphData.graphs,
       idGraphs: idGraphs,
       beads: [],
+      gameFocused: false,
     }
   },
   props: {
@@ -101,6 +102,10 @@ export default {
     },
   },
   methods: {
+    onFocus(event) {
+      let gameButton = document.getElementById('gameButton')
+      this.gameFocused = gameButton.contains(event.target)
+    },
   },
   watch: {
     id(newId, oldId) {
@@ -111,7 +116,7 @@ export default {
 </script>
 
 <template>
-  <div style="text-align: center;">
+  <div style="text-align: center;" @focusin.native="onFocus">
     {{graph.loop ? 'Loop' : ''}}
     {{graph.superior.map(id => idGraphs[id]?.name || id)}}
     <Markdown :source="instructions" style="text-align: start;" />
@@ -137,13 +142,13 @@ export default {
         </template>
       </fieldset>
     </div>
-    <Game :startingBeads="startingBeads" :edges="edges" :baseDustDuration="360" :dustCount="18"/>
+    <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
     <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
       Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
       State space: {{graph.states}} states<br/>
-      {{beads}}
+      <button>hello</button>
       <fieldset>
         <legend>{{graph.puzzles.length}} variations</legend>
         <template
