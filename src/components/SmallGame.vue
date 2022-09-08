@@ -106,8 +106,8 @@ export default {
 
 <style scoped>
 .smallView {
-  width: 16rem;
-  height: 16rem;
+  width: 100%;
+  height: 100%;
 }
 .edge {
   fill: none;

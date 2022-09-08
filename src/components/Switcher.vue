@@ -116,11 +116,8 @@ export default {
 </script>
 
 <template>
-  <div style="text-align: center;" @focusin.native="onFocus">
-    {{graph.loop ? 'Loop' : ''}}
-    {{graph.superior.map(id => idGraphs[id]?.name || id)}}
-    <Markdown :source="instructions" style="text-align: start;" />
-    <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
+  <div :class="{switcher: true, small: !gameFocused}" @focusin.native="onFocus" >
+    <div :class="{levels: true}">
       <fieldset v-for="group in groups">
         <legend>{{group.name}}</legend>
         <template
@@ -143,7 +140,7 @@ export default {
       </fieldset>
     </div>
     <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
-    <div style="height: 40rem; overflow-y: scroll; display: inline-block; text-align: start;">
+    <div :class="{info: true}">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
       Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
@@ -171,3 +168,26 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.switcher {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) 3fr minmax(13rem, 1fr);
+  grid-template-rows: 1fr 0;
+  max-width: 80rem;
+}
+.switcher.small {
+  grid-template-columns: minmax(13rem, 1fr) minmax(13rem, 1fr);
+  grid-template-rows: auto 1fr;
+}
+.levels {
+  grid-row: span 2;
+  overflow-y: auto;
+}
+.info {
+  overflow-y: auto;
+}
+.small .info {
+  grid-column: 2;
+}
+</style>

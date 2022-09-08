@@ -3,13 +3,11 @@ import Switcher from './components/Switcher.vue';
 </script>
 
 <template>
-  <Switcher startingId="pGA="></Switcher>
+  <div style="display: flex; height: 100vh; justify-content: center;">
+    <Switcher startingId="pGA="/>
+  </div>
 </template>
 
 <style>
 @import './assets/base.css';
-
-#app {
-  text-align: center;
-}
 </style>

@@ -713,8 +713,9 @@ export default {
     },
     getClickTarget(offsetX, offsetY) {
       let gameView = document.getElementById('game-view')
-      let x = offsetX / gameView.clientWidth * 240 - 120
-      let y = offsetY / gameView.clientHeight * 240 - 120
+      let clientSize = Math.min(gameView.clientWidth, gameView.clientHeight)
+      let x = (offsetX - 0.5 * gameView.clientWidth) * 240 / clientSize
+      let y = (offsetY - 0.5 * gameView.clientHeight) * 240 / clientSize
       for (let i = 0; i < this.size; i++) {
         let dx = this.nodeXs[i] - x
         let dy = this.nodeYs[i] - y
@@ -796,7 +797,7 @@ export default {
 <template>
   <button
     :id="buttonId"
-    class="tabStop"
+    :class="{tabStop: true, small: small}"
     @keydown.up.stop.prevent="goForward()"
     @keydown.down.stop.prevent="goBack()"
     @keydown.left.stop.prevent="selectLeft()"
@@ -1014,10 +1015,16 @@ export default {
   border: none;
   font: inherit;
   padding: 0;
+  overflow: auto;
+}
+.tabStop.small {
+  aspect-ratio: 1;
+  max-height: 20rem;
+  justify-self: center;
 }
 .gameView {
-  width: 40rem;
-  height: 40rem;
+  width: 100%;
+  height: 100%;
 }
 .touchCircle {
   stroke: var(--color-text);
