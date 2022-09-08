@@ -1015,7 +1015,7 @@ export default {
   border: none;
   font: inherit;
   padding: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 .tabStop.small {
   aspect-ratio: 1;
