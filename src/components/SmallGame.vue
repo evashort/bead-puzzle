@@ -44,7 +44,7 @@ export default {
 </script>
 
 <template>
-  <svg class="smallView" viewBox="-48 -48 96 96">
+  <svg viewBox="-48 -48 96 96">
     <defs>
       <image id="check" x="-10" y="-10" width="20" height="20"
         href="../assets/checkmark.svg"
@@ -105,10 +105,6 @@ export default {
 </template>
 
 <style scoped>
-.smallView {
-  width: 100%;
-  height: 100%;
-}
 .edge {
   fill: none;
   stroke: var(--color-text);

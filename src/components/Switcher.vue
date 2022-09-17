@@ -172,22 +172,26 @@ export default {
 <style scoped>
 .switcher {
   display: grid;
-  grid-template-columns: minmax(13rem, 1fr) 3fr minmax(13rem, 1fr);
-  grid-template-rows: 1fr 0;
-  max-width: 80rem;
+  grid-template-columns: minmax(13rem, 1fr) minmax(30rem, calc(100vh - 0rem)) minmax(13rem, 1fr);
+  grid-template-rows: 1fr;
+  max-width: calc(100vh - 0rem + 2 * 20rem);
+  grid-template-areas:
+    "levels game info";
 }
 .switcher.small {
   grid-template-columns: minmax(13rem, 1fr) minmax(13rem, 1fr);
   grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "levels game"
+    "levels info";
+  max-width: calc(2 * 20rem);
 }
 .levels {
-  grid-row: span 2;
+  grid-area: levels;
   overflow-y: auto;
 }
 .info {
+  grid-area: info;
   overflow-y: auto;
-}
-.small .info {
-  grid-column: 2;
 }
 </style>

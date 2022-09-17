@@ -811,7 +811,7 @@ export default {
     @blur.native="onBlur"
   >
     <SmallGame v-if="small" :beads="beads" :edges="edges" :colorIds="colorIds"/>
-    <svg v-else class="gameView" id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
+    <svg v-else id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"
@@ -1015,16 +1015,12 @@ export default {
   border: none;
   font: inherit;
   padding: 0;
-  overflow: hidden;
+  grid-area: game;
+  display: flex;
+  align-items: stretch;
 }
 .tabStop.small {
   aspect-ratio: 1;
-  max-height: 20rem;
-  justify-self: center;
-}
-.gameView {
-  width: 100%;
-  height: 100%;
 }
 .touchCircle {
   stroke: var(--color-text);
