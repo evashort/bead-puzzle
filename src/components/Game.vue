@@ -1021,6 +1021,8 @@ export default {
 }
 .tabStop.small {
   aspect-ratio: 1;
+  max-height: 21rem;
+  justify-self: center;
 }
 .touchCircle {
   stroke: var(--color-text);

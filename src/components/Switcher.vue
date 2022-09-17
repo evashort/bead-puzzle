@@ -172,9 +172,10 @@ export default {
 <style scoped>
 .switcher {
   display: grid;
-  grid-template-columns: minmax(17rem, 1fr) minmax(30rem, calc(100vh - 0rem)) minmax(17rem, 1fr);
-  grid-template-rows: minmax(17rem, 1fr);
-  max-width: calc(100vh - 0rem + 2 * 32rem);
+  grid-template-columns: minmax(17rem, 1fr) minmax(27rem, calc(100vh - 0rem)) minmax(17rem, 1fr);
+  grid-template-rows: minmax(27rem, 1fr);
+  max-width: calc(100vh - 0rem + 2 * 27rem);
+  width: calc(100vh - 0rem + 2 * 27rem);
   grid-template-areas:
     "levels game info";
 }
@@ -184,7 +185,7 @@ export default {
   grid-template-areas:
     "levels game"
     "levels info";
-  max-width: calc(2 * 32rem);
+  width: calc(2 * 27rem);
 }
 .levels {
   grid-area: levels;
