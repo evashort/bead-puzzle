@@ -3,7 +3,7 @@ import Switcher from './components/Switcher.vue';
 </script>
 
 <template>
-  <div style="display: flex; height: 100vh; justify-content: center;">
+  <div style="height: 100vh;">
     <Switcher startingId="pGA="/>
   </div>
 </template>
