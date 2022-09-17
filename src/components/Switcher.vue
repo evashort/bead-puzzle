@@ -117,7 +117,7 @@ export default {
 
 <template>
   <div :class="{switcher: true, small: !gameFocused}" @focusin.native="onFocus" >
-    <div :class="{levels: true}">
+    <div class="levels">
       <fieldset v-for="group in groups">
         <legend>{{group.name}}</legend>
         <template
@@ -140,7 +140,7 @@ export default {
       </fieldset>
     </div>
     <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
-    <div :class="{info: true}">
+    <div class="info">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
       Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
@@ -172,19 +172,19 @@ export default {
 <style scoped>
 .switcher {
   display: grid;
-  grid-template-columns: minmax(13rem, 1fr) minmax(30rem, calc(100vh - 0rem)) minmax(13rem, 1fr);
-  grid-template-rows: 1fr;
-  max-width: calc(100vh - 0rem + 2 * 20rem);
+  grid-template-columns: minmax(17rem, 1fr) minmax(30rem, calc(100vh - 0rem)) minmax(17rem, 1fr);
+  grid-template-rows: minmax(17rem, 1fr);
+  max-width: calc(100vh - 0rem + 2 * 32rem);
   grid-template-areas:
     "levels game info";
 }
 .switcher.small {
-  grid-template-columns: minmax(13rem, 1fr) minmax(13rem, 1fr);
-  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(17rem, 1fr) minmax(17rem, 1fr);
+  grid-template-rows: auto minmax(17rem, 1fr);
   grid-template-areas:
     "levels game"
     "levels info";
-  max-width: calc(2 * 20rem);
+  max-width: calc(2 * 32rem);
 }
 .levels {
   grid-area: levels;
