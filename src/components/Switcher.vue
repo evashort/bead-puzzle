@@ -174,7 +174,7 @@ export default {
   display: grid;
   grid-template-columns: minmax(17rem, 1fr) minmax(27rem, min(100vh - 0rem, 40rem)) minmax(17rem, 1fr);
   grid-template-rows: minmax(27rem, 1fr);
-  max-width: calc(min(100vh - 0rem, 40rem) + 2 * 27rem);
+  max-width: calc(clamp(27rem, 100vh - 0rem, 40rem) + 2 * 27rem);
   width: 100%;
   height: 100%;
   margin: auto;
