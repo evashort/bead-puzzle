@@ -75,28 +75,28 @@ export default {
         'pGA=': `
 ## Moving
 ### Pointing device
-- Select each bead to move it into the empty space.
-- Select the empty space to undo.
+1. Select each bead to move it into the empty space.
+1. Select the empty space to undo.
 ### Keyboard
-- Navigate to the puzzle by selecting it with your pointing device or using the **Tab** key.
-- Select **Up arrow** or **W** to move each bead into the empty space.
-- Select **Down arrow** or **S** to undo.
+1. Navigate to the puzzle by selecting it with your pointing device or using the **Tab** key.
+1. Select **Up arrow** or **W** to move each bead into the empty space.
+1. Select **Down arrow** or **S** to undo.
 `,
         'ZIA=': `
 ## Selecting
 ### Pointing device
-- Select a bead to move it into the empty space.
+1. Select a bead to move it into the empty space.
 ### Keyboard
-- Use **Left arrow** and **Right arrow** or **A** and **D** to select a bead.
-- Select **Up arrow** or **W** to move it into the empty space.
+1. Use **Left arrow** and **Right arrow** or **A** and **D** to select a bead.
+1. Select **Up arrow** or **W** to move it into the empty space.
 `,
         'pkA=': `
 ## Spinning
 ### Pointing device
-- Select a bead to move it into the empty space. Two arrows will appear in the center.
-- Select the arrows to move the beads around the loop.
+1. Select a bead to move it into the empty space. Two arrows will appear in the center.
+1. Select the arrows to move the beads around the loop.
 ### Keyboard
-- Select **Up arrow** or **W** to move the beads around the loop.
+1. Select **Up arrow** or **W** to move the beads around the loop.
 `,
       }[this.id]
     },
@@ -142,6 +142,7 @@ export default {
     <div class="game" id="gameArea">
       <Markdown v-if="gameFocused" class="instructions" :source="instructions" />
       <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
+      <button v-if="gameFocused" :class="{next: true, tutorial: this.instructions}">Next</button>
     </div>
     <div class="info">
       {{graph.name}}<br/>
@@ -200,10 +201,11 @@ export default {
   grid-area: game;
   overflow-y: auto;
   display: grid;
-  grid-template-rows: auto minmax(auto, 1fr);
+  grid-template-rows: auto minmax(auto, 1fr) auto;
   grid-template-areas:
     "instructions"
-    "game";
+    "game"
+    "next";
 }
 .small .game {
   display: flex;
@@ -211,6 +213,13 @@ export default {
 }
 .instructions {
   grid-area: instructions;
+}
+.next {
+  height: 5rem;
+  margin-top: -5rem;
+}
+.next.tutorial {
+  margin-top: 0;
 }
 .info {
   grid-area: info;
