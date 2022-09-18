@@ -103,7 +103,7 @@ export default {
   },
   methods: {
     onFocus(event) {
-      let gameButton = document.getElementById('gameButton')
+      let gameButton = document.getElementById('gameArea')
       this.gameFocused = gameButton.contains(event.target)
     },
   },
@@ -139,7 +139,10 @@ export default {
         </template>
       </fieldset>
     </div>
-    <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
+    <div class="game" id="gameArea">
+      <Markdown v-if="gameFocused" class="instructions" :source="instructions" />
+      <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
+    </div>
     <div class="info">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
@@ -183,7 +186,7 @@ export default {
 }
 .switcher.small {
   grid-template-columns: minmax(17rem, 1fr) minmax(17rem, 1fr);
-  grid-template-rows: auto minmax(17rem, 1fr);
+  grid-template-rows: minmax(15rem, auto) minmax(17rem, 1fr);
   grid-template-areas:
     "levels game"
     "levels info";
@@ -192,6 +195,22 @@ export default {
 .levels {
   grid-area: levels;
   overflow-y: auto;
+}
+.game {
+  grid-area: game;
+  overflow-y: auto;
+  display: grid;
+  grid-template-rows: auto minmax(auto, 1fr);
+  grid-template-areas:
+    "instructions"
+    "game";
+}
+.small .game {
+  display: flex;
+  justify-content: space-around;
+}
+.instructions {
+  grid-area: instructions;
 }
 .info {
   grid-area: info;
