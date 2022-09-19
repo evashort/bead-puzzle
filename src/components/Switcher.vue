@@ -33,6 +33,7 @@ export default {
     }
   },
   props: {
+    headerHeight: String,
   },
   computed: {
     graph() {
@@ -122,7 +123,7 @@ export default {
 </script>
 
 <template>
-  <div :class="{switcher: true, small: !gameFocused}" @focusin.native="onFocus" >
+  <div :class="{switcher: true, small: !gameFocused}" @focusin.native="onFocus" :style="{'--header-height': headerHeight}">
     <div class="levels">
       <fieldset v-for="group in groups">
         <legend>{{group.name}}</legend>
@@ -157,7 +158,7 @@ export default {
       <button
         id="nextButton"
         @click="nextLevel"
-        :class="{next: true, tutorial: instructions}"
+        :class="{next: true}"
         :disabled="!graph.won || graphIndex >= graphs.length - 1"
       >
         Next{{graph.won && graphIndex < graphs.length - 1 ? `: Level ${graphIndex + 2} ${graphs[graphIndex + 1].name}` : ''}}
@@ -195,9 +196,9 @@ export default {
 <style scoped>
 .switcher {
   display: grid;
-  grid-template-columns: minmax(17rem, 1fr) minmax(27rem, min(100vh - 0rem, 40rem)) minmax(17rem, 1fr);
+  grid-template-columns: minmax(17rem, 1fr) minmax(27rem, min(100vh - var(--header-height), 40rem)) minmax(17rem, 1fr);
   grid-template-rows: minmax(27rem, 1fr);
-  max-width: calc(clamp(27rem, 100vh - 0rem, 40rem) + 2 * 27rem);
+  max-width: calc(clamp(27rem, 100vh - var(--header-height), 40rem) + 2 * 27rem);
   width: 100%;
   height: 100%;
   margin: auto;
@@ -235,11 +236,7 @@ export default {
 }
 .next {
   grid-area: next;
-  height: 5rem;
-  margin-top: -5rem;
-}
-.next.tutorial {
-  margin-top: 0;
+  height: var(--header-height);
 }
 .small .next {
   position: absolute;
