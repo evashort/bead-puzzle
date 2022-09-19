@@ -24,27 +24,19 @@ export default {
       start = group.stop
     }
 
-    let idGraphs = {}
-    for (let graph of graphData.graphs) {
-      idGraphs[graph.id] = graph
-    }
-
     return {
-      id: this.startingId,
+      graphIndex: 0,
       variation: 0,
       groups: groups,
       graphs: graphData.graphs,
-      idGraphs: idGraphs,
-      beads: [],
       gameFocused: false,
     }
   },
   props: {
-    startingId: String,
   },
   computed: {
     graph() {
-      return this.idGraphs[this.id]
+      return this.graphs[this.graphIndex]
     },
     nodes() {
       return this.graph.nodes
@@ -98,17 +90,31 @@ export default {
 ### Keyboard
 1. Select **Up arrow** or **W** to move the beads around the loop.
 `,
-      }[this.id]
+      }[this.graph.id]
     },
   },
   methods: {
     onFocus(event) {
-      let gameButton = document.getElementById('gameArea')
-      this.gameFocused = gameButton.contains(event.target)
+      let nextButton = document.getElementById('nextButton')
+      if (nextButton.contains(event.target)) {
+        return
+      }
+
+      let gameArea = document.getElementById('gameArea')
+      this.gameFocused = gameArea.contains(event.target)
     },
+    nextLevel() {
+      this.graphIndex++
+      document.getElementById('gameButton').focus()
+    },
+    wonChanged(won) {
+      if (won) {
+        this.graph.won = true
+      }
+    }
   },
   watch: {
-    id(newId, oldId) {
+    graphIndex(newGraphIndex, oldGraphIndex) {
       this.variation = 0
     },
   },
@@ -126,14 +132,14 @@ export default {
         >
           <input
             type="radio"
-            :value="graph.id"
-            v-model="id"
+            :value="group.start + j"
+            v-model="graphIndex"
             :id="`level-${group.start + j}`"
             name="level"
           />
           <label :for="`level-${group.start + j}`">
-            {{group.start + j + 1}} {{graph.name || graph.id}}
-            {{graph.distance}} {{Math.round(graph.difficulty)}}
+            {{group.start + j + 1}}
+            {{graph.name || graph.id}}{{graph.won ? ' ✅' : ''}}
           </label>
           <br/>
         </template>
@@ -141,8 +147,21 @@ export default {
     </div>
     <div class="game" id="gameArea">
       <Markdown v-if="gameFocused" class="instructions" :source="instructions" />
-      <Game :startingBeads="startingBeads" :edges="edges" :small="!gameFocused" buttonId="gameButton"/>
-      <button v-if="gameFocused" :class="{next: true, tutorial: this.instructions}">Next</button>
+      <Game
+        :startingBeads="startingBeads"
+        :edges="edges"
+        :small="!gameFocused"
+        buttonId="gameButton"
+        @update:won="wonChanged"
+      />
+      <button
+        id="nextButton"
+        @click="nextLevel"
+        :class="{next: true, tutorial: instructions}"
+        :disabled="!graph.won || graphIndex >= graphs.length - 1"
+      >
+        Next{{graph.won && graphIndex < graphs.length - 1 ? `: Level ${graphIndex + 2} ${graphs[graphIndex + 1].name}` : ''}}
+      </button>
     </div>
     <div class="info">
       {{graph.name}}<br/>
@@ -215,11 +234,20 @@ export default {
   grid-area: instructions;
 }
 .next {
+  grid-area: next;
   height: 5rem;
   margin-top: -5rem;
 }
 .next.tutorial {
   margin-top: 0;
+}
+.small .next {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: auto;
+  margin-top: 0;
+  max-width: 7rem;
 }
 .info {
   grid-area: info;

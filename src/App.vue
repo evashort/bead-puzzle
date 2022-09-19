@@ -4,7 +4,7 @@ import Switcher from './components/Switcher.vue';
 
 <template>
   <div style="height: 100vh;">
-    <Switcher startingId="pGA="/>
+    <Switcher/>
   </div>
 </template>
 

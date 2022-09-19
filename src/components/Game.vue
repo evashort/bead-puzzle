@@ -33,7 +33,7 @@ export default {
     small: Boolean,
     buttonId: String,
   },
-  emits: ['update:beads'],
+  emits: ['update:won'],
   computed: {
     size() {
       return this.startingBeads.length + 1
@@ -493,7 +493,6 @@ export default {
     goForwardHelp() {
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
-      this.checkWin()
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.chosenTail = null
@@ -588,7 +587,6 @@ export default {
         this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
-        this.checkWin()
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         if (this.history[0] == this.tail) {
@@ -759,9 +757,6 @@ export default {
       this.clickTarget = null
       this.history[this.history.length - 1] = this.hole
     },
-    checkWin() {
-      this.$emit('update:beads', [...this.beads])
-    },
   },
   watch: {
     startingBeads: {
@@ -776,7 +771,6 @@ export default {
         this.history = [hole, hole]
         this.chosenTail = null
         this.clickTarget = null
-        this.checkWin()
       },
       immediate: true,
     },
@@ -789,6 +783,9 @@ export default {
 
         this.animations = newAnimations
       }
+    },
+    won(newWon, oldWon) {
+      this.$emit('update:won', newWon)
     },
   },
 }
