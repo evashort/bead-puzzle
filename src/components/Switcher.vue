@@ -112,6 +112,11 @@ export default {
       if (won) {
         this.graph.won = true
       }
+    },
+    focusGame(event) {
+      if (event.target.value == this.graphIndex || event.pageX != 0 || event.pageY != 0) {
+        document.getElementById('gameButton').focus()
+      }
     }
   },
   watch: {
@@ -137,6 +142,7 @@ export default {
             v-model="graphIndex"
             :id="`level-${group.start + j}`"
             name="level"
+            @click="focusGame"
           />
           <label :for="`level-${group.start + j}`">
             {{group.start + j + 1}}
