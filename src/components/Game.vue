@@ -1,7 +1,3 @@
-<script setup>
-import SmallGame from './SmallGame.vue'
-</script>
-
 <script>
 export default {
   data() {
@@ -30,7 +26,6 @@ export default {
   props: {
     startingBeads: Array,
     edges: Array,
-    small: Boolean,
     buttonId: String,
   },
   emits: ['update:won'],
@@ -794,7 +789,7 @@ export default {
 <template>
   <button
     :id="buttonId"
-    :class="{tabStop: true, small: small}"
+    :class="{tabStop: true}"
     @keydown.up.stop.prevent="goForward()"
     @keydown.down.stop.prevent="goBack()"
     @keydown.left.stop.prevent="selectLeft()"
@@ -807,8 +802,7 @@ export default {
     @focus.native="onFocus"
     @blur.native="onBlur"
   >
-    <SmallGame v-if="small" :beads="beads" :edges="edges" :colorIds="colorIds"/>
-    <svg v-else id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
+    <svg id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"

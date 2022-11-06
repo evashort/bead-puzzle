@@ -95,15 +95,6 @@ export default {
     },
   },
   methods: {
-    onFocus(event) {
-      let nextButton = document.getElementById('nextButton')
-      if (nextButton.contains(event.target)) {
-        return
-      }
-
-      let gameArea = document.getElementById('gameArea')
-      this.gameFocused = gameArea.contains(event.target)
-    },
     nextLevel() {
       this.graphIndex++
       document.getElementById('gameButton').focus()
@@ -115,7 +106,7 @@ export default {
     },
     focusGame(event) {
       if (event.target.value == this.graphIndex || event.pageX != 0 || event.pageY != 0) {
-        document.getElementById('gameButton').focus()
+        this.gameFocused = true
       }
     }
   },
@@ -128,8 +119,8 @@ export default {
 </script>
 
 <template>
-  <div :class="{switcher: true, small: !gameFocused}" @focusin.native="onFocus" :style="{'--header-height': headerHeight}">
-    <div class="levels">
+  <div :class="{switcher: true, leftSide: !gameFocused, rightSide: gameFocused}" :style="{'--header-height': headerHeight}">
+    <div class="levels" v-if="!gameFocused">
       <fieldset v-for="group in groups">
         <legend>{{group.name}}</legend>
         <template
@@ -152,12 +143,11 @@ export default {
         </template>
       </fieldset>
     </div>
-    <div class="game" id="gameArea">
-      <Markdown v-if="gameFocused" class="instructions" :source="instructions" />
+    <div class="game" id="gameArea" v-if="gameFocused">
+      <Markdown class="instructions" :source="instructions" />
       <Game
         :startingBeads="startingBeads"
         :edges="edges"
-        :small="!gameFocused"
         buttonId="gameButton"
         @update:won="wonChanged"
       />
@@ -170,12 +160,12 @@ export default {
         Next{{graph.won && graphIndex < graphs.length - 1 ? `: Level ${graphIndex + 2} ${graphs[graphIndex + 1].name}` : ''}}
       </button>
     </div>
-    <div class="info">
+    <div class="info" v-if="gameFocused">
       {{graph.name}}<br/>
       Minimum: {{graph.distance}} moves<br/>
       Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
       State space: {{graph.states}} states<br/>
-      <button>hello</button>
+      <button @click="gameFocused = false">hello</button>
       <fieldset>
         <legend>{{graph.puzzles.length}} variations</legend>
         <template
@@ -211,13 +201,20 @@ export default {
   grid-template-areas:
     "levels game info";
 }
-.switcher.small {
-  grid-template-columns: minmax(17rem, 1fr) minmax(17rem, 1fr);
-  grid-template-rows: minmax(15rem, auto) minmax(17rem, 1fr);
+.switcher.leftSide {
+  grid-template-columns: minmax(17rem, 1fr);
+  grid-template-rows: minmax(17rem, 1fr);
   grid-template-areas:
-    "levels game"
-    "levels info";
-  max-width: calc(2 * 27rem);
+    "levels";
+  max-width: calc(27rem);
+}
+.switcher.rightSide {
+  grid-template-columns: minmax(17rem, 1fr);
+  grid-template-rows: minmax(17rem, 1fr);
+  grid-template-areas:
+    "game"
+    "info";
+  max-width: calc(27rem);
 }
 .levels {
   grid-area: levels;
@@ -233,24 +230,12 @@ export default {
     "game"
     "next";
 }
-.small .game {
-  display: flex;
-  justify-content: space-around;
-}
 .instructions {
   grid-area: instructions;
 }
 .next {
   grid-area: next;
   height: var(--header-height);
-}
-.small .next {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: auto;
-  margin-top: 0;
-  max-width: 7rem;
 }
 .info {
   grid-area: info;
