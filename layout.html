@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>layout</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .app {
+        display: grid;
+        grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
+        grid-template-rows: minmax(15rem, 100vh);
+      }
+      .sidebar {
+        background-color: red;
+      }
+      .play {
+        background-color: blue;
+        display: grid;
+        grid-template-columns: 5fr minmax(10rem, 2fr);
+      }
+      .gameholder {
+        background-color: yellowgreen;
+        max-height: max(100vh, 15rem);
+        overflow: hidden;
+        align-self: start; /* just for debugging */
+      }
+      .game {
+        background-color: green;
+        aspect-ratio: 1;
+        width: min(120%, 1.2 * max(100vh, 15rem), 30rem);
+        margin-top: calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 30rem)));
+        margin-left: calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 30rem)));
+      }
+      .info {
+        background-color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="sidebar">
+        sidebar
+      </div>
+      <div class="play">
+        <div class="gameholder">
+          <div class="game">
+            gamegamegamegame1<br/>
+            gamegamegamegame2<br/>
+            gamegamegamegame3<br/>
+            gamegamegamegame4<br/>
+            gamegamegamegame5<br/>
+            gamegamegamegame6<br/>
+            gamegamegamegame7<br/>
+            gamegamegamegame8<br/>
+            gamegamegamegame9<br/>
+            gamegamegamegame10
+          </div>
+        </div>
+        <div class="info">
+          info
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
