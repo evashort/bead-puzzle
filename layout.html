@@ -12,6 +12,9 @@
         grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
         grid-template-rows: minmax(15rem, 100vh);
       }
+      .app.infobelow {
+        grid-template-columns: minmax(10rem, 2fr) minmax(15rem, 5fr);
+      }
       .sidebar {
         background-color: red;
       }
@@ -19,6 +22,10 @@
         background-color: blue;
         display: grid;
         grid-template-columns: 5fr minmax(10rem, 2fr);
+      }
+      .infobelow .play {
+        display: block;
+        overflow-y: auto;
       }
       .gameholder {
         background-color: yellowgreen;
@@ -39,7 +46,7 @@
     </style>
   </head>
   <body>
-    <div class="app">
+    <div class="app infobelow">
       <div class="sidebar">
         sidebar
       </div>
@@ -59,6 +66,13 @@
           </div>
         </div>
         <div class="info">
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
           info
         </div>
       </div>
