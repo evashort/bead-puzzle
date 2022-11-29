@@ -9,27 +9,18 @@
       }
       .app {
         display: grid;
-        grid-template-columns: 2fr 5fr;
+        grid-template-columns: 1fr;
         grid-template-rows: 100vh;
-        min-width: 25rem;
       }
-      .app.desktop {
-        grid-template-columns: 2fr 7fr;
-        min-width: 35rem;
-      }
-      .app.gameonly {
+      .app.playing {
         display: block;
         min-width: 15rem;
-      }
-      .app.sidebaronly {
-        grid-template-columns: 1fr;
-        min-width: 10rem;
       }
       .sidebar {
         background-color: red;
         overflow-y: auto;
       }
-      .gameonly .sidebar {
+      .playing .sidebar {
         display: none;
       }
       .navigation {
@@ -40,15 +31,10 @@
       .play {
         background-color: blue;
         overflow-y: auto;
-      }
-      .desktop .play {
-        display: grid;
-        grid-template-columns: 5fr 2fr;
-        grid-template-rows: 100vh;
-        overflow-y: visible;
-      }
-      .sidebaronly .play {
         display: none;
+      }
+      .playing .play {
+        display: initial;
       }
       dialog {
         background-color: inherit;
@@ -78,11 +64,34 @@
       }
       .back {
         position: absolute;
+        display: none;
+      }
+      .playing .back {
+        display: initial;
+      }
+      @media (min-width: 25rem) {
+        .app {
+          grid-template-columns: 2fr 5fr;
+        }
+        .play {
+          display: initial;
+        }
+      }
+      @media (min-width: 35rem) {
+        .app {
+          grid-template-columns: 2fr 7fr;
+        }
+        .play {
+          display: grid;
+          grid-template-columns: 5fr 2fr;
+          grid-template-rows: 100vh;
+          overflow-y: visible;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="app sidebaronly">
+    <div class="app">
       <div class="sidebar">
         <div class="navigation">
           buttons
