@@ -14,11 +14,19 @@
       }
       .app.desktop {
         grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
-        grid-template-rows: max(15rem, 100vh);
+        grid-template-rows: minmax(15rem, 100vh);
+      }
+      .app.gameonly {
+        display: block;
+        min-width: 15rem;
+        min-height: 100vh;
       }
       .sidebar {
         background-color: red;
         overflow-y: auto;
+      }
+      .gameonly .sidebar {
+        display: none;
       }
       .play {
         background-color: blue;
