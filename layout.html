@@ -21,12 +21,20 @@
         min-width: 15rem;
         min-height: 100vh;
       }
+      .app.sidebaronly {
+        grid-template-columns: minmax(10rem, 1fr);
+      }
       .sidebar {
         background-color: red;
         overflow-y: auto;
       }
       .gameonly .sidebar {
         display: none;
+      }
+      .navigation {
+        background-color: pink;
+        position: sticky;
+        top: 0;
       }
       .play {
         background-color: blue;
@@ -35,6 +43,9 @@
       .desktop .play {
         display: grid;
         grid-template-columns: 5fr minmax(10rem, 2fr);
+      }
+      .sidebaronly .play {
+        display: none;
       }
       dialog {
         background-color: inherit;
@@ -70,7 +81,9 @@
   <body>
     <div class="app desktop">
       <div class="sidebar">
-        sidebar<br/>
+        <div class="navigation">
+          buttons
+        </div>
         sidebar<br/>
         sidebar<br/>
         sidebar<br/>
