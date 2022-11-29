@@ -10,22 +10,35 @@
       .app {
         display: grid;
         grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
-        grid-template-rows: minmax(15rem, 100vh);
+        grid-template-rows: 100vh;
       }
       .app.infobelow {
         grid-template-columns: minmax(10rem, 2fr) minmax(15rem, 5fr);
       }
       .sidebar {
         background-color: red;
+        overflow-y: auto;
+      }
+      .playholder {
+        background-color: inherit;
+        background-color: purple;
+        color: inherit;
+        position: static;
+        width: auto;
+        height: auto;
+        border: none;
+        padding: 0;
+        margin: 0;
       }
       .play {
         background-color: blue;
+        height: 100%;
         display: grid;
         grid-template-columns: 5fr minmax(10rem, 2fr);
+        overflow-y: auto;
       }
       .infobelow .play {
         display: block;
-        overflow-y: auto;
       }
       .gameholder {
         background-color: yellowgreen;
@@ -42,6 +55,10 @@
       }
       .info {
         background-color: orange;
+        overflow-y: auto;
+      }
+      .back {
+        position: absolute;
       }
     </style>
   </head>
@@ -50,32 +67,37 @@
       <div class="sidebar">
         sidebar
       </div>
-      <div class="play">
-        <div class="gameholder">
-          <div class="game">
-            gamegamegamegame1<br/>
-            gamegamegamegame2<br/>
-            gamegamegamegame3<br/>
-            gamegamegamegame4<br/>
-            gamegamegamegame5<br/>
-            gamegamegamegame6<br/>
-            gamegamegamegame7<br/>
-            gamegamegamegame8<br/>
-            gamegamegamegame9<br/>
-            gamegamegamegame10
+      <dialog class="playholder" open>
+        <div class="play">
+          <button class="back">
+            Back
+          </button>
+          <div class="gameholder">
+            <div class="game">
+              gamegamegamegame1<br/>
+              gamegamegamegame2<br/>
+              gamegamegamegame3<br/>
+              gamegamegamegame4<br/>
+              gamegamegamegame5<br/>
+              gamegamegamegame6<br/>
+              gamegamegamegame7<br/>
+              gamegamegamegame8<br/>
+              gamegamegamegame9<br/>
+              gamegamegamegame10
+            </div>
+          </div>
+          <div class="info">
+            info<br/>
+            info<br/>
+            info<br/>
+            info<br/>
+            info<br/>
+            info<br/>
+            info<br/>
+            info
           </div>
         </div>
-        <div class="info">
-          info<br/>
-          info<br/>
-          info<br/>
-          info<br/>
-          info<br/>
-          info<br/>
-          info<br/>
-          info
-        </div>
-      </div>
+      </dialog>
     </div>
   </body>
 </html>
