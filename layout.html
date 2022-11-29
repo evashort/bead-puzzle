@@ -9,20 +9,21 @@
       }
       .app {
         display: grid;
-        grid-template-columns: minmax(10rem, 2fr) minmax(15rem, 5fr);
+        grid-template-columns: 2fr 5fr;
         grid-template-rows: 100vh;
+        min-width: 25rem;
       }
       .app.desktop {
-        grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
-        grid-template-rows: minmax(15rem, 100vh);
+        grid-template-columns: 2fr 7fr;
+        min-width: 35rem;
       }
       .app.gameonly {
         display: block;
         min-width: 15rem;
-        min-height: 100vh;
       }
       .app.sidebaronly {
-        grid-template-columns: minmax(10rem, 1fr);
+        grid-template-columns: 1fr;
+        min-width: 10rem;
       }
       .sidebar {
         background-color: red;
@@ -42,7 +43,9 @@
       }
       .desktop .play {
         display: grid;
-        grid-template-columns: 5fr minmax(10rem, 2fr);
+        grid-template-columns: 5fr 2fr;
+        grid-template-rows: 100vh;
+        overflow-y: visible;
       }
       .sidebaronly .play {
         display: none;
@@ -59,8 +62,8 @@
       }
       .gameholder {
         background-color: yellowgreen;
+        min-height: 15rem;
         overflow: hidden;
-        max-height: max(100vh, 15rem);
       }
       .game {
         background-color: green;
@@ -79,7 +82,7 @@
     </style>
   </head>
   <body>
-    <div class="app desktop">
+    <div class="app sidebaronly">
       <div class="sidebar">
         <div class="navigation">
           buttons
