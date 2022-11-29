@@ -9,19 +9,27 @@
       }
       .app {
         display: grid;
-        grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
+        grid-template-columns: minmax(10rem, 2fr) minmax(15rem, 5fr);
         grid-template-rows: 100vh;
       }
-      .app.infobelow {
-        grid-template-columns: minmax(10rem, 2fr) minmax(15rem, 5fr);
+      .app.desktop {
+        grid-template-columns: minmax(10rem, 2fr) minmax(25rem, 7fr);
+        grid-template-rows: max(15rem, 100vh);
       }
       .sidebar {
         background-color: red;
         overflow-y: auto;
       }
-      .playholder {
+      .play {
+        background-color: blue;
+        overflow-y: auto;
+      }
+      .desktop .play {
+        display: grid;
+        grid-template-columns: 5fr minmax(10rem, 2fr);
+      }
+      dialog {
         background-color: inherit;
-        background-color: purple;
         color: inherit;
         position: static;
         width: auto;
@@ -30,21 +38,10 @@
         padding: 0;
         margin: 0;
       }
-      .play {
-        background-color: blue;
-        height: 100%;
-        display: grid;
-        grid-template-columns: 5fr minmax(10rem, 2fr);
-        overflow-y: auto;
-      }
-      .infobelow .play {
-        display: block;
-      }
       .gameholder {
         background-color: yellowgreen;
-        max-height: max(100vh, 15rem);
         overflow: hidden;
-        align-self: start; /* just for debugging */
+        max-height: max(100vh, 15rem);
       }
       .game {
         background-color: green;
@@ -63,41 +60,69 @@
     </style>
   </head>
   <body>
-    <div class="app infobelow">
+    <div class="app desktop">
       <div class="sidebar">
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
+        sidebar<br/>
         sidebar
       </div>
-      <dialog class="playholder" open>
-        <div class="play">
+      <div class="play">
+        <dialog class="gameholder" open>
           <button class="back">
             Back
           </button>
-          <div class="gameholder">
-            <div class="game">
-              gamegamegamegame1<br/>
-              gamegamegamegame2<br/>
-              gamegamegamegame3<br/>
-              gamegamegamegame4<br/>
-              gamegamegamegame5<br/>
-              gamegamegamegame6<br/>
-              gamegamegamegame7<br/>
-              gamegamegamegame8<br/>
-              gamegamegamegame9<br/>
-              gamegamegamegame10
-            </div>
+          <div class="game">
+            gamegamegamegame1<br/>
+            gamegamegamegame2<br/>
+            gamegamegamegame3<br/>
+            gamegamegamegame4<br/>
+            gamegamegamegame5<br/>
+            gamegamegamegame6<br/>
+            gamegamegamegame7<br/>
+            gamegamegamegame8<br/>
+            gamegamegamegame9<br/>
+            gamegamegamegame10
           </div>
-          <div class="info">
-            info<br/>
-            info<br/>
-            info<br/>
-            info<br/>
-            info<br/>
-            info<br/>
-            info<br/>
-            info
-          </div>
+        </dialog>
+        <div class="info">
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info<br/>
+          info
         </div>
-      </dialog>
+      </div>
     </div>
   </body>
 </html>
