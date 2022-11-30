@@ -6,84 +6,96 @@
     <style>
       body {
         margin: 0;
+        line-height: 2;
       }
-      .app {
+      #app {
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 100vh;
       }
-      .app.playing {
+      #app.playing {
         display: block;
         min-width: 15rem;
       }
-      .sidebar {
+      #sidebar {
         background-color: red;
         overflow-y: auto;
       }
-      .playing .sidebar {
+      .playing #sidebar {
         display: none;
       }
-      .navigation {
+      #navigation {
         background-color: pink;
         position: sticky;
         top: 0;
       }
-      .play {
+      #close::before {
+        content: "Play";
+      }
+      #play {
         background-color: blue;
         overflow-y: auto;
         display: none;
       }
-      .playing .play {
+      .playing #play {
         display: initial;
       }
       dialog {
         background-color: inherit;
         color: inherit;
-        position: static;
+        position: relative;
         width: auto;
         height: auto;
         border: none;
         padding: 0;
         margin: 0;
       }
-      .gameholder {
+      #gameholder {
         background-color: yellowgreen;
         min-height: 15rem;
         overflow: hidden;
       }
-      .game {
+      #game {
         background-color: green;
         aspect-ratio: 1;
-        width: min(120%, 1.2 * max(100vh, 15rem), 30rem);
-        margin-top: calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 30rem)));
-        margin-left: calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 30rem)));
+        width: min(120%, 1.2 * max(100vh, 15rem), 35rem);
+        margin-top: calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 35rem)));
+        margin-left: calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 35rem)));
       }
-      .info {
+      #info {
         background-color: orange;
         overflow-y: auto;
       }
-      .back {
+      #back {
         position: absolute;
         display: none;
       }
-      .playing .back {
+      .playing #back {
         display: initial;
       }
-      @media (min-width: 25rem) {
-        .app {
-          grid-template-columns: 2fr 5fr;
-        }
-        .play {
-          display: initial;
-        }
+      #next {
+        position: absolute;
+        right: 0;
+        bottom: 0;
       }
       @media (min-width: 35rem) {
-        .app {
-          grid-template-columns: 2fr 7fr;
+        #app {
+          grid-template-columns: 3fr 7fr;
         }
-        .play {
+        #play {
+          display: initial;
+        }
+        #close::before {
+          content: "Close";
+        }
+      }
+      @media (min-width: 49rem) {
+        #app {
+          grid-template-columns: 3fr 11fr;
+        }
+        #play {
           display: grid;
-          grid-template-columns: 5fr 2fr;
+          grid-template-columns: 7fr 4fr;
           grid-template-rows: 100vh;
           overflow-y: visible;
         }
@@ -91,10 +103,12 @@
     </style>
   </head>
   <body>
-    <div class="app">
-      <div class="sidebar">
-        <div class="navigation">
+    <div id="app">
+      <div id="sidebar">
+        <div id="navigation">
           buttons
+          <button id="close" onclick="document.getElementById('app').classList.add('playing')">
+          </button>
         </div>
         sidebar<br/>
         sidebar<br/>
@@ -113,12 +127,12 @@
         sidebar<br/>
         sidebar
       </div>
-      <div class="play">
-        <dialog class="gameholder" open>
-          <button class="back">
+      <div id="play">
+        <dialog id="gameholder" open>
+          <button id="back" onclick="document.getElementById('app').classList.remove('playing')">
             Back
           </button>
-          <div class="game">
+          <div id="game">
             gamegamegamegame1<br/>
             gamegamegamegame2<br/>
             gamegamegamegame3<br/>
@@ -130,8 +144,11 @@
             gamegamegamegame9<br/>
             gamegamegamegame10
           </div>
+          <button id="next">
+            Next
+          </button>
         </dialog>
-        <div class="info">
+        <div id="info">
           info<br/>
           info<br/>
           info<br/>
