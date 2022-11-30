@@ -114,7 +114,7 @@
       <div id="sidebar">
         <div id="navigation">
           buttons
-          <button id="close" onclick="document.getElementById('app').classList.add('playing'); document.getElementById('gameholder').close(); document.getElementById('gameholder').show();">
+          <button id="close" onclick="document.getElementById('app').classList.add('playing'); document.getElementById('gameholder').close(); document.getElementById('game').setAttribute('autofocus', 'true'); document.getElementById('gameholder').show();">
           </button>
         </div>
         sidebar<br/>
@@ -139,7 +139,7 @@
           <button id="back" onclick="document.getElementById('app').classList.remove('playing')">
             Back
           </button>
-          <button id="game" autofocus>
+          <button id="game">
             gamegamegamegame1<br/>
             gamegamegamegame2<br/>
             gamegamegamegame3<br/>
