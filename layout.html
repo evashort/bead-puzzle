@@ -20,6 +20,7 @@
       #sidebar {
         background-color: red;
         overflow-y: auto;
+        z-index: 1; /* make scroll focus border visible in firefox */
       }
       .playing #sidebar {
         display: none;
@@ -33,9 +34,12 @@
         content: "Play";
       }
       #play {
-        background-color: blue;
         overflow-y: auto;
         display: none;
+      }
+      #play:focus {
+        /* indicate that div is focused in firefox via scrollbar color */
+        background-color: AccentColor;
       }
       .playing #play {
         display: initial;
@@ -43,7 +47,7 @@
       dialog {
         background-color: inherit;
         color: inherit;
-        position: relative;
+        position: static;
         width: auto;
         height: auto;
         border: none;
@@ -54,6 +58,8 @@
         background-color: yellowgreen;
         min-height: 15rem;
         overflow: hidden;
+        position: relative; /* allow children to have position: absolute */
+        display: block; /* closing the dialog doesn't do anything */
       }
       #game {
         background-color: green;
@@ -65,6 +71,7 @@
       #info {
         background-color: orange;
         overflow-y: auto;
+        z-index: 1; /* make scroll focus border visible in firefox */
       }
       #back {
         position: absolute;
@@ -107,7 +114,7 @@
       <div id="sidebar">
         <div id="navigation">
           buttons
-          <button id="close" onclick="document.getElementById('app').classList.add('playing')">
+          <button id="close" onclick="document.getElementById('app').classList.add('playing'); document.getElementById('gameholder').close(); document.getElementById('gameholder').show();">
           </button>
         </div>
         sidebar<br/>
@@ -128,11 +135,11 @@
         sidebar
       </div>
       <div id="play">
-        <dialog id="gameholder" open>
+        <dialog id="gameholder">
           <button id="back" onclick="document.getElementById('app').classList.remove('playing')">
             Back
           </button>
-          <div id="game">
+          <button id="game" autofocus>
             gamegamegamegame1<br/>
             gamegamegamegame2<br/>
             gamegamegamegame3<br/>
@@ -143,7 +150,7 @@
             gamegamegamegame8<br/>
             gamegamegamegame9<br/>
             gamegamegamegame10
-          </div>
+          </button>
           <button id="next">
             Next
           </button>
