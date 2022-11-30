@@ -29,11 +29,9 @@ export default {
       variation: 0,
       groups: groups,
       graphs: graphData.graphs,
-      gameFocused: false,
+      autofocus: false,
+      playing: false,
     }
-  },
-  props: {
-    headerHeight: String,
   },
   computed: {
     graph() {
@@ -95,20 +93,26 @@ export default {
     },
   },
   methods: {
+    focusGame() {
+      let gameHolder = document.getElementById('gameHolder');
+      gameHolder.close()
+      // TODO: does this work in time? or should we try putting it in mount()?
+      this.autofocus = true
+      gameHolder.show()
+    },
     nextLevel() {
       this.graphIndex++
-      document.getElementById('gameButton').focus()
+      this.focusGame()
+    },
+    play() {
+      this.playing = true
+      this.focusGame()
     },
     wonChanged(won) {
       if (won) {
         this.graph.won = true
       }
     },
-    focusGame(event) {
-      if (event.target.value == this.graphIndex || event.pageX != 0 || event.pageY != 0) {
-        this.gameFocused = true
-      }
-    }
   },
   watch: {
     graphIndex(newGraphIndex, oldGraphIndex) {
@@ -119,8 +123,12 @@ export default {
 </script>
 
 <template>
-  <div :class="{switcher: true, leftSide: !gameFocused, rightSide: gameFocused}" :style="{'--header-height': headerHeight}">
-    <div class="levels" v-if="!gameFocused">
+  <div :class="{switcher: true, playing: playing}">
+    <div class="levels">
+      <div class="navigation">
+        <button class="close" :onclick="play">
+        </button>
+      </div>
       <fieldset v-for="group in groups">
         <legend>{{group.name}}</legend>
         <template
@@ -143,48 +151,54 @@ export default {
         </template>
       </fieldset>
     </div>
-    <div class="game" id="gameArea" v-if="gameFocused">
-      <Markdown class="instructions" :source="instructions" />
-      <Game
-        :startingBeads="startingBeads"
-        :edges="edges"
-        buttonId="gameButton"
-        @update:won="wonChanged"
-      />
-      <button
-        id="nextButton"
-        @click="nextLevel"
-        :class="{next: true}"
-        :disabled="!graph.won || graphIndex >= graphs.length - 1"
-      >
-        Next{{graph.won && graphIndex < graphs.length - 1 ? `: Level ${graphIndex + 2} ${graphs[graphIndex + 1].name}` : ''}}
-      </button>
-    </div>
-    <div class="info" v-if="gameFocused">
-      {{graph.name}}<br/>
-      Minimum: {{graph.distance}} moves<br/>
-      Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
-      State space: {{graph.states}} states<br/>
-      <button @click="gameFocused = false">hello</button>
-      <fieldset>
-        <legend>{{graph.puzzles.length}} variations</legend>
-        <template
-          v-for="(puzzle, i) in graph.puzzles"
-          :key="[graph.id, i]"
+    <div class="play">
+      <dialog id="gameHolder">
+        <button
+          class="back"
+          @click="this.playing = false"
         >
-          <input
-            type="radio"
-            :value="i"
-            v-model="variation"
-            :id="`variation-${i}`"
-            name="variation"
-          />
-          <label :for="`variation-${i}`">
-            V{{i}}
-          </label>
-          <br/>
-        </template>
-      </fieldset>
+          Back
+        </button>
+        <Game
+          :startingBeads="startingBeads"
+          :edges="edges"
+          :autofocus="autofocus"
+          @update:won="wonChanged"
+        />
+        <button
+          class="next"
+          @click="nextLevel"
+          :disabled="!graph.won || graphIndex >= graphs.length - 1"
+        >
+          Next
+        </button>
+      </dialog>
+      <div class="info">
+        {{graph.name}}<br/>
+        <Markdown class="instructions" :source="instructions" />
+        Minimum: {{graph.distance}} moves<br/>
+        Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
+        State space: {{graph.states}} states<br/>
+        <fieldset>
+          <legend>{{graph.puzzles.length}} variations</legend>
+          <template
+            v-for="(puzzle, i) in graph.puzzles"
+            :key="[graph.id, i]"
+          >
+            <input
+              type="radio"
+              :value="i"
+              v-model="variation"
+              :id="`variation-${i}`"
+              name="variation"
+            />
+            <label :for="`variation-${i}`">
+              V{{i}}
+            </label>
+            <br/>
+          </template>
+        </fieldset>
+      </div>
     </div>
   </div>
 </template>
@@ -192,53 +206,91 @@ export default {
 <style scoped>
 .switcher {
   display: grid;
-  grid-template-columns: minmax(17rem, 1fr) minmax(27rem, min(100vh - var(--header-height), 40rem)) minmax(17rem, 1fr);
-  grid-template-rows: minmax(27rem, 1fr);
-  max-width: calc(clamp(27rem, 100vh - var(--header-height), 40rem) + 2 * 27rem);
-  width: 100%;
-  height: 100%;
-  margin: auto;
-  grid-template-areas:
-    "levels game info";
+  grid-template-columns: 1fr;
+  grid-template-rows: 100vh;
 }
-.switcher.leftSide {
-  grid-template-columns: minmax(17rem, 1fr);
-  grid-template-rows: minmax(17rem, 1fr);
-  grid-template-areas:
-    "levels";
-  max-width: calc(27rem);
-}
-.switcher.rightSide {
-  grid-template-columns: minmax(17rem, 1fr);
-  grid-template-rows: minmax(17rem, 1fr);
-  grid-template-areas:
-    "game"
-    "info";
-  max-width: calc(27rem);
+.switcher.playing {
+  display: block;
+  min-width: 15rem;
 }
 .levels {
-  grid-area: levels;
   overflow-y: auto;
+  z-index: 1; /* make scroll focus border visible in firefox */
 }
-.game {
-  grid-area: game;
+.playing .levels {
+  display: none;
+}
+.navigation {
+  position: sticky;
+  top: 0;
+  z-index: inherit;
+}
+.close::before {
+  content: "Play";
+}
+.play {
   overflow-y: auto;
-  display: grid;
-  grid-template-rows: auto minmax(auto, 1fr) auto;
-  grid-template-areas:
-    "instructions"
-    "game"
-    "next";
+  display: none;
 }
-.instructions {
-  grid-area: instructions;
+.play:focus {
+  /* indicate that div is focused in firefox via scrollbar color */
+  background-color: AccentColor;
 }
-.next {
-  grid-area: next;
-  height: var(--header-height);
+.playing .play {
+  display: initial;
+}
+dialog {
+  background-color: inherit;
+  color: inherit;
+  position: static;
+  width: auto;
+  height: auto;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+#gameHolder {
+  min-height: 15rem;
+  overflow: hidden;
+  position: relative; /* allow children to have position: absolute */
+  display: block; /* closing the dialog doesn't do anything */
 }
 .info {
-  grid-area: info;
   overflow-y: auto;
+  z-index: 1; /* make scroll focus border visible in firefox */
+}
+.back {
+  position: absolute;
+  display: none;
+}
+.playing .back {
+  display: initial;
+}
+.next {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+@media (min-width: 35rem) {
+  .switcher {
+    grid-template-columns: 3fr 7fr;
+  }
+  .play {
+    display: initial;
+  }
+  .close::before {
+    content: "Close";
+  }
+}
+@media (min-width: 49rem) {
+  .switcher {
+    grid-template-columns: 3fr 11fr;
+  }
+  .play {
+    display: grid;
+    grid-template-columns: 7fr 4fr;
+    grid-template-rows: 100vh;
+    overflow-y: visible;
+  }
 }
 </style>

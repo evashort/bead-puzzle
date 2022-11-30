@@ -26,7 +26,7 @@ export default {
   props: {
     startingBeads: Array,
     edges: Array,
-    buttonId: String,
+    autofocus: Boolean,
   },
   emits: ['update:won'],
   computed: {
@@ -788,8 +788,8 @@ export default {
 
 <template>
   <button
-    :id="buttonId"
-    :class="{tabStop: true}"
+    class="game"
+    :autofocus="autofocus"
     @keydown.up.stop.prevent="goForward()"
     @keydown.down.stop.prevent="goBack()"
     @keydown.left.stop.prevent="selectLeft()"
@@ -802,7 +802,7 @@ export default {
     @focus.native="onFocus"
     @blur.native="onBlur"
   >
-    <svg id="game-view" viewBox="-120 -120 240 240" @mousedown="onMouseDown" @click.stop.prevent="clicked">
+    <svg id="game-view" viewBox="-143 -143 286 286" @mousedown="onMouseDown" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"
@@ -1001,18 +1001,18 @@ export default {
 </template>
 
 <style scoped>
-.tabStop {
+button {
   background-color: inherit;
   border: none;
   font: inherit;
   padding: 0;
-  grid-area: game;
-  display: flex;
-  align-items: stretch;
 }
-.tabStop.small {
+.game {
   aspect-ratio: 1;
-  max-height: 21rem;
+  width: min(120%, 1.2 * max(100vh, 15rem), 35rem);
+  margin:
+    calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 35rem)))
+    calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 35rem)));
 }
 .touchCircle {
   stroke: var(--color-text);
