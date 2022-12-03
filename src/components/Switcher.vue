@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     focusGame() {
-      let gameHolder = document.getElementById('gameHolder');
+      let gameHolder = document.getElementById('gameHolder')
       gameHolder.close()
       // TODO: does this work in time? or should we try putting it in mount()?
       this.autofocus = true
@@ -104,9 +104,16 @@ export default {
       this.graphIndex++
       this.focusGame()
     },
-    play() {
-      this.playing = true
-      this.focusGame()
+    levelClicked(event) {
+      let mouse = event.pageX != 0 || event.pageY != 0
+      let secondClick = event.target.value == this.graphIndex
+      let playArea = document.getElementById('gameHolder').parentNode
+      let sidebarOnly = window.getComputedStyle(playArea).display == 'none'
+      if ((mouse || secondClick) && sidebarOnly) {
+        this.playing = true
+      } else if (!mouse && secondClick) {
+        this.focusGame()
+      }
     },
     wonChanged(won) {
       if (won) {
@@ -118,6 +125,11 @@ export default {
     graphIndex(newGraphIndex, oldGraphIndex) {
       this.variation = 0
     },
+    playing(newPlaying, oldPlaying) {
+      if (newPlaying && !oldPlaying) {
+        this.focusGame()
+      }
+    },
   },
 }
 </script>
@@ -126,7 +138,7 @@ export default {
   <div :class="{switcher: true, playing: playing}">
     <div class="levels">
       <div class="navigation">
-        <button class="close" :onclick="play">
+        <button class="close" @click="this.playing = true">
         </button>
       </div>
       <fieldset v-for="group in groups">
@@ -141,7 +153,7 @@ export default {
             v-model="graphIndex"
             :id="`level-${group.start + j}`"
             name="level"
-            @click="focusGame"
+            @click="levelClicked"
           />
           <label :for="`level-${group.start + j}`">
             {{group.start + j + 1}}
