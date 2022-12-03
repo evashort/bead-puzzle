@@ -136,6 +136,12 @@ export default {
 
 <template>
   <div :class="{switcher: true, playing: playing}">
+    <button
+      class="back"
+      @click="this.playing = false"
+    >
+      Back
+    </button>
     <div class="levels">
       <div class="navigation">
         <button class="close" @click="this.playing = true">
@@ -165,12 +171,6 @@ export default {
     </div>
     <div class="play">
       <dialog id="gameHolder">
-        <button
-          class="back"
-          @click="this.playing = false"
-        >
-          Back
-        </button>
         <Game
           :startingBeads="startingBeads"
           :edges="edges"
@@ -274,6 +274,7 @@ dialog {
 .back {
   position: absolute;
   display: none;
+  z-index: 1;
 }
 .playing .back {
   display: initial;

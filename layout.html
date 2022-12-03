@@ -76,6 +76,7 @@
       #back {
         position: absolute;
         display: none;
+        z-index: 1;
       }
       .playing #back {
         display: initial;
@@ -111,6 +112,9 @@
   </head>
   <body>
     <div id="app">
+      <button id="back" onclick="document.getElementById('app').classList.remove('playing')">
+        Back
+      </button>
       <div id="sidebar">
         <div id="navigation">
           buttons
@@ -136,9 +140,6 @@
       </div>
       <div id="play">
         <dialog id="gameholder">
-          <button id="back" onclick="document.getElementById('app').classList.remove('playing')">
-            Back
-          </button>
           <button id="game">
             gamegamegamegame1<br/>
             gamegamegamegame2<br/>
