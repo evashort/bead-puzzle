@@ -195,7 +195,7 @@ export default {
           <legend>{{graph.puzzles.length}} variations</legend>
           <template
             v-for="(puzzle, i) in graph.puzzles"
-            :key="[graph.id, i]"
+            :key="[graph.id, i].toString()"
           >
             <input
               type="radio"
@@ -295,7 +295,7 @@ dialog {
     content: "Close";
   }
 }
-@media (min-width: 49rem) {
+@media (min-width: 60rem) {
   .switcher {
     grid-template-columns: 3fr 11fr;
   }
