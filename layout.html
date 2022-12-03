@@ -18,17 +18,22 @@
         min-width: 15rem;
       }
       #sidebar {
-        background-color: red;
-        overflow-y: auto;
-        z-index: 1; /* make scroll focus border visible in firefox */
+        background-color: yellow;
+        display: grid;
+        grid-template-rows: auto 1fr;
       }
       .playing #sidebar {
         display: none;
       }
       #navigation {
         background-color: pink;
-        position: sticky;
-        top: 0;
+      }
+      #levels {
+        background-color: red;
+        overflow-y: auto;
+      }
+      #levels:focus {
+        z-index: 1; /* make scroll focus border visible in firefox */
       }
       #close::before {
         content: "Play";
@@ -36,10 +41,6 @@
       #play {
         overflow-y: auto;
         display: none;
-      }
-      #play:focus {
-        /* indicate that div is focused in firefox via scrollbar color */
-        background-color: AccentColor;
       }
       .playing #play {
         display: initial;
@@ -121,22 +122,24 @@
           <button id="close" onclick="document.getElementById('app').classList.add('playing'); document.getElementById('gameholder').close(); document.getElementById('game').setAttribute('autofocus', 'true'); document.getElementById('gameholder').show();">
           </button>
         </div>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar<br/>
-        sidebar
+        <div id="levels">
+        levelssssssssssssssssssssssssssssssss<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels<br/>
+        levels
+        </div>
       </div>
       <div id="play">
         <dialog id="gameholder">

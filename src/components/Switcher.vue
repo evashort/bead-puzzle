@@ -142,32 +142,34 @@ export default {
     >
       Back
     </button>
-    <div class="levels">
+    <div class="sidebar">
       <div class="navigation">
         <button class="close" @click="this.playing = true">
         </button>
       </div>
-      <fieldset v-for="group in groups">
-        <legend>{{group.name}}</legend>
-        <template
-          v-for="(graph, j) in graphs.slice(group.start, group.stop)"
-          :key="graph.id"
-        >
-          <input
-            type="radio"
-            :value="group.start + j"
-            v-model="graphIndex"
-            :id="`level-${group.start + j}`"
-            name="level"
-            @click="levelClicked"
-          />
-          <label :for="`level-${group.start + j}`">
-            {{group.start + j + 1}}
-            {{graph.name || graph.id}}{{graph.won ? ' ✅' : ''}}
-          </label>
-          <br/>
-        </template>
-      </fieldset>
+      <div class="levels">
+        <fieldset v-for="group in groups">
+          <legend>{{group.name}}</legend>
+          <template
+            v-for="(graph, j) in graphs.slice(group.start, group.stop)"
+            :key="graph.id"
+          >
+            <input
+              type="radio"
+              :value="group.start + j"
+              v-model="graphIndex"
+              :id="`level-${group.start + j}`"
+              name="level"
+              @click="levelClicked"
+            />
+            <label :for="`level-${group.start + j}`">
+              {{group.start + j + 1}}
+              {{graph.name || graph.id}}{{graph.won ? ' ✅' : ''}}
+            </label>
+            <br/>
+          </template>
+        </fieldset>
+      </div>
     </div>
     <div class="play">
       <dialog id="gameHolder">
@@ -225,17 +227,18 @@ export default {
   display: block;
   min-width: 15rem;
 }
-.levels {
-  overflow-y: auto;
-  z-index: 1; /* make scroll focus border visible in firefox */
+.sidebar {
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
-.playing .levels {
+.playing .sidebar {
   display: none;
 }
-.navigation {
-  position: sticky;
-  top: 0;
-  z-index: inherit;
+.levels {
+  overflow-y: auto;
+}
+.levels:focus {
+  z-index: 1; /* make scroll focus border visible in firefox */
 }
 .close::before {
   content: "Play";
@@ -243,10 +246,6 @@ export default {
 .play {
   overflow-y: auto;
   display: none;
-}
-.play:focus {
-  /* indicate that div is focused in firefox via scrollbar color */
-  background-color: AccentColor;
 }
 .playing .play {
   display: initial;
