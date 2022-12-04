@@ -105,13 +105,23 @@ export default {
       this.focusGame()
     },
     levelClicked(event) {
-      let mouse = event.pageX != 0 || event.pageY != 0
-      let secondClick = event.target.value == this.graphIndex
+      if (event.pageX == 0 && event.pageY == 0) {
+        // Keyboard events are handled by levelPressed because Chrome doesn't
+        // fire a click event unless the radio button selection has changed.
+        return
+      }
       let playArea = document.getElementById('gameHolder').parentNode
       let sidebarOnly = window.getComputedStyle(playArea).display == 'none'
-      if ((mouse || secondClick) && sidebarOnly) {
+      if (sidebarOnly) {
         this.playing = true
-      } else if (!mouse && secondClick) {
+      }
+    },
+    levelPressed() {
+      let playArea = document.getElementById('gameHolder').parentNode
+      let sidebarOnly = window.getComputedStyle(playArea).display == 'none'
+      if (sidebarOnly) {
+        this.playing = true
+      } else {
         this.focusGame()
       }
     },
@@ -162,6 +172,8 @@ export default {
               :id="`level-${group.start + j}`"
               name="level"
               @click="levelClicked"
+              @keyup.space.stop.prevent="levelPressed"
+              @keyup.enter.stop.prevent="levelPressed"
             />
             <label :for="`level-${group.start + j}`">
               {{group.start + j + 1}}
