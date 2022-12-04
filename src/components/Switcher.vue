@@ -150,9 +150,10 @@ export default {
       <div class="levels">
         <fieldset v-for="group in groups">
           <legend>{{group.name}}</legend>
-          <template
+          <div
             v-for="(graph, j) in graphs.slice(group.start, group.stop)"
             :key="graph.id"
+            class="radioHolder"
           >
             <input
               type="radio"
@@ -166,8 +167,7 @@ export default {
               {{group.start + j + 1}}
               {{graph.name || graph.id}}{{graph.won ? ' ✅' : ''}}
             </label>
-            <br/>
-          </template>
+          </div>
         </fieldset>
       </div>
     </div>
@@ -195,9 +195,10 @@ export default {
         State space: {{graph.states}} states<br/>
         <fieldset>
           <legend>{{graph.puzzles.length}} variations</legend>
-          <template
+          <div
             v-for="(puzzle, i) in graph.puzzles"
             :key="[graph.id, i].toString()"
+            class="radioHolder"
           >
             <input
               type="radio"
@@ -210,7 +211,7 @@ export default {
               V{{i}}
             </label>
             <br/>
-          </template>
+          </div>
         </fieldset>
       </div>
     </div>
@@ -233,6 +234,22 @@ export default {
 }
 .playing .sidebar {
   display: none;
+}
+.radioHolder {
+  display: flex;
+}
+.radioHolder input {
+  appearance: none;
+  display: block;
+	margin: 0;
+  width: 100%;
+  margin-right: -100%;
+}
+.radioHolder input:checked {
+  border: 1px solid var(--color-text);
+}
+.radioHolder label {
+  padding: 0 0.5rem;
 }
 .levels {
   overflow-y: auto;
