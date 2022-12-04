@@ -168,6 +168,12 @@ export default {
     </button>
     <div class="sidebar">
       <div class="navigation">
+        <button disabled class="tab">
+          Levels
+        </button>
+        <button class="tab">
+          Settings
+        </button>
         <button class="close" @click="this.playing = true">
         </button>
       </div>
@@ -281,6 +287,26 @@ export default {
 .playing .sidebar {
   display: none;
 }
+.navigation {
+  display: flex;
+}
+.navigation button {
+  flex-basis: 0;
+  flex-grow: 1;
+}
+.tab {
+  border-radius: 6px 6px 0 0;
+  border-bottom-style: none;
+  border-left-style: none;
+}
+.tab:disabled {
+  background: inherit;
+  color: inherit;
+}
+button {
+  line-height: inherit;
+  font: inherit;
+}
 fieldset {
   border-width: 1px;
   border-style: none;
@@ -346,6 +372,7 @@ dialog {
 }
 .gameHolder {
   min-height: 15rem;
+  max-height: 100vh;
   overflow: hidden;
   position: relative; /* allow children to have position: absolute */
 }
@@ -357,6 +384,7 @@ dialog {
   position: absolute;
   display: none;
   z-index: 1;
+  min-width: 5.5rem;
 }
 .playing .back {
   display: initial;
@@ -365,6 +393,7 @@ dialog {
   position: absolute;
   right: 0;
   bottom: 0;
+  min-width: 5.5rem;
 }
 @media (min-width: 35rem) {
   .switcher {
