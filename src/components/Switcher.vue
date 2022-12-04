@@ -246,10 +246,13 @@ export default {
   margin-right: -100%;
 }
 .radioHolder input:checked {
-  border: 1px solid var(--color-text);
+  background-color: var(--color-text);
 }
 .radioHolder label {
   padding: 0 0.5rem;
+}
+.radioHolder input:checked+label {
+  color: black;
 }
 .levels {
   overflow-y: auto;
