@@ -111,18 +111,18 @@ export default {
       }
 
       let play = document.getElementById('play')
-      let sidebarOnly = window.getComputedStyle(play).display == 'none'
-      if (sidebarOnly) {
+      let alwaysVisible = window.getComputedStyle(play).getPropertyValue('--always-visible')
+      if (!alwaysVisible) {
         this.playing = true
       }
     },
     levelPressed() {
       let play = document.getElementById('play')
-      let sidebarOnly = window.getComputedStyle(play).display == 'none'
-      if (sidebarOnly) {
-        this.playing = true
-      } else {
+      let alwaysVisible = window.getComputedStyle(play).getPropertyValue('--always-visible')
+      if (alwaysVisible) {
         this.focusGame()
+      } else {
+        this.playing = true
       }
     },
     wonChanged(won) {
@@ -341,6 +341,7 @@ dialog {
     grid-template-columns: 3fr 7fr;
   }
   #play {
+    --always-visible: 1;
     display: block;
   }
   .close::before {
