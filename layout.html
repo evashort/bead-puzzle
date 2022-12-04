@@ -10,7 +10,7 @@
       }
       #app {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 0fr;
         grid-template-rows: 100vh;
       }
       #app.playing {
@@ -40,10 +40,6 @@
       }
       #play {
         overflow-y: auto;
-        display: none;
-      }
-      .playing #play {
-        display: initial;
       }
       dialog {
         background-color: inherit;
@@ -60,7 +56,6 @@
         min-height: 15rem;
         overflow: hidden;
         position: relative; /* allow children to have position: absolute */
-        display: block; /* closing the dialog doesn't do anything */
       }
       #game {
         background-color: green;
@@ -68,6 +63,7 @@
         width: min(120%, 1.2 * max(100vh, 15rem), 42rem);
         margin-top: calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
         margin-left: calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
+        margin-bottom: min(0rem, 0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
       }
       #info {
         background-color: orange;
@@ -92,7 +88,7 @@
           grid-template-columns: 3fr 7fr;
         }
         #play {
-          display: initial;
+          display: block;
         }
         #close::before {
           content: "Close";
@@ -108,18 +104,21 @@
           grid-template-rows: 100vh;
           overflow-y: visible;
         }
+        .playing #play {
+          display: block;
+        }
       }
     </style>
   </head>
   <body>
     <div id="app">
-      <button id="back" onclick="document.getElementById('app').classList.remove('playing')">
+      <button id="back" onclick="document.getElementById('app').classList.remove('playing'); document.getElementById('play').close();">
         Back
       </button>
       <div id="sidebar">
         <div id="navigation">
           buttons
-          <button id="close" onclick="document.getElementById('app').classList.add('playing'); document.getElementById('gameholder').close(); document.getElementById('game').setAttribute('autofocus', 'true'); document.getElementById('gameholder').show();">
+          <button id="close" onclick="document.getElementById('app').classList.add('playing'); document.getElementById('game').setAttribute('autofocus', 'true'); document.getElementById('play').show();">
           </button>
         </div>
         <div id="levels">
@@ -141,8 +140,8 @@
         levels
         </div>
       </div>
-      <div id="play">
-        <dialog id="gameholder">
+      <dialog id="play">
+        <div id="gameholder">
           <button id="game">
             gamegamegamegame1<br/>
             gamegamegamegame2<br/>
@@ -158,7 +157,7 @@
           <button id="next">
             Next
           </button>
-        </dialog>
+        </div>
         <div id="info">
           info<br/>
           info<br/>

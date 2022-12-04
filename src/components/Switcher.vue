@@ -94,11 +94,10 @@ export default {
   },
   methods: {
     focusGame() {
-      let gameHolder = document.getElementById('gameHolder')
-      gameHolder.close()
-      // TODO: does this work in time? or should we try putting it in mount()?
+      let play = document.getElementById('play')
+      play.close()
       this.autofocus = true
-      gameHolder.show()
+      play.show()
     },
     nextLevel() {
       this.graphIndex++
@@ -110,15 +109,16 @@ export default {
         // fire a click event unless the radio button selection has changed.
         return
       }
-      let playArea = document.getElementById('gameHolder').parentNode
-      let sidebarOnly = window.getComputedStyle(playArea).display == 'none'
+
+      let play = document.getElementById('play')
+      let sidebarOnly = window.getComputedStyle(play).display == 'none'
       if (sidebarOnly) {
         this.playing = true
       }
     },
     levelPressed() {
-      let playArea = document.getElementById('gameHolder').parentNode
-      let sidebarOnly = window.getComputedStyle(playArea).display == 'none'
+      let play = document.getElementById('play')
+      let sidebarOnly = window.getComputedStyle(play).display == 'none'
       if (sidebarOnly) {
         this.playing = true
       } else {
@@ -136,8 +136,12 @@ export default {
       this.variation = 0
     },
     playing(newPlaying, oldPlaying) {
-      if (newPlaying && !oldPlaying) {
-        this.focusGame()
+      let play = document.getElementById('play')
+      if (newPlaying) {
+        this.autofocus = true
+        play.show()
+      } else {
+        play.close()
       }
     },
   },
@@ -183,8 +187,8 @@ export default {
         </fieldset>
       </div>
     </div>
-    <div class="play">
-      <dialog id="gameHolder">
+    <dialog id="play">
+      <div class="gameHolder">
         <Game
           :startingBeads="startingBeads"
           :edges="edges"
@@ -198,7 +202,7 @@ export default {
         >
           Next
         </button>
-      </dialog>
+      </div>
       <div class="info">
         {{graph.name}}<br/>
         <Markdown class="instructions" :source="instructions" />
@@ -226,14 +230,14 @@ export default {
           </div>
         </fieldset>
       </div>
-    </div>
+    </dialog>
   </div>
 </template>
 
 <style scoped>
 .switcher {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 0fr;
   grid-template-rows: 100vh;
 }
 .switcher.playing {
@@ -297,12 +301,8 @@ fieldset {
 .close::before {
   content: "Play";
 }
-.play {
+#play {
   overflow-y: auto;
-  display: none;
-}
-.playing .play {
-  display: initial;
 }
 dialog {
   background-color: inherit;
@@ -314,11 +314,10 @@ dialog {
   padding: 0;
   margin: 0;
 }
-#gameHolder {
+.gameHolder {
   min-height: 15rem;
   overflow: hidden;
   position: relative; /* allow children to have position: absolute */
-  display: block; /* closing the dialog doesn't do anything */
 }
 .info {
   overflow-y: auto;
@@ -341,8 +340,8 @@ dialog {
   .switcher {
     grid-template-columns: 3fr 7fr;
   }
-  .play {
-    display: initial;
+  #play {
+    display: block;
   }
   .close::before {
     content: "Close";
@@ -357,6 +356,9 @@ dialog {
     grid-template-columns: 7fr 4fr;
     grid-template-rows: 100vh;
     overflow-y: visible;
+  }
+  .playing #play {
+    display: block;
   }
 }
 </style>

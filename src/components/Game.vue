@@ -1012,6 +1012,7 @@ button {
   width: min(120%, 1.2 * max(100vh, 15rem), 42rem);
   margin-top: calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
   margin-left: calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
+  margin-bottom: min(0rem, 0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
 }
 .touchCircle {
   stroke: var(--color-text);
