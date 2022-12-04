@@ -235,6 +235,12 @@ export default {
 .playing .sidebar {
   display: none;
 }
+fieldset {
+  border-width: 1px;
+  border-style: none;
+  border-top-style: solid;
+  border-color: var(--color-text);
+}
 .radioHolder {
   display: flex;
 }
@@ -244,14 +250,30 @@ export default {
 	margin: 0;
   width: 100%;
   margin-right: -100%;
+  border-radius: 2px;
 }
-.radioHolder input:checked {
+.radioHolder:nth-child(odd) input {
+  background-color: black;
+}
+.radioHolder:nth-child(even) input {
+  background-color: var(--color-background-mute);
+}
+.radioHolder input:checked:not(:active) {
+  background-color: lightgray;
+}
+.radioHolder input:focus:checked:not(:active) {
   background-color: var(--color-text);
+}
+.radioHolder input:focus:not(:checked) {
+  border: solid var(--color-text);
+}
+.radioHolder input:active {
+  border: solid var(--color-text);
 }
 .radioHolder label {
   padding: 0 0.5rem;
 }
-.radioHolder input:checked+label {
+.radioHolder input:checked:not(:active)+label {
   color: black;
 }
 .levels {
