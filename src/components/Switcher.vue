@@ -26,6 +26,7 @@ export default {
 
     return {
       graphIndex: 0,
+      rotationIndex: 0,
       variation: 0,
       groups: groups,
       graphs: graphData.graphs,
@@ -40,14 +41,19 @@ export default {
     nodes() {
       return this.graph.nodes
     },
-    puzzle() {
-      return this.graph.puzzles[this.variation]
+    letters() {
+      let letters = Object.keys(this.graph.puzzles)
+      letters.sort()
+      return letters
+    },
+    letter() {
+      return this.letters[this.rotationIndex]
     },
     rotation() {
-      return this.puzzle.rotation
+      return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(this.letter)
     },
     startingBeads() {
-      return this.puzzle.beads
+      return this.graph.puzzles[this.letter][this.variation]
     },
     edges() {
       return this.graph.edges.map(
@@ -133,6 +139,10 @@ export default {
   },
   watch: {
     graphIndex(newGraphIndex, oldGraphIndex) {
+      this.rotationIndex = 0
+      this.variation = 0
+    },
+    rotationIndex(newRotationIndex, oldRotationIndex) {
       this.variation = 0
     },
     playing(newPlaying, oldPlaying) {
@@ -210,21 +220,41 @@ export default {
         Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
         State space: {{graph.states}} states<br/>
         <fieldset>
-          <legend>{{graph.puzzles.length}} variations</legend>
+          <legend>{{letters.length}} rotations</legend>
           <div
-            v-for="(puzzle, i) in graph.puzzles"
+            v-for="(letter, i) in letters"
             :key="[graph.id, i].toString()"
             class="radioHolder"
           >
             <input
               type="radio"
               :value="i"
+              v-model="rotationIndex"
+              :id="`rotation-${letter}`"
+              name="rotation"
+            />
+            <label :for="`rotation-${letter}`">
+              {{letter}} ({{graph.puzzles[letter].length}})
+            </label>
+            <br/>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>{{graph.puzzles[letter].length}} variations</legend>
+          <div
+            v-for="i in graph.puzzles[letter].length"
+            :key="[graph.id, letter, i - 1].toString()"
+            class="radioHolder"
+          >
+            <input
+              type="radio"
+              :value="(i - 1)"
               v-model="variation"
-              :id="`variation-${i}`"
+              :id="`variation-${i - 1}`"
               name="variation"
             />
-            <label :for="`variation-${i}`">
-              V{{i}}
+            <label :for="`variation-${i - 1}`">
+              {{letter}}{{(i)}}
             </label>
             <br/>
           </div>
@@ -352,7 +382,7 @@ dialog {
   .switcher {
     grid-template-columns: 3fr 11fr;
   }
-  .play {
+  #play {
     display: grid;
     grid-template-columns: 7fr 4fr;
     grid-template-rows: 100vh;

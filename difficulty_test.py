@@ -208,11 +208,35 @@ for graph in graphs:
     random.seed(graph['id'])
     random.shuffle(graph['puzzles'])
     name = id_names[graph['id']]
-    if isinstance(name, list):
-        name, *puzzle_order = name
-        puzzles = graph['puzzles']
-        for i in puzzle_order:
-            puzzles.insert(0, puzzles.pop(i))
+    if isinstance(name, dict):
+        a_rotation = name['rotation']
+        rotation_orders = name.get('puzzles', {})
+        name = name['name']
+
+        nodes = graph['nodes']
+        for edge in graph['edges']:
+            edge[0] = (edge[0] + nodes - a_rotation) % nodes
+            edge[1] = (edge[1] + nodes - a_rotation) % nodes
+
+        letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        letter_puzzles = {letter: [] for letter in letters[:nodes]}
+        for puzzle in graph['puzzles']:
+            rotation = (puzzle['rotation'] + nodes - a_rotation) % nodes
+            letter = letters[rotation]
+            letter_puzzles[letter].append(puzzle['beads'])
+
+        for rotation, order in rotation_orders.items():
+            rotation = (int(rotation) + nodes - a_rotation) % nodes
+            letter = letters[rotation]
+            puzzles = letter_puzzles[letter]
+            for i, j in enumerate(order):
+                puzzles.insert(i, puzzles.pop(j))
+
+        for letter in letters[:nodes]:
+            if not letter_puzzles[letter]:
+                del letter_puzzles[letter]
+
+        graph['puzzles'] = letter_puzzles
 
     graph['name'] = name
 
