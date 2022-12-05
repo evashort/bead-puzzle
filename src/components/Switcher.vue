@@ -313,12 +313,15 @@ export default {
   filter: invert();
 }
 button {
-  line-height: inherit;
   font: inherit;
+  line-height: 1.6;
+}
+button::first-line {
+  line-height: 2;
 }
 button img {
   height: 1.5rem;
-  width: 2rem;
+  padding: 0rem 0.2rem;
   vertical-align: -16%;
 }
 fieldset {
@@ -369,7 +372,7 @@ fieldset {
   z-index: 1; /* make scroll focus border visible in firefox */
 }
 .close::after {
-  content: "Play";
+  content: " Play";
 }
 .close img:first-child {
   display: none;
@@ -421,7 +424,7 @@ dialog {
     display: block;
   }
   .close::after {
-    content: "Close";
+    content: " Close";
   }
   .close img:first-child {
     display: initial;
