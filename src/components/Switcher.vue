@@ -164,17 +164,23 @@ export default {
       class="back"
       @click="this.playing = false"
     >
+      <!-- https://github.com/FortAwesome/Font-Awesome/tree/6.x/svgs/solid -->
+      <img src="../assets/arrow-left.svg"/>
       Back
     </button>
     <div class="sidebar">
       <div class="navigation">
         <button disabled class="tab">
+          <img src="../assets/list.svg"/>
           Levels
         </button>
         <button class="tab">
+          <img src="../assets/gear.svg"/>
           Settings
         </button>
         <button class="close" @click="this.playing = true">
+          <img src="../assets/xmark.svg"/>
+          <img src="../assets/play.svg"/>
         </button>
       </div>
       <div class="levels">
@@ -216,6 +222,7 @@ export default {
           @click="nextLevel"
           :disabled="!graph.won || graphIndex >= graphs.length - 1"
         >
+          <img src="../assets/forward-step.svg"/>
           Next
         </button>
       </div>
@@ -291,21 +298,28 @@ export default {
   display: flex;
 }
 .navigation button {
-  flex-basis: 0;
-  flex-grow: 1;
+  flex: 1;
 }
 .tab {
   border-radius: 6px 6px 0 0;
-  border-bottom-style: none;
+  border-bottom-color: transparent;
   border-left-style: none;
 }
 .tab:disabled {
   background: inherit;
   color: inherit;
 }
+.tab:disabled img {
+  filter: invert();
+}
 button {
   line-height: inherit;
   font: inherit;
+}
+button img {
+  height: 1.5rem;
+  width: 2rem;
+  vertical-align: -16%;
 }
 fieldset {
   border-width: 1px;
@@ -354,8 +368,11 @@ fieldset {
 .levels:focus {
   z-index: 1; /* make scroll focus border visible in firefox */
 }
-.close::before {
+.close::after {
   content: "Play";
+}
+.close img:first-child {
+  display: none;
 }
 #play {
   overflow-y: auto;
@@ -403,8 +420,14 @@ dialog {
     --always-visible: 1;
     display: block;
   }
-  .close::before {
+  .close::after {
     content: "Close";
+  }
+  .close img:first-child {
+    display: initial;
+  }
+  .close img:nth-child(2) {
+    display: none;
   }
 }
 @media (min-width: 60rem) {
