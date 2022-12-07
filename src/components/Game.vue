@@ -780,6 +780,7 @@ export default {
       }
     },
     won(newWon, oldWon) {
+      this.history[this.history.length - 1] = this.hole
       this.$emit('update:won', newWon)
     },
   },
@@ -863,14 +864,6 @@ export default {
         :class="{ghost: clickTarget != null && !clicking}"
         fill="none"
       />
-      <path
-        :opacity="showCross ? 1 : 0"
-        class="head"
-        :d="crossPath"
-        :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
-        :class="{ghost: clickTarget != null && !clicking}"
-        fill="none"
-      />
       <mask id="cross-mask">
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use
@@ -886,6 +879,7 @@ export default {
           :opacity="showHead ? 1 : 0"
           :class="{ghost: clickTarget != null && !clicking}"
         />
+        <!-- replace with black shape and make sure it covers the trophy -->
         <use
           href="#cross-path"
           :opacity="showCross ? 1 : 0"
@@ -912,6 +906,15 @@ export default {
           :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
+      <mask id="trophy-mask">
+        <circle
+          :cx="nodeXs[0]"
+          :cy="nodeYs[0]"
+          :r="clickRadius"
+          fill="white"
+        >
+        </circle>
+      </mask>
       <path
         v-for="edge of edges"
         :key="`${edge.toString()},${size}`"
@@ -919,6 +922,20 @@ export default {
         :d="edgePaths[edge.toString()]"
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
+      />
+      <g mask="url(#trophy-mask)">
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, won: won, showHead: showHead}"
+          href="../assets/butterfly_outline.svg"
+          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': `path('M ${nodeXs[0]} ${nodeYs[0]} v ${-2 * clickRadius}')` }"
+        />
+      </g>
+      <path
+        :opacity="showCross ? 1 : 0"
+        class="head"
+        :d="crossPath"
+        :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
+        :class="{ghost: clickTarget != null && !clicking}"
+        fill="none"
       />
       <template v-if="canSpin">
         <g
@@ -1122,5 +1139,16 @@ tail onPath undo loop reverse offset-rotate
    * beads to stay BIG sometimes due to browser bug
    */
   transition: transform 0.06s cubic-bezier(1,0,1,0);
+}
+.trophy {
+  offset-distance: 75%;
+  transition: offset-distance 0.75s;
+}
+.trophy.won {
+  offset-distance: 0%;
+}
+.trophy.won.showHead {
+  offset-distance: 30%;
+  transition: offset-distance 0.06s 0.06s;
 }
 </style>
