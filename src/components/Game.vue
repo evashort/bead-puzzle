@@ -311,6 +311,31 @@ export default {
         this,
       )
     },
+    trophyAnimation() {
+      if (this.hole == 0) {
+        return this.hole == this.tail ? 'slideIn' : 'slideAside'
+      }
+
+      return 'slideOut'
+    },
+    trophyEnd() {
+      if (this.hole == 0 && (this.tail == this.hole || this.history.length < 3 || this.tail == this.history[this.history.length - 3])) {
+        return 5
+      }
+
+      for (let i = this.history.length - 2; i >= 1; i--) {
+        if (this.history[i] == 0) {
+          return this.history[i - 1]
+        }
+      }
+      
+      return 1
+    },
+    trophyPath() {
+      let edge = [0, this.trophyEnd]
+      let path = this.edgePaths[edge.toString()]
+      return `path('${path}')`
+    },
     normalBeadScale() {
       return 1
     },
@@ -565,7 +590,11 @@ export default {
       this.clickTarget = null
       if (this.history.length > 2) {
         let hideTail = false
-        if (this.hole == this.tail) {
+        if (
+          this.hole == this.tail &&
+            // always show tail when undoing win because winning hides tail
+            !this.won
+        ) {
           // tutorial levels have dead ends which cause the tail to be hidden
           // even when using the keyboard. it's confusing if going back
           // doesn't cause the tail to be shown again.
@@ -780,7 +809,10 @@ export default {
       }
     },
     won(newWon, oldWon) {
-      this.history[this.history.length - 1] = this.hole
+      if (newWon) {
+        this.history[this.history.length - 1] = this.hole
+      }
+
       this.$emit('update:won', newWon)
     },
   },
@@ -924,9 +956,9 @@ export default {
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g mask="url(#trophy-mask)">
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, won: won, showHead: showHead}"
+        <image  x="-6" y="-6" width="12" height="12" :class="['trophy', trophyAnimation]"
           href="../assets/butterfly_outline.svg"
-          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': `path('M ${nodeXs[0]} ${nodeYs[0]} v ${-2 * clickRadius}')` }"
+          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyPath }"
         />
       </g>
       <path
@@ -1110,7 +1142,7 @@ tail onPath undo loop reverse offset-rotate
   to { offset-distance: 100%; }
 }
 .bead.alternate {
-  animation-name: slide2
+  animation-name: slide2;
 }
 @keyframes slide2 {
   from { offset-distance: 0%; }
@@ -1141,14 +1173,28 @@ tail onPath undo loop reverse offset-rotate
   transition: transform 0.06s cubic-bezier(1,0,1,0);
 }
 .trophy {
-  offset-distance: 75%;
-  transition: offset-distance 0.75s;
+  offset-rotate: auto;
 }
-.trophy.won {
-  offset-distance: 0%;
+.trophy.slideIn {
+  animation: slideIn 0.75s ease forwards;
+  offset-rotate: reverse;
 }
-.trophy.won.showHead {
-  offset-distance: 30%;
-  transition: offset-distance 0.06s 0.06s;
+@keyframes slideIn {
+  from { offset-distance: 100%; }
+  to { offset-distance: 0%; }
+}
+.trophy.slideAside {
+  animation: slideAside calc(0.75s * 0.2) ease forwards;
+}
+@keyframes slideAside {
+  from { offset-distance: 0%; }
+  to { offset-distance: calc(100% * 0.2); }
+}
+.trophy.slideOut {
+  animation: slideOut calc(0.75s * (1 - 0.2)) ease forwards;
+}
+@keyframes slideOut {
+  from { offset-distance: calc(100% * 0.2); }
+  to { offset-distance: 100%; }
 }
 </style>
