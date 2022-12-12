@@ -316,7 +316,9 @@ export default {
     trophyClasses() {
       let animationClass = 'slideOut'
       if (this.hole == 0) {
-        animationClass = this.hole == this.tail ? 'slideIn' : 'slideAside'
+        animationClass = this.hole == this.tail
+          || !this.matrix[this.hole * this.size + this.tail]
+          ? 'slideIn' : 'slideAside'
       }
 
       let classes = ['trophy', animationClass]
@@ -636,10 +638,10 @@ export default {
           }
         }
 
+        this.trophyHeadless = this.hole == this.tail
         this.history.pop()
         if (this.hole == 0) {
           this.trophyExit = this.tail
-          this.trophyHeadless = hideTail
         }
 
         let id = this.beads.indexOf(this.hole)
