@@ -320,7 +320,7 @@ export default {
       }
 
       let classes = ['trophy', animationClass]
-      if (this.tail == this.trophyExit) {
+      if (this.tail == this.trophyExit || this.hole == this.trophyExit) {
         classes.push('reverse')
       }
       if (this.trophyHeadless) {
@@ -330,7 +330,12 @@ export default {
       return classes
     },
     trophyEnd() {
-      return this.tail == 0 || this.tail == this.trophyExit ? this.trophyEntrance : this.trophyExit
+      return (
+        this.tail == 0 ||
+          this.tail == this.trophyExit ||
+          this.hole == this.trophyExit
+        ) && this.hole != this.trophyEntrance ?
+        this.trophyEntrance : this.trophyExit
     },
     trophyEntrance() {
       // the exit should be as close to 180 degrees from the entrance as possible
@@ -521,6 +526,7 @@ export default {
           // continue going around the loop with the tail hidden
           this.goForwardHelp()
           this.history.push(this.tail)
+          this.trophyHeadless = true
         }
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
@@ -630,12 +636,12 @@ export default {
           }
         }
 
-        if (this.tail == 0) {
-          this.trophyExit = this.hole
-          this.trophyHeadless = false
+        this.history.pop()
+        if (this.hole == 0) {
+          this.trophyExit = this.tail
+          this.trophyHeadless = hideTail
         }
 
-        this.history.pop()
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
         this.animations[id] = 3 + this.animations[id] % 2
