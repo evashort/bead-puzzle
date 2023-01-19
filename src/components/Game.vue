@@ -1155,9 +1155,8 @@ tail onPath undo loop reverse offset-rotate
 0    1                0       auto
 0    1                1       reverse
 1    0      0                 reverse
-1           1    0    0       auto
-1           1    0    1       reverse
-1           1    1            reverse
+1           1         0       auto
+1           1         1       reverse
 1    1      0                 auto
 */
 .bead {
@@ -1194,9 +1193,6 @@ tail onPath undo loop reverse offset-rotate
   offset-rotate: auto;
 }
 .bead.tail.undo.reverse {
-  offset-rotate: reverse;
-}
-.bead.tail.undo.loop {
   offset-rotate: reverse;
 }
 .bead.ghost {
