@@ -21,8 +21,7 @@ export default {
       */
       animations: new Uint8Array(0),
       oldBeads: [],
-      trophyExit: 0,
-      trophyHeadless: false,
+      trophyAlternate: false,
     }
   },
   props: {
@@ -312,50 +311,42 @@ export default {
         this,
       )
     },
-    trophyClasses() {
-      let animationClass = 'slideOut'
-      if (this.hole == 0) {
-        animationClass = this.hole == this.tail
-          || !this.matrix[this.hole * this.size + this.tail]
-          ? 'slideIn' : 'slideAside'
+    trophyStart() {
+      if (this.history.length >= 4) {
+        return this.history[this.history.length - 3]
       }
 
-      let classes = ['trophy', animationClass]
-      if (this.tail == this.trophyExit || this.hole == this.trophyExit) {
-        classes.push('reverse')
-      }
-      if (this.trophyHeadless) {
-        classes.push('headless')
-      }
-
-      return classes
+      return this.hole
     },
     trophyEnd() {
-      return (
-        this.tail == 0 ||
-          this.tail == this.trophyExit ||
-          this.hole == this.trophyExit
-        ) && this.hole != this.trophyEntrance ?
-        this.trophyEntrance : this.trophyExit
-    },
-    trophyEntrance() {
-      // the exit should be as close to 180 degrees from the entrance as possible
-      let nearSide = 2 * this.trophyExit >= this.size ? 1 : -1
-      let trophyEntrance = this.trophyExit
-      for (let distance = 1; distance < this.size - 1; distance++) {
-        // try near side first so it can be overridden by far side which is better
-        for (let side = nearSide; Math.abs(side) == 1; side -= 2 * nearSide) {
-          let id = this.trophyExit + distance * side
-          if (id > 0 && id < this.size && this.matrix[0 * this.size + id]) {
-            trophyEntrance = id
-          }
-        }
+      if (this.history.length >= 4) {
+        return this.history[this.history.length - 4]
       }
-      
-      return trophyEntrance
+
+      return this.hole
+    },
+    trophy2Start() {
+      if (this.history.length >= 3) {
+        if (this.history[0] == this.hole) {
+          return this.history[1]
+        }
+
+        let egress = this.history[this.history.length - 3]
+        return this.getIngress(this.hole, egress)
+      }
+
+      return this.hole
+    },
+    trophy2End() {
+      return this.hole
     },
     trophyPath() {
-      let edge = [0, this.trophyEnd]
+      let edge = [this.trophyStart, this.trophyEnd]
+      let path = this.edgePaths[edge.toString()]
+      return `path('${path}')`
+    },
+    trophy2Path() {
+      let edge = [this.trophy2Start, this.trophy2End]
       let path = this.edgePaths[edge.toString()]
       return `path('${path}')`
     },
@@ -533,7 +524,6 @@ export default {
           // continue going around the loop with the tail hidden
           this.goForwardHelp()
           this.history.push(this.tail)
-          this.trophyHeadless = true
         }
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
@@ -541,15 +531,11 @@ export default {
       }
     },
     goForwardHelp() {
-      if (this.tail == 0) {
-        this.trophyExit = this.hole
-        this.trophyHeadless = false
-      }
-
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
+      this.trophyAlternate = !this.trophyAlternate
       this.chosenTail = null
       this.clickTarget = null
       if (
@@ -643,16 +629,13 @@ export default {
           }
         }
 
-        this.trophyHeadless = this.hole == this.tail
         this.history.pop()
-        if (this.hole == 0) {
-          this.trophyExit = this.tail
-        }
 
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
+        this.trophyAlternate = !this.trophyAlternate
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
@@ -766,7 +749,6 @@ export default {
         }
         this.goForwardHelp()
         this.history.push(this.tail)
-        this.trophyHeadless = true
         this.clickTarget = -2
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
@@ -822,6 +804,28 @@ export default {
       this.clickTarget = null
       this.history[this.history.length - 1] = this.hole
     },
+    getIngress(center, egress) {
+      let result = egress
+      // calculations are easier with center = 0
+      egress = (egress + this.size - center) % this.size
+      // the entrance should be as close to 180 degrees from the exit as possible
+      let nearSide = 2 * egress >= this.size ? 1 : -1
+      for (let distance = 1; distance < this.size - 1; distance++) {
+        // try near side first so it can be overridden by far side which is better
+        for (let side = nearSide; Math.abs(side) == 1; side -= 2 * nearSide) {
+          let ingress = egress + distance * side
+          if (ingress > 0 && ingress < this.size) {
+            // use real center for matrix check
+            let id = (ingress + center) % this.size
+            if (this.matrix[center * this.size + id]) {
+              result = id
+            }
+          }
+        }
+      }
+
+      return result
+    }
   },
   watch: {
     startingBeads: {
@@ -981,8 +985,15 @@ export default {
       </mask>
       <mask id="trophy-mask">
         <circle
-          :cx="nodeXs[0]"
-          :cy="nodeYs[0]"
+          :cx="nodeXs[this.trophy2End]"
+          :cy="nodeYs[this.trophy2End]"
+          :r="clickRadius"
+          fill="white"
+        >
+        </circle>
+        <circle
+          :cx="nodeXs[this.trophyStart]"
+          :cy="nodeYs[this.trophyStart]"
           :r="clickRadius"
           fill="white"
         >
@@ -997,9 +1008,13 @@ export default {
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g mask="url(#trophy-mask)">
-        <image  x="-6" y="-6" width="12" height="12" :class="trophyClasses"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate}"
           href="../assets/butterfly_outline.svg"
-          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyPath }"
+          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? trophy2Path : trophyPath }"
+        />
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate}"
+          href="../assets/leaf_outline.svg"
+          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? trophyPath : trophy2Path }"
         />
       </g>
       <path
@@ -1211,33 +1226,9 @@ tail onPath undo reverse offset-rotate
 }
 .trophy {
   offset-rotate: auto;
-}
-.trophy.reverse {
-  offset-rotate: auto 180deg;
-}
-.trophy.slideIn {
-  animation: slideIn 0.75s ease forwards;
-  offset-rotate: reverse;
-}
-@keyframes slideIn {
-  from { offset-distance: 100%; }
-  to { offset-distance: 0%; }
-}
-.trophy.slideAside {
-  animation: slideAside calc(0.75s * 0.2) ease forwards;
-}
-@keyframes slideAside {
-  from { offset-distance: 0%; }
-  to { offset-distance: calc(100% * 0.2); }
-}
-.trophy.slideOut {
-  animation: slideOut calc(0.75s * (1 - 0.2)) ease forwards;
-}
-@keyframes slideOut {
-  from { offset-distance: calc(100% * 0.2); }
-  to { offset-distance: 100%; }
-}
-.trophy.slideOut.headless {
   animation: slide 0.75s ease forwards;
+}
+.trophy.enter {
+  animation: slide2 0.75s ease forwards;
 }
 </style>
