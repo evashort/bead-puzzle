@@ -22,6 +22,7 @@ export default {
       animations: new Uint8Array(0),
       oldBeads: [],
       trophyAlternate: false,
+      undoneHole: -1
     }
   },
   props: {
@@ -312,14 +313,18 @@ export default {
       )
     },
     trophyStart() {
-      if (this.history.length >= 3) {
+      if (this.undoneHole >= 0) {
+        return this.undoneHole
+      } else if (this.history.length >= 3) {
         return this.history[this.history.length - 3]
       }
 
       return this.hole
     },
     trophyEnd() {
-      if (this.history.length >= 4) {
+      if (this.undoneHole >= 0) {
+        return this.getIngress(this.undoneHole, this.hole)
+      } else if (this.history.length >= 4) {
         return this.history[this.history.length - 4]
       } else if (this.history.length >= 3) {
         let center = this.history[this.history.length - 3]
@@ -329,7 +334,13 @@ export default {
       return this.hole
     },
     trophy2Start() {
-      if (this.history.length >= 3) {
+      if (this.undoneHole >= 0) {
+        if (this.history.length >= 3) {
+          return this.history[this.history.length - 3]
+        } else {
+          return this.getIngress(this.hole, this.undoneHole)
+        }
+      } else if (this.history.length >= 3) {
         if (this.history[0] == this.hole) {
           return this.history[1]
         }
@@ -539,6 +550,7 @@ export default {
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
+      this.undoneHole = -1
       this.chosenTail = null
       this.clickTarget = null
       if (
@@ -546,6 +558,7 @@ export default {
         this.history[this.history.length - 3] == this.tail
       ) {
         let loop = this.history[0] == this.hole
+        this.undoneHole = this.hole
         this.history.pop()
         this.history.pop()
         if (loop) {
@@ -632,6 +645,7 @@ export default {
           }
         }
 
+        this.undoneHole = this.hole
         this.history.pop()
 
         let id = this.beads.indexOf(this.hole)
