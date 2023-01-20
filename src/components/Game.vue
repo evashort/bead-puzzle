@@ -289,7 +289,6 @@ export default {
             alternate: this.animations[id] % 2,
             reverse: this.animations[id] >= 3,
             undo: this.oldBeads[id] == this.hole,
-            loop: this.hole == this.history[0],
             moving: this.oldBeads[id] == this.hole ||
               this.oldBeads[id] == this.tail,
             ghost: this.clickTarget != null && !this.clicking,
@@ -1150,14 +1149,14 @@ button {
   stroke: var(--color-text);
 }
 /*
-tail onPath undo loop reverse offset-rotate
-0    0                        -90deg
-0    1                0       auto
-0    1                1       reverse
-1    0      0                 reverse
-1           1         0       auto
-1           1         1       reverse
-1    1      0                 auto
+tail onPath undo reverse offset-rotate
+0    0                   -90deg
+0    1           0       auto
+0    1           1       reverse
+1    0      0            reverse
+1           1    0       auto
+1           1    1       reverse
+1    1      0            auto
 */
 .bead {
   offset-distance: 100%;
