@@ -312,7 +312,7 @@ export default {
       )
     },
     trophyStart() {
-      if (this.history.length >= 4) {
+      if (this.history.length >= 3) {
         return this.history[this.history.length - 3]
       }
 
@@ -321,6 +321,9 @@ export default {
     trophyEnd() {
       if (this.history.length >= 4) {
         return this.history[this.history.length - 4]
+      } else if (this.history.length >= 3) {
+        let center = this.history[this.history.length - 3]
+        return this.getIngress(center, this.hole)
       }
 
       return this.hole
