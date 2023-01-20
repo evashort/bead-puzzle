@@ -444,22 +444,28 @@ export default {
           minB = maxY
           let x1 = this.getXRank(node1)
           let x2 = this.getXRank(node2)
-          if (x1 == x2) {
-            if (y1 < y2) {
-              let node0 = this.extra[
-                i <= this.loopStart ? this.loopEnd - 1 : i - 1
-              ]
+          if (y1 < y2) {
+            let node0 = this.extra[
+              i <= this.loopStart ? this.loopEnd - 1 : i - 1
+            ]
+            let y0 = this.getHeightRank(node0)
+            if (y0 == y2) {
               let x0 = this.getXRank(node0)
-              clockwise = x0 < x1
+              clockwise = x0 < x2
             } else {
-              let node3 = this.extra[
-                i >= this.loopEnd - 1 ? this.loopStart + 1 : i + 2
-              ]
-              let x3 = this.getXRank(node3)
-              clockwise = x2 < x3
+              clockwise = x1 < x2
             }
           } else {
-            clockwise = x1 < x2
+            let node3 = this.extra[
+              i >= this.loopEnd - 1 ? this.loopStart + 1 : i + 2
+            ]
+            let y3 = this.getHeightRank(node3)
+            if (y3 == y1) {
+              let x3 = this.getXRank(node3)
+              clockwise = x1 < x3
+            } else {
+              clockwise = x1 < x2
+            }
           }
         }
       }
