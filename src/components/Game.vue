@@ -322,7 +322,9 @@ export default {
       return this.hole
     },
     trophyEnd() {
-      if (this.undoneHole >= 0) {
+      if (this.history.length >= 3 && this.undoneHole == this.history[1]) {
+        return this.history[this.history.length - 3]
+      } else if (this.undoneHole >= 0) {
         return this.getIngress(this.undoneHole, this.hole)
       } else if (this.history.length >= 4) {
         return this.history[this.history.length - 4]
@@ -564,6 +566,7 @@ export default {
         if (loop) {
           this.history.reverse()
           this.history.push(this.history[0])
+          this.undoneHole = -1
         } else {
           this.animations[id] += 2
           this.chosenTail = this.hole // keep going back
