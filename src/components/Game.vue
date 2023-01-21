@@ -95,6 +95,21 @@ export default {
         this.hole == this.history[0] && this.tail == this.history[1] ?
         0 : this.loopStart
     },
+    deadEnd() {
+      let edges = 0
+      for (let i = 0; i < this.size; i++) {
+        edges += this.matrix[this.hole * this.size + i]
+        if (edges > 1) {
+          return false
+        }
+      }
+
+      return true
+    },
+    reversing() {
+      return this.history.length >= 3 &&
+        this.tail == this.history[this.history.length - 3]
+    },
     nodeXs() {
       let xs = new Float64Array(this.size)
       for (let i = 0; i < this.size; i++) {
@@ -345,7 +360,7 @@ export default {
     },
     trophy3End() {
       if (this.history.length >= 3) {
-        let undoing = this.showHead ? this.tail == this.history[this.history.length - 3] : this.pushWasUndo
+        let undoing = this.showHead ? this.reversing : this.pushWasUndo
         if (this.hole == this.history[0]) {
           if (undoing) {
             return this.history[1]
@@ -447,7 +462,7 @@ export default {
 
       if (
         loop.length == this.history.length - 1 &&
-        this.tail != this.history[this.history.length - 3] &&
+        !this.reversing &&
         this.matrix[this.hole * this.size + this.tail]
       ) {
         loop.push(this.tail)
@@ -576,8 +591,9 @@ export default {
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history, this.chosenTail))
-        this.pushedSinceMove = this.hole != this.tail
       }
+
+      this.pushedSinceMove = this.hole != this.tail
     },
     goForwardHelp() {
       let id = this.beads.indexOf(this.tail)
@@ -591,10 +607,7 @@ export default {
       this.pushedBeforeMove = true
       this.pushedSinceMove = false
       this.pushWasUndo = false
-      if (
-        this.history.length >= 3 &&
-        this.history[this.history.length - 3] == this.tail
-      ) {
+      if (this.reversing) {
         let loop = this.history[0] == this.hole
         this.undoneHole = this.hole
         this.history.pop()
@@ -665,27 +678,14 @@ export default {
     goBack() {
       this.clickTarget = null
       if (this.history.length > 2) {
-        let hideTail = false
-        if (
-          this.hole == this.tail &&
-            // always show tail when undoing win because winning hides tail
-            !this.won
-        ) {
-          // tutorial levels have dead ends which cause the tail to be hidden
-          // even when using the keyboard. it's confusing if going back
-          // doesn't cause the tail to be shown again.
-          let edges = 0
-          for (let i = 0; i < this.size; i++) {
-            edges += this.matrix[this.hole * this.size + i]
-            if (edges > 1) {
-              hideTail = true // not a dead end, ok to hide tail
-              break
-            }
-          }
-        }
-
+        // always show tail when undoing win because winning hides tail.
+        //
+        // tutorial levels have dead ends which cause the tail to be hidden
+        // even when using the keyboard. it's confusing if going back
+        // doesn't cause the tail to be shown again.
+        let hideTail = this.hole == this.tail && !this.won && !this.deadEnd
         this.undoneHole = this.hole
-        this.pushedBeforeMove = this.history.length >= 3 && this.tail == this.history[this.history.length - 3]
+        this.pushedBeforeMove = this.reversing
         this.pushedSinceMove = !hideTail
         this.pushWasUndo = false
         this.history.pop()
@@ -718,6 +718,7 @@ export default {
           this.history[this.history.length - 1] = newTail
           this.chosenTail = newTail
           this.clickTarget = null
+          this.pushedSinceMove = true
           return
         }
       }
@@ -734,6 +735,7 @@ export default {
           this.history[this.history.length - 1] = newTail
           this.chosenTail = newTail
           this.clickTarget = null
+          this.pushedSinceMove = true
           return
         }
       }
@@ -741,10 +743,9 @@ export default {
     ensureTail() {
       if (this.hole == this.tail) {
         this.clickTarget = null
-        this.pushedSinceMove = true
         this.history[this.history.length - 1] =
           this.getNextTail(this.history, this.chosenTail)
-
+        this.pushedSinceMove = this.pushedSinceMove || this.hole != this.tail
         return true
       }
 
@@ -763,13 +764,13 @@ export default {
       } else if (this.clickTarget != null && this.clickTarget >= 0) {
         let newTail = this.clickTarget == this.hole ?
           this.history[this.history.length - 3] : this.clickTarget
-        this.pushWasUndo = this.history.length >= 3 && this.tail == this.history[this.history.length - 3]
+        this.pushWasUndo = this.reversing
         this.history[this.history.length - 1] = newTail
         if (this.matrix[this.size * this.hole + newTail]) {
           this.chosenTail = newTail
         }
       } else if (this.clickTarget == -2 || this.clickTarget == -3) {
-        this.pushWasUndo = this.history.length >= 3 && this.tail == this.history[this.history.length - 3]
+        this.pushWasUndo = this.reversing
         this.history[this.history.length - 1] = this.hole
       }
     },
@@ -783,10 +784,7 @@ export default {
       if (newTarget == this.hole && this.clickTarget == -1) {
       } else if (newTarget != this.clickTarget) {
         this.clicking = true
-      } else if (
-        this.clickTarget == this.hole && this.history.length >= 3 &&
-          this.history[this.history.length - 3] == this.tail
-      ) {
+      } else if (this.clickTarget == this.hole && this.reversing) {
         let oldTarget = this.hole
         this.goBack()
         this.clickTarget = oldTarget
@@ -852,7 +850,7 @@ export default {
     },
     buttonClicked() {
       if (!this.ensureTail()) {
-        this.pushWasUndo = this.history.length >= 3 && this.tail == this.history[this.history.length - 3]
+        this.pushWasUndo = this.reversing
         this.history[this.history.length - 1] = this.hole
       }
     },
@@ -866,7 +864,7 @@ export default {
     },
     onBlur() {
       this.clickTarget = null
-      this.pushWasUndo = this.history.length >= 3 && this.tail == this.history[this.history.length - 3]
+      this.pushWasUndo = this.reversing
       this.history[this.history.length - 1] = this.hole
     },
     getIngress(center, egress) {
@@ -921,6 +919,7 @@ export default {
     won(newWon, oldWon) {
       if (newWon) {
         this.history[this.history.length - 1] = this.hole
+        this.pushedSinceMove = false
       }
 
       this.$emit('update:won', newWon)
@@ -1073,11 +1072,11 @@ export default {
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g mask="url(#trophy-mask)">
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: (trophyAlternate && (showHead || pushedSinceMove)) ? (showHead ? history.length >= 3 && tail == history[history.length - 3] : pushWasUndo) : undoneHole >= 0, pushed: showHead, wasPushed: trophyAlternate ? pushedSinceMove : pushedBeforeMove}"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: (trophyAlternate && (showHead || pushedSinceMove)) ? (showHead ? reversing : pushWasUndo || deadEnd) : undoneHole >= 0, pushed: showHead, wasPushed: trophyAlternate ? pushedSinceMove : pushedBeforeMove}"
           href="../assets/butterfly_outline.svg"
           :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? (showHead || pushedSinceMove ? trophy3Path : trophy2Path) : trophyPath }"
         />
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: (!trophyAlternate && (showHead || pushedSinceMove)) ? (showHead ? history.length >= 3 && tail == history[history.length - 3] : pushWasUndo) : undoneHole >= 0, pushed: showHead, wasPushed: !trophyAlternate ? pushedSinceMove : pushedBeforeMove}"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: (!trophyAlternate && (showHead || pushedSinceMove)) ? (showHead ? reversing : pushWasUndo || deadEnd) : undoneHole >= 0, pushed: showHead, wasPushed: !trophyAlternate ? pushedSinceMove : pushedBeforeMove}"
           href="../assets/leaf_outline.svg"
           :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': !trophyAlternate ? (showHead || pushedSinceMove ? trophy3Path : trophy2Path) : trophyPath }"
         />
