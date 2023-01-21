@@ -335,6 +335,26 @@ export default {
 
       return this.hole
     },
+    trophy3Start() {
+      return this.hole
+    },
+    trophy3End() {
+      if (this.history.length >= 3) {
+        if (this.hole == this.history[0]) {
+          if (this.tail == this.history[this.history.length - 3]) {
+            return this.history[1]
+          }
+
+          return this.history[this.history.length - 3]
+        } else if (this.tail == this.history[this.history.length - 3]) {
+          return this.getIngress(this.hole, this.tail)
+        }
+
+        return this.history[this.history.length - 3]
+      }
+
+      return this.getIngress(this.hole, this.tail)
+    },
     trophy2Start() {
       if (this.undoneHole >= 0) {
         if (this.history.length >= 3) {
@@ -363,6 +383,11 @@ export default {
     },
     trophy2Path() {
       let edge = [this.trophy2Start, this.trophy2End]
+      let path = this.edgePaths[edge.toString()]
+      return `path('${path}')`
+    },
+    trophy3Path() {
+      let edge = [this.trophy3Start, this.trophy3End]
       let path = this.edgePaths[edge.toString()]
       return `path('${path}')`
     },
@@ -1028,13 +1053,13 @@ export default {
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g mask="url(#trophy-mask)">
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: undoneHole >= 0}"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: undoneHole >= 0, pushed: showHead}"
           href="../assets/butterfly_outline.svg"
-          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? trophy2Path : trophyPath }"
+          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? (showHead ? trophy3Path : trophy2Path) : trophyPath }"
         />
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: undoneHole >= 0}"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: undoneHole >= 0, pushed: showHead}"
           href="../assets/leaf_outline.svg"
-          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? trophyPath : trophy2Path }"
+          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? trophyPath : (showHead ? trophy3Path : trophy2Path) }"
         />
       </g>
       <path
@@ -1253,5 +1278,12 @@ tail onPath undo reverse offset-rotate
 }
 .trophy.reverse {
   offset-rotate: reverse;
+}
+@keyframes pushed {
+  from { offset-distance: 0%; }
+  to { offset-distance: calc(100% * 0.2); }
+}
+.trophy.enter.pushed {
+  animation: pushed calc(0.75s * (1 - 0.2)) ease forwards;
 }
 </style>
