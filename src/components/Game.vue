@@ -21,8 +21,11 @@ export default {
       */
       animations: new Uint8Array(0),
       oldBeads: [],
+
+      // trophy state
       trophyAlternate: false,
-      undoneHole: -1
+      undoneHole: -1,
+      hadHead: false,
     }
   },
   props: {
@@ -565,6 +568,7 @@ export default {
           // continue going around the loop with the tail hidden
           this.goForwardHelp()
           this.history.push(this.tail)
+          this.hadHead = false
         }
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
@@ -580,6 +584,7 @@ export default {
       this.undoneHole = -1
       this.chosenTail = null
       this.clickTarget = null
+      this.hadHead = true
       if (
         this.history.length >= 3 &&
         this.history[this.history.length - 3] == this.tail
@@ -674,6 +679,7 @@ export default {
         }
 
         this.undoneHole = this.hole
+        this.hadHead = this.history.length >= 3 && this.tail == this.history[this.history.length - 3]
         this.history.pop()
 
         let id = this.beads.indexOf(this.hole)
@@ -794,6 +800,7 @@ export default {
         }
         this.goForwardHelp()
         this.history.push(this.tail)
+        this.hadHead = false
         this.clickTarget = -2
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
@@ -1053,11 +1060,11 @@ export default {
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
       <g mask="url(#trophy-mask)">
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: undoneHole >= 0, pushed: showHead}"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: trophyAlternate && showHead ? history.length >= 3 && tail == history[history.length - 3] : undoneHole >= 0, pushed: showHead, wasPushed: hadHead}"
           href="../assets/butterfly_outline.svg"
           :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? (showHead ? trophy3Path : trophy2Path) : trophyPath }"
         />
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: undoneHole >= 0, pushed: showHead}"
+        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: !trophyAlternate && showHead ? history.length >= 3 && tail == history[history.length - 3] : undoneHole >= 0, pushed: showHead, wasPushed: hadHead}"
           href="../assets/leaf_outline.svg"
           :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? trophyPath : (showHead ? trophy3Path : trophy2Path) }"
         />
@@ -1272,6 +1279,13 @@ tail onPath undo reverse offset-rotate
 .trophy {
   offset-rotate: auto;
   animation: slide 0.75s ease forwards;
+}
+.trophy.wasPushed {
+  animation: wasPushed 0.75s ease forwards;
+}
+@keyframes wasPushed {
+  from { offset-distance: calc(100% * 0.2); }
+  to { offset-distance: 100%; }
 }
 .trophy.enter {
   animation: slide2 0.75s ease forwards;
