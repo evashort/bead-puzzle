@@ -6,7 +6,7 @@ Every puzzle starts as far from the goal as possible, so restarting will never g
 
 "Number of moves without thinking ahead" is calculated by a computer solving the puzzle 1,000 times. The computer tries to avoid moves that put it back where it was before, but otherwise it moves randomly.
 
-In this game, a *state* is an arrangement of beads. The [state space](https://en.wikipedia.org/wiki/State_space) is the set of all possible ways to arrange the beads while playing the game. In this puzzle, there are [6! = 720](https://en.wikipedia.org/wiki/Factorial) ways to [arrange](https://en.wikipedia.org/wiki/Permutation) the beads, but only half of them can occur while playing, so the state space has size 360.
+In this game, a *state* is an arrangement of beads. The [state space](https://en.wikipedia.org/wiki/State_space) is the set of all possible ways to arrange the beads while playing the game. In this puzzle, there are [6! = 720](https://en.wikipedia.org/wiki/Factorial) ways to [arrange](https://en.wikipedia.org/wiki/Permutation) the beads, but only half of them can occur while playing, so the state space size is 360.
 
 In discrete math, a group of dots connected by lines is called a [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)). The dots are called vertices and the lines are called edges. Each puzzle in this game is based on a different graph.
 
@@ -27,7 +27,7 @@ My program tries to arrange the vertices to keep the edges short, but sometimes 
 
 I've noticed that puzzles with a state space containing exactly half the possible bead arrangements have only even-length [cycles](https://en.wikipedia.org/wiki/Cycle_%28graph_theory%29) (loops).
 
-Nautilus: This is the only puzzle with a state space containing less than half the possible bead arrangements (1/6 to be exact). It has 2 cycles of length 5 and one of length 6.
+Nautilus: For some reason, this is the only puzzle with a state space containing less than half the possible bead arrangements (1/6 of them to be exact). It has 2 cycles of length 5 and one of length 6.
 
 # Save your progress
 The following information will be saved on your device as a cookie:
