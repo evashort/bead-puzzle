@@ -28,3 +28,15 @@ My program tries to arrange the vertices to keep the edges short, but sometimes 
 I've noticed that puzzles with a state space containing exactly half the possible bead arrangements have only even-length [cycles](https://en.wikipedia.org/wiki/Cycle_%28graph_theory%29) (loops).
 
 Nautilus: This is the only puzzle with a state space containing less than half the possible bead arrangements (1/6 to be exact). It has 2 cycles of length 5 and one of length 6.
+
+# Save your progress
+The following information will be saved on your device as a cookie:
+1. Which puzzles you solved
+1. The state of unfinished puzzles
+1. The last puzzle you worked on
+1. Settings you changed
+
+No other information will be saved. You can delete the cookie or copy it to another device in Settings.
+<button>Accept cookies and save</button>
+
+<input type="checkbox"/> Don't show this again
