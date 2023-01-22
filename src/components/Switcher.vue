@@ -52,6 +52,16 @@ export default {
     rotation() {
       return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(this.letter)
     },
+    maxVariations() {
+      let maxVariations = 0
+      for (let puzzles of Object.values(this.graph.puzzles)) {
+        if (puzzles.length > maxVariations) {
+          maxVariations = puzzles.length
+        }
+      }
+
+      return maxVariations
+    },
     startingBeads() {
       return this.graph.puzzles[this.letter][this.variation]
     },
@@ -232,46 +242,48 @@ export default {
         Minimum: {{graph.distance}} moves<br/>
         Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
         State space: {{graph.states}} states<br/>
-        <fieldset>
-          <legend>{{letters.length}} rotations</legend>
-          <div
-            v-for="(letter, i) in letters"
-            :key="[graph.id, i].toString()"
-            class="radioHolder"
-          >
-            <input
-              type="radio"
-              :value="i"
-              v-model="rotationIndex"
-              :id="`rotation-${letter}`"
-              name="rotation"
-            />
-            <label :for="`rotation-${letter}`">
-              {{letter}} ({{graph.puzzles[letter].length}})
-            </label>
-            <br/>
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend>{{graph.puzzles[letter].length}} variations</legend>
-          <div
-            v-for="i in graph.puzzles[letter].length"
-            :key="[graph.id, letter, i - 1].toString()"
-            class="radioHolder"
-          >
-            <input
-              type="radio"
-              :value="(i - 1)"
-              v-model="variation"
-              :id="`variation-${i - 1}`"
-              name="variation"
-            />
-            <label :for="`variation-${i - 1}`">
-              {{letter}}{{(i)}}
-            </label>
-            <br/>
-          </div>
-        </fieldset>
+        <div class="columns">
+          <fieldset v-if="letters.length > 1">
+            <legend>{{letters.length}} rotations</legend>
+            <div
+              v-for="(letter, i) in letters"
+              :key="[graph.id, i].toString()"
+              class="radioHolder"
+            >
+              <input
+                type="radio"
+                :value="i"
+                v-model="rotationIndex"
+                :id="`rotation-${letter}`"
+                name="rotation"
+              />
+              <label :for="`rotation-${letter}`">
+                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[letter].length})` : ''}}
+              </label>
+              <br/>
+            </div>
+          </fieldset>
+          <fieldset v-if="maxVariations > 1">
+            <legend>{{graph.puzzles[letter].length}} variations</legend>
+            <div
+              v-for="i in graph.puzzles[letter].length"
+              :key="[graph.id, letter, i - 1].toString()"
+              class="radioHolder"
+            >
+              <input
+                type="radio"
+                :value="(i - 1)"
+                v-model="variation"
+                :id="`variation-${i - 1}`"
+                name="variation"
+              />
+              <label :for="`variation-${i - 1}`">
+                {{letter}}{{(i)}}
+              </label>
+              <br/>
+            </div>
+          </fieldset>
+        </div>
       </div>
     </dialog>
   </div>
@@ -399,6 +411,10 @@ dialog {
 .info {
   overflow-y: auto;
   z-index: 1; /* make scroll focus border visible in firefox */
+}
+.columns {
+  display: grid;
+  grid-auto-flow: column;
 }
 .back {
   position: absolute;
