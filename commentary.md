@@ -1,4 +1,4 @@
-Each rotation of the puzzle has a different solution with the same number of moves. There's no reason to solve all rotations, but they add replay value.
+Each rotation of the puzzle has a different solution with the same number of moves. There's no reason to solve all the rotations, but they add replay value.
 
 This is the last puzzle that has a [loop going all the way around](https://en.wikipedia.org/wiki/Hamiltonian_path) and a shortcut that skips one space. Once you find a strategy for solving this puzzle, other puzzles like it become boring, so I removed them. TODO: remove Croissant.
 
