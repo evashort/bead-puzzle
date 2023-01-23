@@ -332,7 +332,7 @@ export default {
         this,
       )
     },
-    trophyStart() {
+    trophyExitStart() {
       if (this.undoneHole >= 0) {
         return this.undoneHole
       } else if (this.history.length >= 3) {
@@ -341,7 +341,7 @@ export default {
 
       return this.hole
     },
-    trophyEnd() {
+    trophyExitEnd() {
       if (this.history.length >= 3 && this.undoneHole == this.history[1]) {
         return this.history[2]
       } else if (this.undoneHole >= 0) {
@@ -355,10 +355,10 @@ export default {
 
       return this.hole
     },
-    trophy3Start() {
+    trophyPushedStart() {
       return this.hole
     },
-    trophy3End() {
+    trophyPushedEnd() {
       if (this.history.length >= 3) {
         let undoing = this.showHead ? this.reversing : this.pushWasUndo
         if (this.hole == this.history[0]) {
@@ -376,7 +376,7 @@ export default {
 
       return this.getIngress(this.hole, this.tail)
     },
-    trophy2Start() {
+    trophyEnterStart() {
       if (this.undoneHole >= 0) {
         if (this.history.length >= 3) {
           return this.history[this.history.length - 3]
@@ -394,23 +394,45 @@ export default {
 
       return this.hole
     },
-    trophy2End() {
+    trophyEnterEnd() {
       return this.hole
     },
-    trophyPath() {
-      let edge = [this.trophyStart, this.trophyEnd]
+    trophyExitPath() {
+      let edge = [this.trophyExitStart, this.trophyExitEnd]
       let path = this.edgePaths[edge.toString()]
       return `path('${path}')`
     },
-    trophy2Path() {
-      let edge = [this.trophy2Start, this.trophy2End]
+    trophyPushed() {
+      return this.showHead || this.pushedSinceMove
+    },
+    trophyEnterPath() {
+      let edge = this.trophyPushed ?
+        [this.trophyPushedStart, this.trophyPushedEnd] :
+        [this.trophyEnterStart, this.trophyEnterEnd]
       let path = this.edgePaths[edge.toString()]
       return `path('${path}')`
     },
-    trophy3Path() {
-      let edge = [this.trophy3Start, this.trophy3End]
-      let path = this.edgePaths[edge.toString()]
-      return `path('${path}')`
+    trophyExitClasses() {
+      return {
+        trophy: true,
+        reverse: this.undoneHole >= 0,
+        wasPushed: this.pushedBeforeMove,
+      }
+    },
+    trophyEnterClasses() {
+      return {
+        trophy: true,
+        enter: true,
+        reverse: this.trophyPushed ?
+          (
+            this.showHead ?
+              this.reversing :
+              this.pushWasUndo || this.deadEnd
+          ) :
+          this.undoneHole >= 0,
+        pushed: this.showHead,
+        wasPushed: this.pushedSinceMove,
+      }
     },
     normalBeadScale() {
       return 1
@@ -974,6 +996,7 @@ export default {
         <radialGradient r="0.55" id="checked-4"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#00beff"/> </radialGradient>
         <radialGradient r="0.55" id="checked-5"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#4053d3"/> </radialGradient>
         <radialGradient r="0.55" id="checked-6"> <stop offset="74%" stop-color="black"/> <stop offset="100%" stop-color="#fb49b0"/> </radialGradient>
+        <image id="star" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"></image>
       </defs>
       <circle
         v-for="node in size"
@@ -1047,17 +1070,19 @@ export default {
           :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
-      <mask id="trophy-mask">
+      <mask id="trophy-exit-mask">
         <circle
-          :cx="nodeXs[this.trophy2End]"
-          :cy="nodeYs[this.trophy2End]"
+          :cx="nodeXs[this.trophyExitStart]"
+          :cy="nodeYs[this.trophyExitStart]"
           :r="clickRadius"
           fill="white"
         >
         </circle>
+      </mask>
+      <mask id="trophy-enter-mask">
         <circle
-          :cx="nodeXs[this.trophyStart]"
-          :cy="nodeYs[this.trophyStart]"
+          :cx="nodeXs[this.trophyEnterEnd]"
+          :cy="nodeYs[this.trophyEnterEnd]"
           :r="clickRadius"
           fill="white"
         >
@@ -1071,14 +1096,14 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
-      <g mask="url(#trophy-mask)">
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: trophyAlternate, reverse: (trophyAlternate && (showHead || pushedSinceMove)) ? (showHead ? reversing : pushWasUndo || deadEnd) : undoneHole >= 0, pushed: showHead, wasPushed: trophyAlternate ? pushedSinceMove : pushedBeforeMove}"
-          href="../assets/butterfly_outline.svg"
-          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': trophyAlternate ? (showHead || pushedSinceMove ? trophy3Path : trophy2Path) : trophyPath }"
+      <g :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
+        <use href="#star" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
+          :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
         />
-        <image  x="-6" y="-6" width="12" height="12" :class="{trophy: true, enter: !trophyAlternate, reverse: (!trophyAlternate && (showHead || pushedSinceMove)) ? (showHead ? reversing : pushWasUndo || deadEnd) : undoneHole >= 0, pushed: showHead, wasPushed: !trophyAlternate ? pushedSinceMove : pushedBeforeMove}"
-          href="../assets/leaf_outline.svg"
-          :style="{ 'transform': 'scale(3) rotate(90deg)', 'offset-path': !trophyAlternate ? (showHead || pushedSinceMove ? trophy3Path : trophy2Path) : trophyPath }"
+      </g>
+      <g :mask="trophyAlternate ? 'url(#trophy-exit-mask)' : 'url(#trophy-enter-mask)'">
+        <use href="#star" :class="trophyAlternate ? trophyExitClasses : trophyEnterClasses"
+          :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyExitPath : trophyEnterPath}"
         />
       </g>
       <path
