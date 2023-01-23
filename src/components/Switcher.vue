@@ -78,34 +78,78 @@ export default {
     },
     instructions() {
       // https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/term-collections/keys-keyboard-shortcuts
-      return {
-        'pGA=': `
-## Moving
+      let fullInstructions = {
+        'pEA=': `
 ### Pointing device
 1. Select each bead to move it into the empty space.
-1. Select the empty space to undo.
 ### Keyboard
 1. Navigate to the puzzle by selecting it with your pointing device or using the **Tab** key.
 1. Select **Up arrow** or **W** to move each bead into the empty space.
-1. Select **Down arrow** or **S** to undo.
+### Winning
+When every bead is where it belongs, a star will appear in the empty space and the **Next** button will be enabled.
 `,
         'ZIA=': `
-## Selecting
 ### Pointing device
 1. Select a bead to move it into the empty space.
+1. If you chose the wrong bead, select the empty space to undo.
 ### Keyboard
-1. Use **Left arrow** and **Right arrow** or **A** and **D** to select a bead.
+1. Use **Left arrow** and **Right arrow** or **A** and **D** to choose a bead.
 1. Select **Up arrow** or **W** to move it into the empty space.
+1. If you chose the wrong bead, select **Down arrow** or **S** to undo.
 `,
         'pkA=': `
-## Spinning
 ### Pointing device
 1. Select a bead to move it into the empty space. Two arrows will appear in the center.
-1. Select the arrows to move the beads around the loop.
+1. Select the arrows to move the beads around the loop until the star appears.
 ### Keyboard
-1. Select **Up arrow** or **W** to move the beads around the loop.
+1. Select **Up arrow** or **W** to move the beads around the loop until the star appears.
 `,
-      }[this.graph.id]
+        '9A==': `
+This puzzle has 2 rotations.
+
+Each rotation can be solved in 7 moves.
+
+The rotations add replay value because they have different solutions.
+`,
+        'toA=': `
+Each rotation of this puzzle has many variations.
+
+Each variation can be solved in 8 moves, but there's no reason to solve them all.
+
+If you can win in less than 27 moves, you must be thinking ahead.
+`,
+      }
+      if (Object.hasOwn(fullInstructions, this.graph.id)) {
+        return `
+## ${this.graph.name}
+${fullInstructions[this.graph.id]}
+`
+      }
+
+      let comments = {
+        '9oA=': `
+This puzzle is harder than the last one even though there are more paths for the beads to move on.
+
+That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
+
+I'll explain what a state space is when we get to level 10.
+
+---
+`
+      }
+      let comment = Object.hasOwn(comments, this.graph.id) ?
+        comments[this.graph.id] :
+        ''
+      return `
+## ${this.graph.name}
+${comment}
+
+Minimum: ${this.graph.distance} moves
+
+Without thinking ahead: ${Math.round(this.graph.difficulty)} moves
+
+State space: ${this.graph.states} states
+`
     },
   },
   methods: {
@@ -237,11 +281,7 @@ export default {
         </button>
       </div>
       <div class="info">
-        {{graph.name}}<br/>
         <Markdown class="instructions" :source="instructions" />
-        Minimum: {{graph.distance}} moves<br/>
-        Without thinking ahead: {{Math.round(graph.difficulty)}} moves<br/>
-        State space: {{graph.states}} states<br/>
         <div class="columns">
           <fieldset v-if="letters.length > 1">
             <legend>{{letters.length}} rotations</legend>
