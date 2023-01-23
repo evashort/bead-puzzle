@@ -818,6 +818,7 @@ export default {
         this.goBack()
         this.clickTarget = oldTarget
         this.history[this.history.length - 1] = this.hole
+        this.pushedSinceMove = false
       } else if (this.clickTarget != null && this.clickTarget == this.tail) {
         if (this.matrix[this.hole * this.size + this.tail]) {
           let oldTarget = this.hole
@@ -843,6 +844,7 @@ export default {
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
         this.history[this.history.length - 1] = this.hole
+        this.pushedSinceMove = false
         this.clickTarget = -3
       }
     },
