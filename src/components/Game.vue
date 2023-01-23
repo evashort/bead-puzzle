@@ -28,6 +28,8 @@ export default {
       pushedBeforeMove: false,
       pushedSinceMove: false,
       pushWasUndo: false,
+      justWon: false,
+      hasWon: false,
     }
   },
   props: {
@@ -618,6 +620,9 @@ export default {
       this.pushedSinceMove = this.hole != this.tail
     },
     goForwardHelp() {
+      this.justWon = this.won
+      this.hasWon = this.hasWon || this.justWon
+
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.animations[id] = 1 + this.animations[id] % 2
@@ -710,6 +715,8 @@ export default {
         this.pushedBeforeMove = this.reversing
         this.pushedSinceMove = !hideTail
         this.pushWasUndo = false
+        this.justWon = this.won
+        this.hasWon = this.hasWon || this.justWon
         this.history.pop()
 
         let id = this.beads.indexOf(this.hole)
@@ -925,6 +932,8 @@ export default {
         this.history = [hole, hole]
         this.chosenTail = null
         this.clickTarget = null
+        this.justWon = false
+        this.hasWon = false
       },
       immediate: true,
     },
@@ -996,7 +1005,8 @@ export default {
         <radialGradient r="0.55" id="checked-4"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#00beff"/> </radialGradient>
         <radialGradient r="0.55" id="checked-5"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#4053d3"/> </radialGradient>
         <radialGradient r="0.55" id="checked-6"> <stop offset="74%" stop-color="black"/> <stop offset="100%" stop-color="#fb49b0"/> </radialGradient>
-        <image id="star" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"></image>
+        <image id="star" x="-6" y="-6" width="12" height="12" href="../assets/star.svg"></image>
+        <image id="star-small" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"></image>
       </defs>
       <circle
         v-for="node in size"
@@ -1096,13 +1106,13 @@ export default {
         fill="none"
         v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
       />
-      <g :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
-        <use href="#star" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
+      <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
+        <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
         />
       </g>
-      <g :mask="trophyAlternate ? 'url(#trophy-exit-mask)' : 'url(#trophy-enter-mask)'">
-        <use href="#star" :class="trophyAlternate ? trophyExitClasses : trophyEnterClasses"
+      <g v-if="hasWon || (won && !trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-exit-mask)' : 'url(#trophy-enter-mask)'">
+        <use :href="(trophyAlternate ? justWon : won) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyExitClasses : trophyEnterClasses"
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyExitPath : trophyEnterPath}"
         />
       </g>

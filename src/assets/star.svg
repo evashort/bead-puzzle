@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
-   sodipodi:docname="star_small.svg"
+   sodipodi:docname="star.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@
      id="layer1">
     <path
        sodipodi:type="star"
-       style="fill:#cacaca;fill-opacity:1;stroke:#fdfdfd;stroke-width:27.35599302;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#cacaca;fill-opacity:1;stroke:#fdfdfd;stroke-width:36.4747;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
        id="path117"
        inkscape:flatsided="false"
        sodipodi:sides="5"
