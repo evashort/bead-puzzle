@@ -18,6 +18,12 @@ for i, src_path in enumerate(src_folder.iterdir()):
     with open(src_path, encoding='utf-8') as f:
         graph = json.load(f)
 
+    if 'id' in graph:
+        del graph['id']
+
+    if 'permutation' in graph:
+        del graph['permutation']
+
     dst_path = dst_folder / src_path.name
     difficulty = None
     try:

@@ -486,5 +486,7 @@
             "rotation": 1
         }
     ],
-    "distance": 12
+    "distance": 12,
+    "id": "000111111011101111111",
+    "permutation": 4683
 }

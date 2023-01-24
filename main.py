@@ -87,8 +87,8 @@ def get_move_slices(n, i, j):
     return (moved_slice, hole_slice) if swap else (hole_slice, moved_slice)
 
 def to_bytes(arr):
-    if arr.dtype != np.bool8:
-        raise TypeError(f'dtype must be bool8, not {arr.dtype}')
+    if arr.dtype != np.bool_:
+        raise TypeError(f'dtype must be bool_, not {arr.dtype}')
 
     return np.packbits(arr.view(np.uint8)).tobytes()
 
@@ -312,6 +312,22 @@ def index_to_permutation(n, i):
 
 print(''.join(map(str, index_to_permutation(6, 349)))) # 253041
 
+def permutation_to_index(permutation):
+    permutation = list(permutation)
+    n = len(permutation)
+    index = 0
+    step_size = int(np.product(np.arange(1, n + 1)))
+    for i, x in enumerate(permutation):
+        step_size //= n - i
+        index += int(x) * step_size
+        for j in range(i + 1, n):
+            if permutation[j] > x:
+                permutation[j] -= 1
+
+    return index
+
+print([permutation_to_index(i) for i in itertools.permutations(range(4))])
+
 def get_rotation_slice(n):
     # for n = 4, returns a slice that selects 0123, 1230, 2301, 3012 out of a
     # lexicographically ordered list of all permutations of 0, 1, 2, and 3
@@ -371,6 +387,35 @@ def get_stem(graph, labels='abcdefghijklmnopqrstuvwxyz'):
         f'{labels[x]}{labels[y]}' for x, y in zip(*np.nonzero(graph)) if x < y
     )
 
+def get_triangle_extractor(nodes):
+    count = np.product(np.arange(1, nodes + 1))
+    permutations = np.fromiter(
+        itertools.permutations(range(nodes)),
+        dtype=np.dtype((int, nodes)),
+        count=count,
+    )
+    flat_indexes = np.arange(nodes * nodes).reshape((nodes, nodes))
+    backbone = np.arange(count)
+    squaremutations = flat_indexes[:, permutations] \
+        [permutations.T, backbone].swapaxes(0,1)
+    triangle_indices = np.zeros(nodes * (nodes - 1) // 2, dtype=int)
+    for i in range(nodes):
+        start = i * (i - 1) // 2
+        triangle_indices[start : start + i] = \
+            np.arange(i, i * (nodes + 1), nodes)
+
+    result = squaremutations.reshape((count, nodes * nodes)) \
+        [:, triangle_indices]
+    return result
+
+# 012,021,102,120,201,210
+
+# 012,021,435,453,867,876
+# 345,687,102,687,201,543
+# 678,354,867,120,534,210
+
+# 125,217,352,537,671,763
+print(get_triangle_extractor(3))
 
 if __name__ == '__main__':
     process_count = 1 if len(sys.argv) < 2 else int(sys.argv[1])
@@ -382,6 +427,7 @@ if __name__ == '__main__':
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)
     temp = np.empty_like(distances)
+    triangle_extractor = get_triangle_extractor(nodes)
     for i, graph in enumerate(get_good_graphs(nodes)):
         if i % process_count != process_index:
             continue
@@ -424,5 +470,16 @@ if __name__ == '__main__':
                 ],
                 'distance': max_distance,
             }
+
+        if 'id' not in result:
+            triangles = graph.flatten()[triangle_extractor]
+            best_index = np.lexsort(triangles.T[::-1])[0]
+            triangle = triangles[best_index].astype(np.uint8)
+            result['id'] = ''.join(map(str, triangle))
+            permutation = list(index_to_permutation(nodes, best_index))
+            inverse = np.zeros(nodes, dtype=int)
+            inverse[permutation] = np.arange(nodes)
+            inverse_index = permutation_to_index(inverse)
+            result['permutation'] = inverse_index
             with open(path, 'w', encoding='utf-8', newline='\n') as g:
                 json.dump(result, g, indent=4)

@@ -90,5 +90,7 @@
             "rotation": 4
         }
     ],
-    "distance": 9
+    "distance": 9,
+    "id": "0011111111",
+    "permutation": 81
 }

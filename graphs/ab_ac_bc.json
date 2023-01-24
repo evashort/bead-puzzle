@@ -23,5 +23,7 @@
             "rotation": 0
         }
     ],
-    "distance": 3
+    "distance": 3,
+    "id": "111",
+    "permutation": 0
 }
