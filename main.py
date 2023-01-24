@@ -424,5 +424,5 @@ if __name__ == '__main__':
                 ],
                 'distance': max_distance,
             }
-            with open(path, 'w', encoding='utf-8') as g:
+            with open(path, 'w', encoding='utf-8', newline='\n') as g:
                 json.dump(result, g, indent=4)

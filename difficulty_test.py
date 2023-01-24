@@ -69,7 +69,7 @@ for i, src_path in enumerate(src_folder.iterdir()):
             total_difficulty += moves
 
         difficulty = total_difficulty / iterations
-        with open(dst_path, mode='w', encoding='utf-8') as f:
+        with open(dst_path, mode='w', encoding='utf-8', newline='\n') as f:
             json.dump(difficulty, f)
 
         # reduce precision before sorting
@@ -201,7 +201,7 @@ else:
 for graph in graphs:
     id_names[graph['id']] = id_names.pop(graph['id'], '')
 
-with open(names_path, mode='w', encoding='utf-8') as f:
+with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump(id_names, f, indent=2)
 
 for graph in graphs:
@@ -222,8 +222,12 @@ for graph in graphs:
         letter_puzzles = {letter: [] for letter in letters[:nodes]}
         for puzzle in graph['puzzles']:
             rotation = (puzzle['rotation'] + nodes - a_rotation) % nodes
+            beads = [
+                (node + nodes - a_rotation) % nodes
+                for node in puzzle['beads']
+            ]
             letter = letters[rotation]
-            letter_puzzles[letter].append(puzzle['beads'])
+            letter_puzzles[letter].append(beads)
 
         for rotation, order in rotation_orders.items():
             rotation = (int(rotation) + nodes - a_rotation) % nodes
@@ -248,5 +252,5 @@ graphs = [
 # put tutorial in order
 graphs[0], graphs[1] = graphs[1], graphs[0]
 
-with open(final_path, mode='w', encoding='utf-8') as f:
+with open(final_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump({'graphs': graphs}, f)
