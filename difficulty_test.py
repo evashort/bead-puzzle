@@ -221,13 +221,9 @@ for graph in graphs:
         letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         letter_puzzles = {letter: [] for letter in letters[:nodes]}
         for puzzle in graph['puzzles']:
-            rotation = (puzzle['rotation'] + nodes - a_rotation) % nodes
-            beads = [
-                (node + nodes - a_rotation) % nodes
-                for node in puzzle['beads']
-            ]
+            rotation = (puzzle['rotation'] + a_rotation) % nodes
             letter = letters[rotation]
-            letter_puzzles[letter].append(beads)
+            letter_puzzles[letter].append(puzzle['beads'])
 
         for rotation, order in rotation_orders.items():
             rotation = (int(rotation) + nodes - a_rotation) % nodes
