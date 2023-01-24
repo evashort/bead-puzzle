@@ -68,3 +68,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+fieldset, hr {
+  border-width: 1px;
+  border-style: none;
+  border-top-style: solid;
+  border-color: var(--color-text);
+}
+
+hr {
+  margin: 1em -0.75em;
+}

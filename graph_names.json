@@ -761,10 +761,7 @@
     "name": "\ud83e\udda2 Paper crane",
     "rotation": 6
   },
-  "4GeY": {
-    "name": "\ud83e\udd50 Croissant",
-    "rotation": 6
-  },
+  "4GeY": "#loop",
   "6GOA": {
     "name": "\ud83c\udf33 Tree",
     "rotation": 1

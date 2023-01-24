@@ -91,11 +91,13 @@ When every bead is where it belongs, a star will appear in the empty space and t
         'ZIA=': `
 ### Pointing device
 1. Select a bead to move it into the empty space.
-1. If you chose the wrong bead, select the empty space to undo.
+
+You can select the empty space to undo.
 ### Keyboard
 1. Use **Left arrow** and **Right arrow** or **A** and **D** to choose a bead.
 1. Select **Up arrow** or **W** to move it into the empty space.
-1. If you chose the wrong bead, select **Down arrow** or **S** to undo.
+
+You can select **Down arrow** or **S** to undo.
 `,
         'pkA=': `
 ### Pointing device
@@ -128,14 +130,54 @@ ${fullInstructions[this.graph.id]}
 
       let comments = {
         '9oA=': `
-This puzzle is harder than the last one even though there are more paths for the beads to move on.
+This puzzle is harder than the last one even though there are more paths for the beads to move along.
 
 That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
 
 I'll explain what a state space is when we get to level 10.
 
 ---
-`
+`,
+        'tkA=': `
+This is the last puzzle that has a [loop going all the way around](https://en.wikipedia.org/wiki/Hamiltonian_path)
+and a shortcut that skips one space.
+
+Once you find a strategy for solving this puzzle, other puzzles like it become boring, so I removed them.
+
+---
+`,
+        'Z3Q=': `
+Every puzzle starts as far from the goal as possible, so restarting will never get you closer to winning.
+
+---
+`,
+        'zmQ=': `
+When you fold over one layer of an origami frog base, it becomes a diamond with no visible seams.
+
+A bird base has the same shape but a seam is always visible (see level 13).
+
+---
+`,
+        'ZnQ=': `
+In this game, a *state* is an arrangement of beads.
+
+The [state space](https://en.wikipedia.org/wiki/State_space)
+is the set of all possible ways to arrange the beads while playing the game.
+
+In this puzzle, there are [6! = 720](https://en.wikipedia.org/wiki/Factorial) ways to
+[arrange](https://en.wikipedia.org/wiki/Permutation) the beads,
+but only half of them can occur while playing, so the state space has size 360.
+
+---
+`,
+        'tGI=': `
+Here's another puzzle where the state space contains exactly half the possible bead arrangements (360 out of 720).
+
+I've noticed that puzzles like this have only even-length
+[cycles](https://en.wikipedia.org/wiki/Cycle_%28graph_theory%29) (loops).
+
+---
+`,
       }
       let comment = Object.hasOwn(comments, this.graph.id) ?
         comments[this.graph.id] :
@@ -376,12 +418,6 @@ button img {
   padding: 0rem 0.2rem;
   vertical-align: -16%;
 }
-fieldset {
-  border-width: 1px;
-  border-style: none;
-  border-top-style: solid;
-  border-color: var(--color-text);
-}
 .radioHolder {
   display: flex;
 }
@@ -451,6 +487,9 @@ dialog {
 .info {
   overflow-y: auto;
   z-index: 1; /* make scroll focus border visible in firefox */
+}
+.instructions {
+  padding: 0rem 0.75rem;
 }
 .columns {
   display: grid;
