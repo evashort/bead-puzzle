@@ -109,12 +109,6 @@ for i, src_path in enumerate(src_folder.iterdir()):
 
     graph['states'] = len(seen)
 
-    n = graph['nodes']
-    triangle = np.zeros(n * (n - 1) // 2, dtype=bool)
-    for a, b in graph['edges']:
-        triangle[b * (b - 1) // 2 + a] = True
-
-    graph['old_id'] = base64.b64encode(np.packbits(triangle)).decode('ascii')
     id_array = np.fromiter(
         map(int, graph['id']),
         dtype=bool,
@@ -210,11 +204,7 @@ else:
 
 # sort by difficulty and add new graphs
 for graph in graphs:
-    id_names[graph['id']] = id_names.pop(
-        graph['id'],
-        id_names.pop(graph['old_id'], ''),
-    )
-    del graph['old_id']
+    id_names[graph['id']] = id_names.pop(graph['id'], '')
 
 with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump(id_names, f, indent=2)
