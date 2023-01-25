@@ -331,6 +331,7 @@ print([permutation_to_index(i) for i in itertools.permutations(range(4))])
 def get_rotation_slice(n):
     # for n = 4, returns a slice that selects 0123, 1230, 2301, 3012 out of a
     # lexicographically ordered list of all permutations of 0, 1, 2, and 3
+    # result[i] = i * sum from j=1 to n-i of (n-j)!
     result = np.ones(n, dtype=int)
     for i in range(n - 1, 0, -1):
         result *= i
@@ -338,6 +339,39 @@ def get_rotation_slice(n):
 
     result *= np.arange(n)
     return result
+
+def rotate_permutation_right(permutation_index, permutation_length):
+    factorial = 1 # factorial of n - 1
+    for n in range(1, permutation_length):
+        j = permutation_index // factorial % ((n + 1) * n * factorial)
+        offset = n + j % n * (n - 1) - j // n * n * 2 + j // (n + 1) * (n + 1)
+        permutation_index += offset * factorial
+        factorial *= n
+
+    return permutation_index
+
+# you can get there by swapping pairs
+# 0123 -> 0132 -> 0312 -> 3012
+
+# swap last two = i + 1 - 2 * (i % 2)
+
+# swap second-to-last two = [2,3,-2,2,-3,-2][i % 6]
+# i = np.arange(6)
+# 2 + 1 * (i % 2 - 4 * (i // 2) + 3 * (i // 3))
+# 2! + i % 2 - 2*2! * (i // 2) + (2! + 1!) * (i // 3)
+
+# swap first two = [6,10,14,-6,6,10,-10,-6,6,-14,-10,-6][i // 2 % 12]
+# i = np.arange(24)
+# 6 + 4 * (i % 6 // 2) - 12 * (i // 6) + 8 * (i // 8)
+# 6 + 4 * (i//2 % 3 - 3 * (i//2 // 3) + 2 * (i//2 // 4))
+# 3! + 2*2! * (i//2! % 3) - 2*3! * (i//2! // 3) + 4*2! * (i//2! // 4))
+# n! + (n-1)*(n-1)! * (i//(n-1)! % n) - 2*n! * (i//(n-1)! // n) + (n+1)*(n-1)! * (i//(n-1)! // (n + 1))
+# math.factorial(n) + i // math.factorial(n-1) % n * math.factorial(n-1) * (n-1) - i // math.factorial(n-1) // n * 2 * math.factorial(n) + i // (n+1) // math.factorial(n-1) * (n+1) * math.factorial(n-1)
+# math.factorial(n-1) * (n + i//math.factorial(n-1) % n * (n-1) - i//math.factorial(n-1) // n * n * 2 + i//math.factorial(n-1) // (n+1) * (n+1))
+# j = i // math.factorial(n-1)
+# math.factorial(n-1) * (n + j % n * (n-1) - j // n * n * 2 + j // (n+1) * (n+1))
+
+print(tuple(index_to_permutation(5, rotate_permutation_right(permutation_to_index((2, 1, 4, 0, 3)), 5))))
 
 def get_max_distance_and_puzzles_help(n, distances, distinct_rotations):
     rotation_slice = get_rotation_slice(n)[distinct_rotations]
