@@ -417,13 +417,104 @@ def get_triangle_extractor(nodes):
 # 125,217,352,537,671,763
 print(get_triangle_extractor(3))
 
+def process_graph(
+    graph, stem, folder, triangle_extractor,
+    distances=None, out=None, temp=None
+):
+    nodes = len(graph)
+    path = folder / f'{stem}.json'
+    result = None
+    try:
+        f = open(path, encoding='utf-8')
+    except FileNotFoundError:
+        pass
+    else:
+        with f:
+            try:
+                result = json.load(f)
+            except json.decoder.JSONDecodeError:
+                pass
+
+    # for the tutorial levels, the puzzles should be read from the file, not
+    # generated automatically. make sure this code doesn't run for the
+    # tutorial by requiring distances to be initialized.
+    if result is None and distances is not None:
+        max_distance, puzzles = get_max_distance_and_puzzles(
+            graph,
+            distances=distances,
+            out=out,
+            temp=temp
+        )
+        result = {
+            'nodes': nodes,
+            'edges': [
+                [int(x), int(y)] # avoid the following error:
+                # TypeError: Object of type int64 is not JSON serializable
+                for x, y in zip(*np.nonzero(graph)) if x < y
+            ],
+            'puzzles': [
+                {
+                    'beads': [start.index(i) for i in range(1, nodes)],
+                    'rotation': int(rotation),
+                }
+                for start, rotation in puzzles
+            ],
+            'distance': max_distance,
+        }
+
+    if 'id' not in result:
+        triangles = graph.flatten()[triangle_extractor]
+        best_index = np.lexsort(triangles.T[::-1])[0]
+        triangle = triangles[best_index].astype(np.uint8)
+        result['id'] = ''.join(map(str, triangle))
+        permutation = list(index_to_permutation(nodes, best_index))
+        inverse = np.zeros(nodes, dtype=int)
+        inverse[permutation] = np.arange(nodes)
+        inverse_index = permutation_to_index(inverse)
+        result['permutation'] = inverse_index
+        with open(path, 'w', encoding='utf-8', newline='\n') as g:
+            json.dump(result, g, indent=4)
+
 if __name__ == '__main__':
     process_count = 1 if len(sys.argv) < 2 else int(sys.argv[1])
     process_index = 0 if len(sys.argv) < 3 else int(sys.argv[2])
     print(f'process {process_index + 1} of {process_count}', flush=True)
     folder = Path('graphs')
     folder.mkdir(exist_ok=True)
-    nodes = 7
+    if process_index == 0:
+        process_graph(
+            np.array(
+                [
+                    [0,1,0,0,0],
+                    [1,0,1,0,0],
+                    [0,1,0,1,0],
+                    [0,0,1,0,1],
+                    [0,0,0,1,0],
+                ],
+                dtype=bool,
+            ),
+            'tutorial_1',
+            folder,
+            get_triangle_extractor(5),
+        )
+        process_graph(
+            np.array(
+                [
+                    [0,0,1,0,0],
+                    [0,0,1,0,0],
+                    [1,1,0,1,1],
+                    [0,0,1,0,0],
+                    [0,0,1,0,0],
+                ],
+                dtype=bool,
+            ),
+            'tutorial_2',
+            folder,
+            get_triangle_extractor(5),
+        )
+
+    # you shoud rerun the program with nodes equal to every value from 3 to 7
+    nodes = 3
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)
     temp = np.empty_like(distances)
@@ -434,52 +525,5 @@ if __name__ == '__main__':
 
         stem = get_stem(graph)
         print(f'{i + 1} {stem}', flush=True)
-        path = folder / f'{stem}.json'
-        result = None
-        try:
-            f = open(path, encoding='utf-8')
-        except FileNotFoundError:
-            pass
-        else:
-            with f:
-                try:
-                    result = json.load(f)
-                except json.decoder.JSONDecodeError:
-                    pass
-
-        if result is None:
-            max_distance, puzzles = get_max_distance_and_puzzles(
-                graph,
-                distances=distances,
-                out=out,
-                temp=temp
-            )
-            result = {
-                'nodes': nodes,
-                'edges': [
-                    [int(x), int(y)] # avoid the following error:
-                    # TypeError: Object of type int64 is not JSON serializable
-                    for x, y in zip(*np.nonzero(graph)) if x < y
-                ],
-                'puzzles': [
-                    {
-                        'beads': [start.index(i) for i in range(1, nodes)],
-                        'rotation': int(rotation),
-                    }
-                    for start, rotation in puzzles
-                ],
-                'distance': max_distance,
-            }
-
-        if 'id' not in result:
-            triangles = graph.flatten()[triangle_extractor]
-            best_index = np.lexsort(triangles.T[::-1])[0]
-            triangle = triangles[best_index].astype(np.uint8)
-            result['id'] = ''.join(map(str, triangle))
-            permutation = list(index_to_permutation(nodes, best_index))
-            inverse = np.zeros(nodes, dtype=int)
-            inverse[permutation] = np.arange(nodes)
-            inverse_index = permutation_to_index(inverse)
-            result['permutation'] = inverse_index
-            with open(path, 'w', encoding='utf-8', newline='\n') as g:
-                json.dump(result, g, indent=4)
+        
+        process_graph(graph, stem, folder, distances, out, temp)

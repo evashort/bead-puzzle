@@ -1,34 +1,34 @@
 {
-  "ZIA=": {
+  "A8A=": {
     "name": "\ud83d\udc46 Selecting",
     "rotation": 0
   },
   "4A==": "#loop",
-  "pEA=": {
+  "DoA=": {
     "name": "\u25b6\ufe0f Moving",
     "rotation": 0
   },
-  "tA==": "#square",
+  "eA==": "#square",
   "/A==": "#loop",
-  "8kA=": "#split",
-  "pkA=": {
+  "M8A=": "#split",
+  "NwA=": {
     "name": "\ud83d\udcab Spinning",
     "rotation": 0
   },
-  "9A==": {
+  "fA==": {
     "name": "\ud83e\udd6a Sandwich",
     "rotation": 0
   },
-  "4GY=": "#split",
-  "pGI=": "#hexagon",
-  "4EcI": "#split",
-  "4mQ=": "#split",
-  "pEMI": "#heptagon",
-  "8mEI": "#split",
-  "4GcI": "#split",
-  "8mY=": "#split",
-  "rCMQ": "#split",
-  "toA=": {
+  "LiY=": "#split",
+  "DrA=": "#hexagon",
+  "BS2Q": "#split",
+  "Bzw=": "#split",
+  "BWmA": "#heptagon",
+  "BSH4": "#split",
+  "BS2Y": "#split",
+  "Lj4=": "#split",
+  "BPGQ": "#split",
+  "H4A=": {
     "name": "\ud83e\udd8a Fox",
     "rotation": 1,
     "puzzles": {
@@ -37,46 +37,46 @@
       ]
     }
   },
-  "8EMI": "#split",
-  "8mI=": "#split",
+  "BSPg": "#split",
+  "Bz4=": "#split",
   "/8A=": "#loop",
-  "4mY=": "#split",
-  "4Ec4": "#split",
-  "/0A=": "#loop",
-  "5EeA": "#split",
-  "90A=": "#loop",
-  "9oA=": {
+  "Li4=": "#split",
+  "LeEY": "#split",
+  "f8A=": "#loop",
+  "BfGI": "#split",
+  "e8A=": "#loop",
+  "H8A=": {
     "name": "\ud83e\udd35 Bow tie",
     "rotation": 4
   },
-  "tCMQ": "#split",
-  "/kA=": "#loop like Bow tie",
-  "7kA=": "#loop",
-  "4GeA": "#split",
-  "9kA=": "#loop",
-  "8GOA": "#split",
-  "/CMQ": "#split",
-  "8GMQ": "#split",
-  "tkA=": {
+  "APHg": "#split",
+  "P8A=": "#loop like Bow tie",
+  "P4A=": "#loop",
+  "BPGY": "#split",
+  "N8A=": "#loop",
+  "APHo": "#split",
+  "BPHw": "#split",
+  "AHnw": "#split",
+  "N0A=": {
     "name": "\ud83c\udf6f Pot",
     "rotation": 1
   },
-  "rSMQ": "#split",
-  "/iMY": "#split",
-  "/iMI": "#split",
-  "7CMQ": "#split",
-  "8Gc4": "#split",
-  "9iMI": "#split",
-  "8mc4": "#split",
-  "8mcI": "#split",
-  "7iMI": "#split",
-  "5M+A": "#split",
-  "8mcY": "#split",
-  "92EI": "#split",
-  "8mMQ": "#split",
-  "8GcY": "#split",
-  "/EeA": "#split",
-  "Z3Q=": {
+  "BPOQ": "#split",
+  "LiP4": "#split",
+  "BPH4": "#split",
+  "BPGw": "#split",
+  "LeF4": "#split",
+  "APH4": "#split",
+  "LeH4": "#split",
+  "BS34": "#split",
+  "BPG4": "#split",
+  "LeMY": "#split",
+  "BzP4": "#split",
+  "BzH4": "#split",
+  "AHn4": "#split",
+  "BzPo": "#split",
+  "BfOY": "#split",
+  "H7g=": {
     "name": "\ud83c\udfc0 Half court",
     "rotation": 5,
     "puzzles": {
@@ -85,13 +85,13 @@
       ]
     }
   },
-  "fEeA": "#split",
-  "8mMI": "#split",
-  "4GeI": "#split",
-  "8GcI": "#split",
-  "5PGA": "#split",
-  "8GMY": "#split",
-  "zmQ=": {
+  "BfOQ": "#split",
+  "BSP4": "#split",
+  "BfGY": "#split",
+  "BS24": "#split",
+  "BPOY": "#split",
+  "BS3w": "#split",
+  "A/w=": {
     "name": "\u2666\ufe0f Frog base",
     "rotation": 0,
     "puzzles": {
@@ -100,10 +100,10 @@
       ]
     }
   },
-  "5MeA": "#split",
-  "8EcY": "#split",
+  "DelI": "#split",
+  "BzPg": "#split",
   "//4=": "#loop",
-  "ZnQ=": {
+  "D7g=": {
     "name": "\ud83d\udd2d Lens",
     "rotation": 2,
     "puzzles": {
@@ -112,31 +112,31 @@
       ]
     }
   },
-  "4Gc4": "#split",
-  "8GMI": "#split",
-  "//Y=": "#loop",
-  "//I=": "#loop",
-  "/vY=": "#loop",
-  "/3Q=": "#loop",
-  "YGeI": "#split",
-  "/vI=": "#loop",
-  "7vY=": "#loop",
-  "xOOA": "#split",
-  "/nY=": "#loop",
-  "/PI=": "#loop",
-  "/+I=": "#loop",
-  "tGI=": {
+  "LeE4": "#split",
+  "BSPo": "#split",
+  "f/4=": "#loop",
+  "P/4=": "#loop",
+  "e/4=": "#loop",
+  "H/4=": "#loop",
+  "BfGQ": "#split",
+  "P74=": "#loop",
+  "e/w=": "#loop",
+  "BS2w": "#split",
+  "N/4=": "#loop",
+  "P7o=": "#loop",
+  "L/4=": "#loop",
+  "Drg=": {
     "name": "\ud83d\udee3\ufe0f Highway",
     "rotation": 0
   },
-  "/uI=": "#loop",
-  "+vI=": "#loop",
-  "9uI=": "#loop",
-  "/mY=": "#loop",
-  "7nY=": "#loop",
-  "/nQ=": "#loop",
-  "/nI=": "#loop",
-  "/mQ=": {
+  "Lv4=": "#loop",
+  "H74=": "#loop",
+  "Dv4=": "#loop",
+  "M/4=": "#loop",
+  "N/w=": "#loop",
+  "D/4=": "#loop",
+  "N34=": "#loop",
+  "B/4=": {
     "name": "\ud83c\udf09 Bridge",
     "rotation": 4,
     "puzzles": {
@@ -145,62 +145,62 @@
       ]
     }
   },
-  "7+Q=": "#loop",
-  "53Q=": "#loop",
-  "+nI=": "#loop",
-  "3mQ=": {
+  "L/w=": "#loop",
+  "H7o=": "#loop",
+  "D74=": "#loop",
+  "A/4=": {
     "name": "\ud83e\udda2 Bird base",
     "rotation": 0
   },
-  "7nQ=": "#loop",
-  "7uI=": "#loop",
-  "7nI=": "#loop",
-  "9nI=": "#loop",
-  "/OI=": "#loop",
-  "7mY=": "#loop",
-  "7nA=": "#loop",
-  "/PA=": "#loop",
-  "7mQ=": {
+  "D/w=": "#loop",
+  "LvY=": "#loop",
+  "N3o=": "#loop",
+  "Nz4=": "#loop",
+  "Lvw=": "#loop",
+  "M/w=": "#loop",
+  "Dvo=": "#loop",
+  "Lu4=": "#loop",
+  "B/w=": {
     "name": "\ud83d\udc31 Cat",
     "rotation": 1
   },
-  "5nQ=": "#loop",
-  "53A=": "#loop",
-  "bnI=": "#loop",
-  "9mI=": "#loop",
-  "5vA=": "#loop",
-  "7OI=": "#loop",
-  "9mQ=": {
+  "D7w=": "#loop",
+  "D7o=": "#loop",
+  "N3g=": "#loop",
+  "Dr4=": "#loop",
+  "Lm4=": "#loop",
+  "LvQ=": "#loop",
+  "B34=": {
     "name": "\ud83c\udfe0 Floodlight",
     "rotation": 5
   },
-  "/GI=": "#loop",
-  "5uI=": "#loop",
-  "/mI=": "#loop like Floodlight",
-  "6nA=": {
+  "Lnw=": "#loop",
+  "DvY=": "#loop",
+  "Ln4=": "#loop like Floodlight",
+  "B3o=": {
     "name": "\ud83c\udf44 Mushroom",
     "rotation": 5
   },
-  "puQ=": "#loop",
-  "5mI=": "#loop",
-  "5mQ=": {
+  "Dvg=": "#loop",
+  "DrY=": "#loop",
+  "B3w=": {
     "name": "\ud83d\udcf1 Pocket calculator",
     "rotation": 1
   },
-  "5nA=": "#loop",
-  "7mI=": "#loop like Pocket calculator",
-  "rmI=": "#loop",
-  "7GI=": "#loop",
-  "pmQ=": {
+  "Dro=": "#loop",
+  "Lno=": "#loop like Pocket calculator",
+  "Lmo=": "#loop",
+  "Lng=": "#loop",
+  "B3g=": {
     "name": "\ud83d\ude3d Cat ears",
     "rotation": 2
   },
-  "pmI=": "#loop",
-  "pGMg": {
+  "DrI=": "#loop",
+  "BSfA": {
     "name": "\ud83d\udc1a Nautilus",
     "rotation": 6
   },
-  "ePOQ": {
+  "A/3g": {
     "name": "\ud83c\udfad Marionette",
     "rotation": 3,
     "puzzles": {
@@ -209,7 +209,7 @@
       ]
     }
   },
-  "zmUg": {
+  "AD/w": {
     "name": "\ud83d\udca0 Cootie catcher",
     "rotation": 6,
     "puzzles": {
@@ -218,7 +218,7 @@
       ]
     }
   },
-  "eOOQ": {
+  "Af3g": {
     "name": "\u26bd Corner kick",
     "rotation": 5,
     "puzzles": {
@@ -228,22 +228,22 @@
     }
   },
   "///4": "#loop",
-  "///Y": "#loop",
-  "/vfY": "#loop",
-  "/ueY": "#loop",
-  "//OY": "#loop",
-  "zlMI": {
+  "f//4": "#loop",
+  "e/34": "#loop",
+  "N3v4": "#loop",
+  "M//4": "#loop",
+  "Ae3g": {
     "name": "\ud83d\udd73\ufe0f Cave entrance",
     "rotation": 0
   },
-  "/veY": "#loop",
-  "/++I": "#loop",
-  "//+Y": "#loop",
-  "//OQ": "#loop",
-  "/muY": "#loop",
-  "//fY": "#loop",
-  "//ew": "#loop",
-  "tWMQ": {
+  "N/34": "#loop",
+  "L/34": "#loop",
+  "P//4": "#loop",
+  "B//4": "#loop",
+  "N3n4": "#loop",
+  "e//4": "#loop",
+  "H//4": "#loop",
+  "AP3g": {
     "name": "\ud83e\udd9d Raccoon",
     "rotation": 2,
     "puzzles": {
@@ -252,20 +252,20 @@
       ]
     }
   },
-  "//+I": "#loop",
-  "/veQ": "#loop",
-  "/++Y": "#loop",
-  "/u+Y": "#loop",
-  "//eY": "#loop",
-  "/e+Y": "#loop",
-  "//eQ": "#loop",
-  "/vew": "#loop",
-  "/P+Q": "#loop",
-  "/vOY": "#loop",
-  "/eeY": "#loop",
-  "/PeY": "#loop",
-  "/8eA": "#loop",
-  "+/OQ": {
+  "L//4": "#loop",
+  "D/34": "#loop",
+  "P7/4": "#loop",
+  "P7v4": "#loop",
+  "N//4": "#loop",
+  "P7/w": "#loop",
+  "D//4": "#loop",
+  "H7/4": "#loop",
+  "L/3o": "#loop",
+  "M/34": "#loop",
+  "N3/w": "#loop",
+  "N/3o": "#loop",
+  "De94": "#loop",
+  "A//4": {
     "name": "\u2728 Three lights",
     "rotation": 3,
     "puzzles": {
@@ -274,21 +274,21 @@
       ]
     }
   },
-  "/me4": "#loop",
-  "9+MQ": {
+  "Ln/4": "#loop",
+  "AP/4": {
     "name": "\ud83d\udc5a Do not bleach",
     "rotation": 5
   },
-  "/vOQ": "#loop",
-  "/PeQ": "#loop",
-  "/+eY": "#loop like Do not bleach",
-  "/LeA": "#loop",
-  "7vew": "#loop",
-  "+eOY": "#loop",
-  "/meo": "#loop like Do not bleach",
-  "+u+Y": "#loop",
-  "/HvQ": "#loop",
-  "zFMI": {
+  "B/34": "#loop",
+  "D/3o": "#loop",
+  "N3/4": "#loop like Do not bleach",
+  "Da94": "#loop",
+  "H7/w": "#loop",
+  "B3/w": "#loop",
+  "Dr/4": "#loop like Do not bleach",
+  "H7v4": "#loop",
+  "H7vY": "#loop",
+  "Ae2g": {
     "name": "\ud83d\udc94 Broken heart",
     "rotation": 6,
     "puzzles": {
@@ -297,83 +297,83 @@
       ]
     }
   },
-  "/u8Y": "#loop",
-  "++OY": "#loop like Do not bleach",
-  "+O+Y": "#loop",
-  "+vOQ": {
+  "Lu/4": "#loop",
+  "B3/4": "#loop like Do not bleach",
+  "H7vo": "#loop",
+  "A/34": {
     "name": "\ud83c\udf5f Last French fry",
     "rotation": 3
   },
-  "7meo": "#loop",
-  "9u8I": "#loop",
-  "/ueo": "#loop like Do not bleach",
-  "72eo": "#loop",
-  "7ueY": "#loop",
-  "/2Oo": "#loop",
-  "7ueo": "#loop",
-  "92uo": "#loop",
-  "92eI": "#loop",
-  "//cI": "#loop",
-  "7u8Y": "#loop",
-  "/POY": "#loop",
-  "//8I": "#loop like Do not bleach",
-  "/meY": "#loop",
-  "/neI": "#loop",
-  "/eeQ": "#loop",
-  "/+MQ": "#like Do not bleach",
-  "/mOY": "#loop",
-  "7me4": "#loop",
-  "/2eo": "#loop like Do not bleach",
-  "/2eI": "#loop",
-  "72e4": "#loop",
-  "/3eI": "#loop like Do not bleach",
-  "92uI": "#loop",
-  "/8MI": "#loop",
-  "/O+Q": "#loop",
-  "9eMQ": {
+  "Dr/w": "#loop",
+  "Be/4": "#loop",
+  "Nz/4": "#loop like Do not bleach",
+  "D7/w": "#loop",
+  "N3vo": "#loop",
+  "D7v4": "#loop",
+  "Nz/w": "#loop",
+  "H7n4": "#loop",
+  "Dvn4": "#loop",
+  "Le/4": "#loop",
+  "Lu+4": "#loop",
+  "M/3o": "#loop",
+  "Lf/4": "#loop like Do not bleach",
+  "Lnv4": "#loop",
+  "Dvf4": "#loop",
+  "Dv/w": "#loop",
+  "BP/4": "#like Do not bleach",
+  "Lmv4": "#loop",
+  "Ln/w": "#loop",
+  "D7/4": "#loop like Do not bleach",
+  "Dvv4": "#loop",
+  "Lv/w": "#loop",
+  "Dv/4": "#loop like Do not bleach",
+  "D7n4": "#loop",
+  "LePw": "#loop",
+  "Lv3w": "#loop",
+  "AP/w": {
     "name": "\ud83d\udc39 Hamster",
     "rotation": 6
   },
-  "7seA": "#loop",
-  "7aeQ": "#loop",
-  "9OcQ": "#loop",
-  "/mc4": "#loop like Do not bleach",
-  "/2WI": "#loop",
-  "7nOY": "#loop",
-  "/ucY": "#loop",
-  "7meY": "#loop",
-  "9+OQ": "#loop like Do not bleach",
-  "/uOI": "#loop",
-  "fPeQ": "#loop",
-  "/OeQ": "#loop",
-  "tGMQ": {
+  "Deto": "#loop",
+  "DvvQ": "#loop",
+  "BW/w": "#loop",
+  "Lj/4": "#loop like Do not bleach",
+  "B3v4": "#loop",
+  "Lnvo": "#loop",
+  "Lm/4": "#loop",
+  "Lnvw": "#loop",
+  "BX/4": "#loop like Do not bleach",
+  "Lnn4": "#loop",
+  "D/3g": "#loop",
+  "Dvvw": "#loop",
+  "APXg": {
     "name": "\ud83d\udc98 Cupid's arrow",
     "rotation": 1
   },
-  "72eY": "#loop",
-  "/9cI": "#loop",
-  "7mc4": "#loop like Hamster",
-  "/+OI": "#loop",
-  "/veI": "#loop",
-  "7scI": "#loop",
-  "/f8Q": "#loop like Hamster",
-  "+uOY": "#loop",
-  "/mUg": {
+  "Lvfo": "#loop",
+  "Le/w": "#loop",
+  "Lj/w": "#loop like Hamster",
+  "Ln34": "#loop",
+  "Lvf4": "#loop",
+  "Devg": "#loop",
+  "Lf/w": "#loop like Hamster",
+  "B334": "#loop",
+  "AH/4": {
     "name": "\ud83e\udd73 Party cat",
     "rotation": 2
   },
-  "72eI": "#loop",
-  "/O8Q": "#loop",
-  "/POA": "#loop",
-  "+ueY": "#loop",
-  "/HcY": "#loop",
-  "+OeY": "#loop",
-  "/mco": "#loop like Do not bleach and Party cat",
-  "+uMY": "#loop",
-  "7OeY": "#loop",
-  "/2OI": "#loop",
-  "7OfQ": "#loop",
-  "3ncI": {
+  "Dvvo": "#loop",
+  "De/w": "#loop",
+  "Bf3o": "#loop",
+  "D734": "#loop",
+  "Lm+4": "#loop",
+  "D73w": "#loop",
+  "Bz/4": "#loop like Do not bleach and Party cat",
+  "Bz34": "#loop",
+  "N3vg": "#loop",
+  "Drv4": "#loop",
+  "Lvfg": "#loop",
+  "Ae/4": {
     "name": "\ud83c\udff4 Anarchy symbol",
     "rotation": 0,
     "puzzles": {
@@ -382,16 +382,16 @@
       ]
     }
   },
-  "7+MI": "#loop",
-  "/P+A": "#loop",
-  "/HOA": "#loop",
-  "9ucI": "#loop",
-  "/GOg": "#loop",
-  "7mco": "#loop like Hamster",
-  "/mcg": "#like Party cat",
-  "/HuQ": "#loop",
-  "bmeY": "#loop",
-  "+POQ": {
+  "LeN4": "#loop",
+  "Le94": "#loop",
+  "BXvY": "#loop",
+  "Be34": "#loop",
+  "BzfY": "#loop",
+  "Bz/w": "#loop like Hamster",
+  "BT/4": "#like Party cat",
+  "D73o": "#loop",
+  "Lnvg": "#loop",
+  "A/3o": {
     "name": "\ud83c\udf5f French fry box",
     "rotation": 3,
     "puzzles": {
@@ -400,21 +400,21 @@
       ]
     }
   },
-  "/HeA": "#loop",
-  "/uMQ": {
+  "Bfe4": "#loop",
+  "BPf4": {
     "name": "\ud83c\udfde\ufe0f Hiking trail",
     "rotation": 5
   },
-  "+OOY": "#loop",
-  "5Pew": "#loop",
-  "92OI": "#loop",
-  "72Oo": "#loop",
-  "/POQ": "#loop like French fry box",
-  "/seI": "#loop",
-  "53eI": "#loop",
-  "7OeQ": "#loop",
-  "++OQ": "#loop like Do not bleach, Hamster, Party cat, Anarchy symbol",
-  "3mUg": {
+  "B33w": "#loop",
+  "H7vg": "#loop",
+  "Drn4": "#loop",
+  "D7vo": "#loop",
+  "B/3o": "#loop like French fry box",
+  "LvXo": "#loop",
+  "DvvY": "#loop",
+  "Dvvg": "#loop",
+  "Af/4": "#loop like Do not bleach, Hamster, Party cat, Anarchy symbol",
+  "AD/4": {
     "name": "\ud83e\ude82 Parachute",
     "rotation": 6,
     "puzzles": {
@@ -423,16 +423,16 @@
       ]
     }
   },
-  "7veI": "#loop",
-  "/u8I": "#loop like Anarchy symbol and Hiking trail",
-  "/GcY": "#loop",
-  "/meI": "#loop",
-  "/mcY": "#loop like Hiking trail",
-  "7GcY": "#loop",
-  "/eOA": "#loop",
-  "/eMQ": "#like Hamster",
-  "/mOI": "#loop",
-  "+uOQ": {
+  "LvfY": "#loop",
+  "De/4": "#loop like Anarchy symbol and Hiking trail",
+  "Li+4": "#loop",
+  "Drf4": "#loop",
+  "Li/4": "#loop like Hiking trail",
+  "Li+w": "#loop",
+  "Be/o": "#loop",
+  "BP/w": "#like Hamster",
+  "DrP4": "#loop",
+  "Af34": {
     "name": "\u26a1 Microwave",
     "rotation": 5,
     "puzzles": {
@@ -441,41 +441,41 @@
       ]
     }
   },
-  "7O8Y": "#loop",
-  "/ueI": "#loop",
-  "eOeY": "#loop",
-  "+uMQ": {
+  "Lu+o": "#loop",
+  "LvX4": "#loop",
+  "D73g": "#loop",
+  "AP34": {
     "name": "\ud83d\udd26 Headlamp",
     "rotation": 1
   },
-  "/PeA": "#loop",
-  "+meI": "#loop",
-  "/seA": "#loop",
-  "7neI": "#loop",
-  "52eI": "#loop",
-  "/+OQ": "#loop like 8 things",
-  "+uOI": "#loop",
-  "7HcY": "#loop",
-  "5ucQ": "#loop",
-  "72OI": "#loop",
-  "/ncI": "#loop like Anarchy symbol, Hiking trail, Headlamp",
-  "9qcI": {
+  "DfvY": "#loop",
+  "BfX4": "#loop",
+  "Det4": "#loop",
+  "DvfY": "#loop",
+  "DvnY": "#loop",
+  "Bf/4": "#loop like 8 things",
+  "B3n4": "#loop",
+  "Lm+w": "#loop",
+  "BW/Y": "#loop",
+  "Drvo": "#loop",
+  "Bff4": "#loop like Anarchy symbol, Hiking trail, Headlamp",
+  "Ae34": {
     "name": "\ud83d\udca1 Ceiling light",
     "rotation": 0
   },
-  "+GeI": "#loop",
-  "7O8Q": "#loop",
-  "7aOQ": "#loop",
-  "/GuQ": "#loop",
-  "72WI": "#loop",
-  "9mOI": "#loop",
-  "5HeQ": "#loop",
-  "/M8I": "#loop",
-  "/fcI": "#loop",
-  "/uWQ": "#loop like Headlamp",
-  "/sMI": "#loop",
-  "//eI": "#loop like 9 things",
-  "9uMg": {
+  "BfW4": "#loop",
+  "De/Q": "#loop",
+  "Bfew": "#loop",
+  "Dvnw": "#loop",
+  "B3vo": "#loop",
+  "DrH4": "#loop",
+  "DvnI": "#loop",
+  "De+w": "#loop",
+  "Le+4": "#loop",
+  "Da/4": "#loop like Headlamp",
+  "Denw": "#loop",
+  "Lv/4": "#loop like 9 things",
+  "BWf4": {
     "name": "\ud83c\udfd6\ufe0f Folding chair",
     "rotation": 0,
     "puzzles": {
@@ -484,448 +484,448 @@
       ]
     }
   },
-  "9eOQ": "#loop like Hamster",
-  "7u8I": "#loop",
-  "fPOQ": "#loop",
-  "/uOQ": "#loop like Hiking trail, Microwave, Headlamp, Ceiling light",
-  "7uWQ": "#loop",
-  "7OcY": "#loop",
-  "/mWI": "#loop like Headlamp",
-  "+GeY": "#loop",
-  "+POA": {
+  "BX/w": "#loop like Hamster",
+  "De/Y": "#loop",
+  "B/3g": "#loop",
+  "Bf34": "#loop like Hiking trail, Microwave, Headlamp, Ceiling light",
+  "Da/w": "#loop",
+  "Lm/Q": "#loop",
+  "BXv4": "#loop like Headlamp",
+  "DfnY": "#loop",
+  "Af3o": {
     "name": "\ud83e\udeb4 Aloe",
     "rotation": 1
   },
-  "9ucQ": "#loop like Folding chair",
-  "7KOQ": "#loop",
-  "5O8I": "#loop",
-  "9msI": "#loop",
-  "7WeQ": "#loop",
-  "tM8I": "#loop",
-  "7ucY": "#loop",
-  "/OOI": "#loop",
-  "9mcI": "#loop",
-  "7nOI": "#loop",
-  "/mcI": "#loop",
-  "7meI": "#loop",
-  "/OcI": "#loop",
-  "7uMQ": {
+  "BW/4": "#loop like Folding chair",
+  "BfWw": "#loop",
+  "Be+Y": "#loop",
+  "BWv4": "#loop",
+  "DvfI": "#loop",
+  "Be+g": "#loop",
+  "Lm/Y": "#loop",
+  "LnnY": "#loop",
+  "BW34": "#loop",
+  "DrfY": "#loop",
+  "BfP4": "#loop",
+  "Drfw": "#loop",
+  "Deu4": "#loop",
+  "BPfY": {
     "name": "\ud83d\uddfb Mountain",
     "rotation": 4
   },
-  "/+eI": "#loop like 8 things",
-  "9O8I": "#loop",
-  "7mcY": "#loop",
-  "/O+A": "#loop",
-  "7mcg": {
+  "Lv34": "#loop like 8 things",
+  "Be+4": "#loop",
+  "Li/w": "#loop",
+  "Led4": "#loop",
+  "BT/w": {
     "name": "\ud83e\udd64 Forbidden drink",
     "rotation": 6
   },
-  "7OWQ": "#loop",
-  "/mMY": "#loop",
-  "8HcI": {
+  "Da/Q": "#loop",
+  "Lif4": "#loop",
+  "BS+4": {
     "name": "\ud83c\udf79 Cocktail",
     "rotation": 6
   },
-  "/mUI": "#loop like Cocktail",
-  "pGMQ": {
+  "BS/4": "#loop like Cocktail",
+  "APXA": {
     "name": "\u2764\ufe0f Heart",
     "rotation": 0
   },
-  "/WeA": "#loop like Mountain and Cocktail",
-  "9mUI": {
+  "BffY": "#loop like Mountain and Cocktail",
+  "BSf4": {
     "name": "\ud83e\uddda Angel",
     "rotation": 4
   },
-  "+eOQ": "#like Hamster",
-  "/vcI": "#loop like 10 things",
-  "/HOQ": "#loop like Aloe",
-  "/mMQ": {
+  "Af/w": "#like Hamster",
+  "Dfv4": "#loop like 10 things",
+  "B33o": "#loop like Aloe",
+  "BPP4": {
     "name": "\ud83c\udfaa Tent",
     "rotation": 0
   },
-  "9qMQ": {
+  "APP4": {
     "name": "\u2600\ufe0f Sun",
     "rotation": 5
   },
-  "7mWI": "#loop",
-  "/POI": "#loop like Aloe",
-  "5mcI": "#loop",
-  "7eMg": "#loop",
-  "+OMY": "#loop",
-  "/ucI": "#loop like 6 things",
-  "+uMI": "#loop like Angel",
-  "/GMg": {
+  "BXvw": "#loop",
+  "LnvY": "#loop like Aloe",
+  "BW3Y": "#loop",
+  "Be/g": "#loop",
+  "Bz3w": "#loop",
+  "Dev4": "#loop like 6 things",
+  "BzX4": "#loop like Angel",
+  "BS/o": {
     "name": "\u26f5 Sailboat",
     "rotation": 6
   },
-  "7ucI": "#loop",
-  "zOeQ": "#loop",
-  "suMQ": {
+  "Devo": "#loop",
+  "B3vg": "#loop",
+  "AHvo": {
     "name": "\ud83d\ude48 Closed eye",
     "rotation": 4
   },
-  "/WOA": "#loop like Sailboat and Closed eye",
-  "5Oew": "#loop",
-  "7WOQ": "#loop",
-  "9OOA": "#loop",
-  "7lOI": "#loop",
-  "/KeA": "#loop",
-  "5ncI": "#loop like Cocktail and Closed eye",
-  "9GOg": "#loop",
-  "/eOQ": "#loop like Hamster, Forbidden drink, Sailboat, Closed eye",
-  "/GeA": "#loop like Cocktail",
-  "7mmI": "#loop",
-  "/OcQ": "#loop like Sailboat and Closed eye",
-  "zncI": "#like Closed eye",
-  "9uMQ": "#like Sun, Closed eye",
-  "7GeA": "#loop",
-  "/vcg": "#loop like 12 things",
-  "7ueI": "#loop",
-  "/scI": "#loop like Sailboat and Closed eye",
-  "tPOI": "#loop",
-  "9OMQ": {
+  "BW/o": "#loop like Sailboat and Closed eye",
+  "D7vg": "#loop",
+  "BffQ": "#loop",
+  "BW3w": "#loop",
+  "DrfI": "#loop",
+  "Dat4": "#loop",
+  "BXvo": "#loop like Cocktail and Closed eye",
+  "BzXY": "#loop",
+  "Bf/w": "#loop like Hamster, Forbidden drink, Sailboat, Closed eye",
+  "BfO4": "#loop like Cocktail",
+  "Davw": "#loop",
+  "Bffw": "#loop like Sailboat and Closed eye",
+  "Ae/o": "#like Closed eye",
+  "APf4": "#like Sun, Closed eye",
+  "BfOo": "#loop",
+  "Db/4": "#loop like 12 things",
+  "LvXY": "#loop",
+  "Devw": "#loop like Sailboat and Closed eye",
+  "LmuY": "#loop",
+  "APfw": {
     "name": "\ud83c\udf55 Pizza",
     "rotation": 4
   },
-  "8uMQ": "#like Closed eye",
-  "7GeQ": "#loop",
-  "+mOI": "#loop like Angel",
-  "7tMg": "#loop",
-  "+OMQ": {
+  "AHv4": "#like Closed eye",
+  "DrfQ": "#loop",
+  "BXn4": "#loop like Angel",
+  "Da9w": "#loop",
+  "AP3w": {
     "name": "\ud83e\uded6 Teapot",
     "rotation": 6
   },
-  "/MMI": "#loop",
-  "/GMY": "#loop",
-  "7mUg": {
+  "Demw": "#loop",
+  "LifY": "#loop",
+  "AH/w": {
     "name": "\ud83d\udc78 Tiara cat",
     "rotation": 5
   },
-  "/OMQ": "#loop like Pizza and Teapot",
-  "7ncI": "#loop like Mountain, Cocktail, Closed eye, Pizza",
-  "53uI": "#loop",
-  "+OOI": "#loop",
-  "7GOY": "#loop",
-  "+OOQ": "#like Teapot",
-  "+vMI": "#loop like Angel and Sun",
-  "92cI": "#loop like Folding chair and Angel",
-  "7tsI": "#loop",
-  "5OeQ": "#loop",
-  "7mcI": "#loop like Pizza",
-  "/OPQ": "#loop like Sailboat, Closed eye, Pizza, Teapot",
-  "9OcI": "#loop",
-  "+GOY": "#loop",
-  "zOcQ": {
+  "BPfw": "#loop like Pizza and Teapot",
+  "Bffo": "#loop like Mountain, Cocktail, Closed eye, Pizza",
+  "D7vY": "#loop",
+  "B3no": "#loop",
+  "Lmuw": "#loop",
+  "Af3w": "#like Teapot",
+  "B3X4": "#loop like Angel and Sun",
+  "Dav4": "#loop like Folding chair and Angel",
+  "DfvQ": "#loop",
+  "Drvg": "#loop",
+  "BfPo": "#loop like Pizza",
+  "Dfvw": "#loop like Sailboat, Closed eye, Pizza, Teapot",
+  "Be24": "#loop",
+  "BfXo": "#loop",
+  "Ae/g": {
     "name": "\ud83d\udce1 Satellite dish",
     "rotation": 2
   },
-  "/OMI": "#loop",
-  "/WOg": "#loop like Sailboat, Closed eye",
-  "72GI": "#loop like Cocktail",
-  "/OOQ": "#loop like Pizza, Teapot, Satellite dish",
-  "52GI": "#loop",
-  "7KeQ": "#loop",
-  "5uMQ": {
+  "Dem4": "#loop",
+  "B3fY": "#loop like Sailboat, Closed eye",
+  "Bzfo": "#loop like Cocktail",
+  "Bf3w": "#loop like Pizza, Teapot, Satellite dish",
+  "BzXo": "#loop",
+  "DvnQ": "#loop",
+  "APfY": {
     "name": "\ud83d\udd3a Tetrahedron",
     "rotation": 6
   },
-  "zWeI": "#loop",
-  "/uMI": "#loop like Angel",
-  "7mOo": "#loop like Pizza and Teapot",
-  "eOOY": "#loop",
-  "3HcI": "#like Tetrahedron",
-  "9WcI": "#loop",
-  "/McI": "#loop",
-  "5Ocw": "#loop",
-  "fOOQ": "#loop",
-  "tuMQ": "#like Closed eye",
-  "4meY": "#loop",
-  "/v8I": "#loop like 23 things",
-  "/GOA": "#loop",
-  "7OcQ": "#loop like Satellite dish",
-  "9mMI": "#loop",
-  "/GcQ": "#loop like Sailboat and Closed eye",
-  "/OeA": "#loop like Cocktail",
-  "9mco": "#loop like Cocktail, Angel, Sailboat, Closed eye",
-  "9G8I": "#loop like Cocktail",
-  "7PcQ": "#loop like Satellite dish",
-  "/8eI": "#loop like Aloe, Cocktail, Sailboat, Closed eye",
-  "7OMg": "#loop",
-  "tscI": "#loop",
-  "7mUI": {
+  "Da+w": "#loop",
+  "Den4": "#loop like Angel",
+  "Drvw": "#loop like Pizza and Teapot",
+  "B33g": "#loop",
+  "Ae+4": "#like Tetrahedron",
+  "Dau4": "#loop",
+  "Deuw": "#loop",
+  "B3fg": "#loop",
+  "Bf3g": "#loop",
+  "APfo": "#like Closed eye",
+  "Del4": "#loop",
+  "Df/4": "#loop like 23 things",
+  "BW3o": "#loop",
+  "Bffg": "#loop like Satellite dish",
+  "BWn4": "#loop",
+  "BfPw": "#loop like Sailboat and Closed eye",
+  "DevY": "#loop like Cocktail",
+  "Bzf4": "#loop like Cocktail, Angel, Sailboat, Closed eye",
+  "BW+4": "#loop like Cocktail",
+  "Dfvg": "#loop like Satellite dish",
+  "Lv3o": "#loop like Aloe, Cocktail, Sailboat, Closed eye",
+  "BW/g": "#loop",
+  "Be3g": "#loop",
+  "BS/w": {
     "name": "\ud83d\udc20 Fish",
     "rotation": 1
   },
-  "/GOQ": "#loop",
-  "8OMQ": {
+  "BfXw": "#loop",
+  "AHvw": {
     "name": "\u2615 Coffee cup",
     "rotation": 1
   },
-  "+OOA": {
+  "Ae3o": {
     "name": "\ud83e\uded7 Spilled cocktail",
     "rotation": 1
   },
-  "rOdQ": "#loop",
-  "9mMQ": {
+  "DvfA": "#loop",
+  "APX4": {
     "name": "\ud83d\udebc Stroller",
     "rotation": 6
   },
-  "5OcI": "#loop",
-  "9XcI": "#loop like Cocktail and Tetrahedron",
-  "9KcI": {
+  "Be2Y": "#loop",
+  "Da+4": "#loop like Cocktail and Tetrahedron",
+  "Ae24": {
     "name": "\ud83d\udeb1 Non-potable",
     "rotation": 3
   },
-  "7WOg": "#loop",
-  "1WcI": {
+  "B3fI": "#loop",
+  "BWfY": {
     "name": "\ud83e\udd5b Half full",
     "rotation": 0
   },
-  "9GOQ": "#loop",
-  "/ccI": "#loop",
-  "/cMI": "#loop",
-  "7OWA": "#loop",
-  "+GOI": "#loop",
-  "7eMI": "#loop",
-  "6mGI": {
+  "BXnw": "#loop",
+  "LefQ": "#loop",
+  "LePg": "#loop",
+  "BW+w": "#loop",
+  "BXnY": "#loop",
+  "LeNo": "#loop",
+  "BSfY": {
     "name": "\ud83e\ude83 Boomerang",
     "rotation": 1
   },
-  "+PMI": "#loop like Boomerang",
-  "zmMQ": {
+  "B3Xo": "#loop like Boomerang",
+  "APPo": {
     "name": "\ud83e\uddaa Clam",
     "rotation": 3
   },
-  "6meI": "#loop like Non-potable, Boomerang, Clam",
-  "tWOQ": "#loop",
-  "9WOA": "#loop like Boomerang and Clam",
-  "7uMI": "#loop like Boomerang",
-  "7seI": "#loop",
-  "7OMQ": {
+  "BfXY": "#loop like Non-potable, Boomerang, Clam",
+  "BXvQ": "#loop",
+  "BWvo": "#loop like Boomerang and Clam",
+  "DenY": "#loop like Boomerang",
+  "LvXI": "#loop",
+  "BPfQ": {
     "name": "\ud83d\udcb5 Pyramid",
     "rotation": 3
   },
-  "/GOY": "#loop like Spilled cocktail, Non-potable, Boomerang, Clam",
-  "7GuA": "#loop",
-  "+meY": "#loop like 9 things",
-  "7GOQ": "#loop",
-  "53OI": "#loop like Boomerang",
-  "7mMQ": "#like Clam",
-  "7WOA": "#loop like Boomerang",
-  "9GsI": "#loop like Boomerang",
-  "/GMQ": "#like Clam",
-  "sOMQ": {
+  "Lmu4": "#loop like Spilled cocktail, Non-potable, Boomerang, Clam",
+  "Dato": "#loop",
+  "Dfn4": "#loop like 9 things",
+  "BfXQ": "#loop",
+  "DrvY": "#loop like Boomerang",
+  "BPPo": "#like Clam",
+  "BW/I": "#loop like Boomerang",
+  "BWu4": "#loop like Boomerang",
+  "BPPw": "#like Clam",
+  "AHvg": {
     "name": "\ud83d\udc41\ufe0f Open eye",
     "rotation": 4
   },
-  "7sMI": "#loop",
-  "7vcg": "#loop like 11 things",
-  "+HOA": {
+  "DenQ": "#loop",
+  "Db/w": "#loop like 11 things",
+  "AP3o": {
     "name": "\ud83d\udc2e Cow",
     "rotation": 3
   },
-  "/M+A": "#loop like Cow",
-  "/PGA": "#like Cow",
-  "7eOA": "#loop like Non-potable and Boomerang",
-  "5Kcw": "#loop",
-  "eOOI": "#loop",
-  "9ucw": "#loop like 16 things",
-  "/mMI": "#loop like Stroller",
-  "/OWQ": "#loop like 7 things",
-  "7mOI": "#loop like Boomerang",
-  "7OsI": "#loop",
-  "rO8Q": "#loop",
-  "7vcI": "#loop like 15 things",
-  "7eeA": "#loop like Non-potable, Boomerang, Clam",
-  "bGeQ": "#loop",
-  "5WeA": "#loop",
-  "5GeQ": "#loop",
-  "/O8I": "#loop like 6 things",
-  "/ePQ": "#loop like 18 things",
-  "+OMI": "#loop",
-  "vGcQ": "#loop like Boomerang",
-  "5O+A": "#loop",
-  "7GOA": "#loop",
-  "/OOA": "#loop like Spilled cocktail and Boomerang",
-  "7O+A": "#loop",
-  "5PeA": "#loop",
-  "7tMI": "#loop",
-  "zOeA": "#loop",
-  "7aMQ": {
+  "Lec4": "#loop like Cow",
+  "BPe4": "#like Cow",
+  "Be+o": "#loop like Non-potable and Boomerang",
+  "B3Xg": "#loop",
+  "B3ng": "#loop",
+  "B3f4": "#loop like 16 things",
+  "BfH4": "#loop like Stroller",
+  "Da/Y": "#loop like 7 things",
+  "DrPo": "#loop like Boomerang",
+  "DeuY": "#loop",
+  "De/A": "#loop",
+  "Dfvo": "#loop like 15 things",
+  "De/I": "#loop like Non-potable, Boomerang, Clam",
+  "DrfA": "#loop",
+  "BfXI": "#loop",
+  "DrPg": "#loop",
+  "De+4": "#loop like 6 things",
+  "Df/w": "#loop like 18 things",
+  "BzXw": "#loop",
+  "BfOw": "#loop like Boomerang",
+  "LeM4": "#loop",
+  "BW3I": "#loop",
+  "Be3o": "#loop like Spilled cocktail and Boomerang",
+  "LedY": "#loop",
+  "DfnI": "#loop",
+  "DfnQ": "#loop",
+  "Bzfg": "#loop",
+  "BPew": {
     "name": "\ud83d\ude10 Neutral face",
     "rotation": 4
   },
-  "tOOQ": "#loop like Open eye",
-  "+GOA": {
+  "BXvg": "#loop like Open eye",
+  "APXo": {
     "name": "\ud83e\udda2 Paper crane",
     "rotation": 6
   },
-  "4GeY": "#loop",
-  "6GOA": {
+  "DelY": "#loop",
+  "APXI": {
     "name": "\ud83c\udf33 Tree",
     "rotation": 1
   },
-  "7GOg": "#loop like Open eye",
-  "5OMQ": {
+  "BzfQ": "#loop like Open eye",
+  "APfQ": {
     "name": "\u2b55 Ring",
     "rotation": 1
   },
-  "7lMI": "#loop",
-  "9GeA": "#loop",
-  "znOQ": "#loop like Boomerang, Clam",
-  "7OMI": "#loop",
-  "5OeA": "#loop",
-  "5WcI": "#loop",
-  "zHOQ": "#loop",
-  "6MsI": "#loop",
-  "7KMQ": {
+  "BfXg": "#loop",
+  "BfG4": "#loop",
+  "B3XY": "#loop like Boomerang, Clam",
+  "DemY": "#loop",
+  "DenI": "#loop",
+  "Dauo": "#loop",
+  "B3XI": "#loop",
+  "Datg": "#loop",
+  "BPOw": {
     "name": "\ud83e\udd80 Claw",
     "rotation": 0
   },
-  "xWcI": {
+  "BWfI": {
     "name": "\ud83e\udea3 Bucket",
     "rotation": 1
   },
-  "/+cI": "#loop like 27 things",
-  "7GMY": "#loop",
-  "tGsI": "#loop",
-  "5mco": "#loop like Fish, Coffee cup, Open eye, Tree",
-  "9Ocw": "#loop like 14 things",
-  "7kMo": "#loop",
-  "7OeA": "#loop like Croissant and Claw",
-  "zGeA": {
+  "Lef4": "#loop like 27 things",
+  "LifQ": "#loop",
+  "BWuo": "#loop",
+  "Bzfw": "#loop like Fish, Coffee cup, Open eye, Tree",
+  "B3fo": "#loop like 14 things",
+  "Bz3g": "#loop",
+  "DevI": "#loop like Croissant and Claw",
+  "BS+w": {
     "name": "\ud83c\udfa7 Headphones",
     "rotation": 5
   },
-  "7GMg": "#like Open eye",
-  "9GMQ": {
+  "BS/g": "#like Open eye",
+  "APXw": {
     "name": "\ud83c\udff9 Bow and arrow",
     "rotation": 6
   },
-  "9GOA": "#loop",
-  "/8cI": "#loop like 13 things",
-  "/GPQ": "#loop like 6 things",
-  "5mUI": {
+  "BWno": "#loop",
+  "Lefw": "#loop like 13 things",
+  "Dfnw": "#loop like 6 things",
+  "BSfw": {
     "name": "\ud83e\udea8 Boulder",
     "rotation": 0
   },
-  "tOMQ": "#like Open eye",
-  "/EuA": "#loop",
-  "7McI": "#loop",
-  "5GcQ": "#loop",
-  "+GeA": "#like Paper crane and Claw",
-  "7ssI": "#loop like Boomerang and Claw",
-  "6ssI": "#loop",
-  "7GcQ": "#loop like Open eye",
-  "7mMI": "#loop like Bow and arrow",
-  "9GMI": "#loop",
-  "zGOQ": {
+  "APfg": "#like Open eye",
+  "DatY": "#loop",
+  "Deug": "#loop",
+  "BW3Q": "#loop",
+  "BPO4": "#like Paper crane and Claw",
+  "DevQ": "#loop like Boomerang and Claw",
+  "Datw": "#loop",
+  "BfPg": "#loop like Open eye",
+  "BfHo": "#loop like Bow and arrow",
+  "BWm4": "#loop",
+  "BWvg": {
     "name": "\u26b0\ufe0f Coffin",
     "rotation": 5
   },
-  "7OOA": "#loop",
-  "/+MI": "#loop like 16 things",
-  "tMcI": "#loop",
-  "zWOI": "#loop like Bucket",
-  "rlMI": "#loop",
-  "5mMQ": "#like Tree",
-  "6OOA": "#like Tree",
-  "pKcw": {
+  "Be2o": "#loop",
+  "LeP4": "#loop like 16 things",
+  "Be2g": "#loop",
+  "Dauw": "#loop like Bucket",
+  "BfWg": "#loop",
+  "APXY": "#like Tree",
+  "Ae2o": "#like Tree",
+  "B3XA": {
     "name": "\ud83d\udd77\ufe0f Jumping spider",
     "rotation": 1
   },
-  "/kMo": "#loop like Cow, Paper crane, Tree",
-  "5GsI": "#loop",
-  "7GMQ": {
+  "Bz3o": "#loop like Cow, Paper crane, Tree",
+  "BWuY": "#loop",
+  "BPPg": {
     "name": "\ud83c\udf80 Gift basket",
     "rotation": 6
   },
-  "7OcI": "#loop like Tree, Ring, Bucket, Headphones",
-  "/ecI": "#loop like 22 things",
-  "5GOg": "#loop",
-  "7MsI": "#loop",
-  "5GcI": "#loop",
-  "5nOI": "#loop like Paper crane and Tree",
-  "rGcQ": "#loop",
-  "rscI": "#loop",
-  "5WOA": "#loop",
-  "5GeA": "#loop",
-  "tEsI": {
+  "Deuo": "#loop like Tree, Ring, Bucket, Headphones",
+  "LefY": "#loop like 22 things",
+  "BzXQ": "#loop",
+  "DeuQ": "#loop",
+  "BW2Y": "#loop",
+  "DrPY": "#loop like Paper crane and Tree",
+  "BfOg": "#loop",
+  "DevA": "#loop",
+  "BWuw": "#loop",
+  "BfGo": "#loop",
+  "BWug": {
     "name": "\ud83d\udee4\ufe0f Railroad crossing sign",
     "rotation": 4
   },
-  "5OcQ": "#loop like Ring, Bucket, Headphones, Railroad crossing sign",
-  "5POA": "#loop",
-  "9GcI": "#loop",
-  "pO8I": "#loop like Tree",
-  "tGcQ": "#loop",
-  "7ccI": "#loop like Tree, Jumping spider, Railroad crossing sign",
-  "7MMI": "#loop",
-  "/eMI": "#loop like 6 things",
-  "/dcI": "#loop like 16 things",
-  "tGOQ": "#loop like Railroad crossing sign",
-  "7ecI": "#loop like 6 things",
-  "tkMo": {
+  "BW/Q": "#loop like Ring, Bucket, Headphones, Railroad crossing sign",
+  "BfWo": "#loop",
+  "BW24": "#loop",
+  "Be+I": "#loop like Tree",
+  "BW3g": "#loop",
+  "LefA": "#loop like Tree, Jumping spider, Railroad crossing sign",
+  "DemQ": "#loop",
+  "LePo": "#loop like 6 things",
+  "Le+w": "#loop like 16 things",
+  "BXnQ": "#loop like Railroad crossing sign",
+  "LefI": "#loop like 6 things",
+  "BzXI": {
     "name": "\ud83c\udfe1 Barn",
     "rotation": 1
   },
-  "pOcw": "#loop like Jumping spider, Railroad crossing sign",
-  "5OOA": "#loop",
-  "5GOA": "#loop",
-  "7COQ": "#loop",
-  "5UcI": "#loop",
-  "tGMg": {
+  "B3fA": "#loop like Jumping spider, Railroad crossing sign",
+  "BW2w": "#loop",
+  "BWmw": "#loop",
+  "BfGw": "#loop",
+  "Daug": "#loop",
+  "BSfI": {
     "name": "\ud83d\udd5b Sundial",
     "rotation": 3
   },
-  "pGcQ": "#loop",
-  "/kMI": "#loop like Paper crane and tree",
-  "plMI": {
+  "BW3A": "#loop",
+  "BfHw": "#loop like Paper crane and tree",
+  "BXnA": {
     "name": "\ud83c\udfad Mask",
     "rotation": 1
   },
-  "zGMQ": {
+  "APPg": {
     "name": "\u2712\ufe0f Pen nib",
     "rotation": 3
   },
-  "bGOQ": "#loop like Railroad crossing sign",
-  "5GMQ": {
+  "BfXA": "#loop like Railroad crossing sign",
+  "APXQ": {
     "name": "\ud83d\udcd0 House on a hill",
     "rotation": 3
   },
-  "pM8I": "#loop like Tree",
-  "5GMI": "#loop",
-  "zGOA": {
+  "Be+A": "#loop like Tree",
+  "BWmY": "#loop",
+  "BSfQ": {
     "name": "\ud83d\udef8 Flying saucer",
     "rotation": 5
   },
-  "pOMg": {
+  "BWfA": {
     "name": "\ud83d\udc58 Kimono",
     "rotation": 2
   },
-  "7kMI": "#loop",
-  "pOcQ": "#loop like Railroad crossing sign, House on a hill, Flying saucer, Kimono",
-  "tkMI": {
+  "BfHg": "#loop",
+  "BW/A": "#loop like Railroad crossing sign, House on a hill, Flying saucer, Kimono",
+  "BWng": {
     "name": "\ud83c\udfa1 Ferris wheel",
     "rotation": 4
   },
-  "5HOA": "#loop like Mask",
-  "pMcI": "#loop",
-  "tGMI": "#loop",
-  "pOcI": "#loop like House on a hill",
-  "5EcI": "#loop",
-  "tEMI": {
+  "BXnI": "#loop like Mask",
+  "Be2A": "#loop",
+  "BWmo": "#loop",
+  "Be2I": "#loop like House on a hill",
+  "BW2Q": "#loop",
+  "BWmg": {
     "name": "\ud83c\udf30 Acorn",
     "rotation": 6
   },
-  "6GeA": "#like Tree",
-  "rGMQ": {
+  "BPOo": "#like Tree",
+  "BPOg": {
     "name": "\ud83d\udc59 Bikini",
     "rotation": 5
   },
-  "rOMI": "#loop like Bikini",
-  "reMI": "#loop like Tree, Acorn, Bikini",
-  "rkMI": "#loop like Acorn",
-  "pGMI": "#loop"
+  "DemI": "#loop like Bikini",
+  "LeMo": "#loop like Tree, Acorn, Bikini",
+  "BfGg": "#loop like Acorn",
+  "BWmI": "#loop"
 }

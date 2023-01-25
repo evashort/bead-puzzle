@@ -18,9 +18,6 @@ for i, src_path in enumerate(src_folder.iterdir()):
     with open(src_path, encoding='utf-8') as f:
         graph = json.load(f)
 
-    if 'id' in graph:
-        del graph['id']
-
     if 'permutation' in graph:
         del graph['permutation']
 
@@ -116,7 +113,15 @@ for i, src_path in enumerate(src_folder.iterdir()):
     triangle = np.zeros(n * (n - 1) // 2, dtype=bool)
     for a, b in graph['edges']:
         triangle[b * (b - 1) // 2 + a] = True
-    graph['id'] = base64.b64encode(np.packbits(triangle)).decode('ascii')
+
+    graph['old_id'] = base64.b64encode(np.packbits(triangle)).decode('ascii')
+    id_array = np.fromiter(
+        map(int, graph['id']),
+        dtype=bool,
+        count=len(graph['id']),
+    )
+    graph['id'] = base64.b64encode(np.packbits(id_array)).decode('ascii')
+
     graphs.append(graph)
 
 graphs.sort(key=lambda graph: graph['difficulty'])
@@ -205,7 +210,11 @@ else:
 
 # sort by difficulty and add new graphs
 for graph in graphs:
-    id_names[graph['id']] = id_names.pop(graph['id'], '')
+    id_names[graph['id']] = id_names.pop(
+        graph['id'],
+        id_names.pop(graph['old_id'], ''),
+    )
+    del graph['old_id']
 
 with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump(id_names, f, indent=2)
