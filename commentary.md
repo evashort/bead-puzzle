@@ -27,6 +27,46 @@ The following information will be saved on your device as a cookie:
 1. Settings you changed
 
 No other information will be saved. You can delete the cookie or copy it to another device in Settings.
-<button>Accept cookies and save</button>
 
-<input type="checkbox"/> Don't show this again
+<button>Accept cookies and save</button>
+<button>Don't save my progress</button>
+
+Your progress will be saved automatically from now on.
+
+Your progress will not be saved. You can change this in Settings.
+
+# Save file format
+
+1. 16-bit version
+1. settings
+1. 32-bit last-played level ID
+1. 16-bit number of won levels
+    1. 32-bit level ID
+1. 16-bit number of variations
+1. 16-bit number of won variations
+    1. 32-bit variation ID
+    1. 16-bit original bead locations
+1. 16-bit number of started variations
+    1. 16-bit current bead locations
+    1. 8-bit history length
+    1. 4-bit history[0]
+    1. 4-bit tail
+    1. 16-bit history[1:-1]
+1. 32-bit CRC checksum
+
+## graphs.json
+```json
+{
+    "graphs": [
+        {
+            "id": "DoA=",
+            "distance": 4,
+            "difficulty": 4.0,
+            "states": 5,
+            "puzzles": {
+                "BcA=": 12
+            }
+        }
+    ]
+}
+```
