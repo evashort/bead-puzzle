@@ -63,9 +63,8 @@ Your progress will not be saved. You can change this in Settings.
             "distance": 4,
             "difficulty": 4.0,
             "states": 5,
-            "puzzles": {
-                "BcA=": 12
-            }
+            "layout": "BcA=",
+            "puzzles": [21, 42, 79]
         }
     ]
 }
