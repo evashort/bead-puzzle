@@ -496,16 +496,30 @@ def process_graph(
             'distance': max_distance,
         }
 
-    if 'id' not in result:
+    if True:#'id' not in result:
         triangles = graph.flatten()[triangle_extractor]
-        best_index = np.lexsort(triangles.T[::-1])[0]
+        order = np.lexsort(triangles.T[::-1])
+        best_index = order[0]
         triangle = triangles[best_index].astype(np.uint8)
         result['id'] = ''.join(map(str, triangle))
         permutation = list(index_to_permutation(nodes, best_index))
+        candidates, = np.where(
+            np.all(np.equal(triangles, triangles[0]), axis=1)
+        )
         inverse = np.zeros(nodes, dtype=int)
         inverse[permutation] = np.arange(nodes)
-        inverse_index = permutation_to_index(inverse)
-        result['permutation'] = inverse_index
+        best_inverse_index = float('inf')
+        for candidate in candidates:
+            new_inverse = inverse[
+                list(index_to_permutation(nodes, candidate))
+            ]
+            inverse_index = permutation_to_index(new_inverse)
+            best_inverse_index = min(inverse_index, best_inverse_index)
+
+        # most of the time we choose candidates[0] and this condition is true:
+        # list(index_to_permutation(nodes, best_inverse_index)) != list(inverse)
+
+        result['permutation'] = best_inverse_index
         with open(path, 'w', encoding='utf-8', newline='\n') as g:
             json.dump(result, g, indent=4)
 
@@ -548,7 +562,7 @@ if __name__ == '__main__':
         )
 
     # you shoud rerun the program with nodes equal to every value from 3 to 7
-    nodes = 3
+    nodes = 7
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)
     temp = np.empty_like(distances)
@@ -560,4 +574,6 @@ if __name__ == '__main__':
         stem = get_stem(graph)
         print(f'{i + 1} {stem}', flush=True)
         
-        process_graph(graph, stem, folder, distances, out, temp)
+        process_graph(
+            graph, stem, folder, triangle_extractor, distances, out, temp
+        )
