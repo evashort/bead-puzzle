@@ -44,7 +44,7 @@ Your progress will not be saved. You can change this in Settings.
     1. 32-bit level ID
 1. 16-bit number of variations
 1. 16-bit number of won variations
-    1. 32-bit variation ID
+    1. 32-bit rotation ID
     1. 16-bit original bead locations
 1. 16-bit number of started variations
     1. 16-bit current bead locations
@@ -63,8 +63,12 @@ Your progress will not be saved. You can change this in Settings.
             "distance": 4,
             "difficulty": 4.0,
             "states": 5,
-            "layout": "BcA=",
-            "puzzles": [21, 42, 79]
+            "rotations": {
+                "A": {
+                    "id": "BcA=",
+                    "variations": [21, 42, 79]
+                }
+            }
         }
     ]
 }
