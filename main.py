@@ -2,6 +2,7 @@ import itertools
 import json
 import numpy as np
 from pathlib import Path
+import simple_graph
 import sys
 
 def get_hole_slice(n, i):
@@ -421,40 +422,7 @@ def get_stem(graph, labels='abcdefghijklmnopqrstuvwxyz'):
         f'{labels[x]}{labels[y]}' for x, y in zip(*np.nonzero(graph)) if x < y
     )
 
-def get_triangle_extractor(nodes):
-    count = np.product(np.arange(1, nodes + 1))
-    permutations = np.fromiter(
-        itertools.permutations(range(nodes)),
-        dtype=np.dtype((int, nodes)),
-        count=count,
-    )
-    flat_indexes = np.arange(nodes * nodes).reshape((nodes, nodes))
-    backbone = np.arange(count)
-    squaremutations = flat_indexes[:, permutations] \
-        [permutations.T, backbone].swapaxes(0,1)
-    triangle_indices = np.zeros(nodes * (nodes - 1) // 2, dtype=int)
-    for i in range(nodes):
-        start = i * (i - 1) // 2
-        triangle_indices[start : start + i] = \
-            np.arange(i, i * (nodes + 1), nodes)
-
-    result = squaremutations.reshape((count, nodes * nodes)) \
-        [:, triangle_indices]
-    return result
-
-# 012,021,102,120,201,210
-
-# 012,021,435,453,867,876
-# 345,687,102,687,201,543
-# 678,354,867,120,534,210
-
-# 125,217,352,537,671,763
-print(get_triangle_extractor(3))
-
-def process_graph(
-    graph, stem, folder, triangle_extractor,
-    distances=None, out=None, temp=None
-):
+def process_graph(graph, stem, folder, distances=None, out=None, temp=None):
     nodes = len(graph)
     path = folder / f'{stem}.json'
     result = None
@@ -496,8 +464,10 @@ def process_graph(
             'distance': max_distance,
         }
 
-    if True:#'id' not in result:
-        triangles = graph.flatten()[triangle_extractor]
+    if 'id' not in result:
+        triangle = simple_graph.matrix_to_triangle(graph)
+        transformer = simple_graph.get_triangle_permutations(nodes)
+        triangles = triangle[transformer]
         order = np.lexsort(triangles.T[::-1])
         best_index = order[0]
         triangle = triangles[best_index].astype(np.uint8)
@@ -543,7 +513,6 @@ if __name__ == '__main__':
             ),
             'tutorial_1',
             folder,
-            get_triangle_extractor(5),
         )
         process_graph(
             np.array(
@@ -558,7 +527,6 @@ if __name__ == '__main__':
             ),
             'tutorial_2',
             folder,
-            get_triangle_extractor(5),
         )
 
     # you shoud rerun the program with nodes equal to every value from 3 to 7
@@ -566,7 +534,6 @@ if __name__ == '__main__':
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)
     temp = np.empty_like(distances)
-    triangle_extractor = get_triangle_extractor(nodes)
     for i, graph in enumerate(get_good_graphs(nodes)):
         if i % process_count != process_index:
             continue
@@ -574,6 +541,4 @@ if __name__ == '__main__':
         stem = get_stem(graph)
         print(f'{i + 1} {stem}', flush=True)
         
-        process_graph(
-            graph, stem, folder, triangle_extractor, distances, out, temp
-        )
+        process_graph(graph, stem, folder, distances, out, temp)
