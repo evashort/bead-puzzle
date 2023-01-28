@@ -1,39 +1,12 @@
 {
-    "nodes": 5,
-    "edges": [
-        [
-            0,
-            1
-        ],
-        [
-            0,
-            4
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            2,
-            3
-        ],
-        [
-            3,
-            4
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                3,
-                4,
-                1,
-                2
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 60
         }
     ],
     "distance": 10,
-    "id": "0011011100",
-    "permutation": 14
+    "id": "7AA=",
+    "old_id": "0011011100",
+    "layout": "ZQI="
 }

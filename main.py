@@ -2,6 +2,7 @@ import itertools
 import json
 import numpy as np
 from pathlib import Path
+import permute
 import simple_graph
 import sys
 
@@ -313,22 +314,6 @@ def index_to_permutation(n, i):
 
 print(''.join(map(str, index_to_permutation(6, 349)))) # 253041
 
-def permutation_to_index(permutation):
-    permutation = list(permutation)
-    n = len(permutation)
-    index = 0
-    step_size = int(np.product(np.arange(1, n + 1)))
-    for i, x in enumerate(permutation):
-        step_size //= n - i
-        index += int(x) * step_size
-        for j in range(i + 1, n):
-            if permutation[j] > x:
-                permutation[j] -= 1
-
-    return index
-
-print([permutation_to_index(i) for i in itertools.permutations(range(4))])
-
 def get_rotation_slice(n):
     # for n = 4, returns a slice that selects 0123, 1230, 2301, 3012 out of a
     # lexicographically ordered list of all permutations of 0, 1, 2, and 3
@@ -372,7 +357,7 @@ def rotate_permutation_right(permutation_index, permutation_length):
 # j = i // math.factorial(n-1)
 # math.factorial(n-1) * (n + j % n * (n-1) - j // n * n * 2 + j // (n+1) * (n+1))
 
-print(tuple(index_to_permutation(5, rotate_permutation_right(permutation_to_index((2, 1, 4, 0, 3)), 5))))
+# print(tuple(index_to_permutation(5, rotate_permutation_right(permutation_to_index((2, 1, 4, 0, 3)), 5))))
 
 def get_max_distance_and_puzzles_help(n, distances, distinct_rotations):
     rotation_slice = get_rotation_slice(n)[distinct_rotations]
@@ -448,15 +433,9 @@ def process_graph(graph, stem, folder, distances=None, out=None, temp=None):
             temp=temp
         )
         result = {
-            'nodes': nodes,
-            'edges': [
-                [int(x), int(y)] # avoid the following error:
-                # TypeError: Object of type int64 is not JSON serializable
-                for x, y in zip(*np.nonzero(graph)) if x < y
-            ],
             'puzzles': [
                 {
-                    'beads': [start.index(i) for i in range(1, nodes)],
+                    'start': permute.to_index(start),
                     'rotation': int(rotation),
                 }
                 for start, rotation in puzzles
@@ -464,32 +443,34 @@ def process_graph(graph, stem, folder, distances=None, out=None, temp=None):
             'distance': max_distance,
         }
 
-    if 'id' not in result:
+    if 'layout' not in result:
+        if 'nodes' in result:
+            del result['nodes']
+
+        if 'edges' in result:
+            del result['edges']
+
+        if 'permutation' in result:
+            del result['permutation']
+
+        for puzzle in result['puzzles']:
+            if 'beads' in puzzle:
+                start = np.zeros(nodes, dtype=int)
+                start[puzzle['beads']] = np.arange(1, nodes)
+                puzzle['start'] = int(permute.to_index(start))
+                del puzzle['beads']
+
         triangle = simple_graph.matrix_to_triangle(graph)
         transformer = simple_graph.get_triangle_permutations(nodes)
         triangles = triangle[transformer]
         order = np.lexsort(triangles.T[::-1])
         best_index = order[0]
-        triangle = triangles[best_index].astype(np.uint8)
-        result['id'] = ''.join(map(str, triangle))
-        permutation = list(index_to_permutation(nodes, best_index))
-        candidates, = np.where(
-            np.all(np.equal(triangles, triangles[0]), axis=1)
+        old_triangle = triangles[best_index].astype(np.uint8)
+        result['old_id'] = ''.join(map(str, old_triangle))
+        result['id'] = simple_graph.triangle_to_base64(
+            simple_graph.get_canonical_permutation(triangle)
         )
-        inverse = np.zeros(nodes, dtype=int)
-        inverse[permutation] = np.arange(nodes)
-        best_inverse_index = float('inf')
-        for candidate in candidates:
-            new_inverse = inverse[
-                list(index_to_permutation(nodes, candidate))
-            ]
-            inverse_index = permutation_to_index(new_inverse)
-            best_inverse_index = min(inverse_index, best_inverse_index)
-
-        # most of the time we choose candidates[0] and this condition is true:
-        # list(index_to_permutation(nodes, best_inverse_index)) != list(inverse)
-
-        result['permutation'] = best_inverse_index
+        result['layout'] = simple_graph.triangle_to_base64(triangle)
         with open(path, 'w', encoding='utf-8', newline='\n') as g:
             json.dump(result, g, indent=4)
 
@@ -529,7 +510,7 @@ if __name__ == '__main__':
             folder,
         )
 
-    # you shoud rerun the program with nodes equal to every value from 3 to 7
+    # you should rerun the program with nodes equal to every value from 3 to 7
     nodes = 7
     distances = get_empty_distances(nodes)
     out = np.empty_like(distances)

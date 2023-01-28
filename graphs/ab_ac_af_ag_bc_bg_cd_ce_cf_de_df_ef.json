@@ -1,300 +1,96 @@
 {
-    "nodes": 7,
-    "edges": [
-        [
-            0,
-            1
-        ],
-        [
-            0,
-            2
-        ],
-        [
-            0,
-            5
-        ],
-        [
-            0,
-            6
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            1,
-            6
-        ],
-        [
-            2,
-            3
-        ],
-        [
-            2,
-            4
-        ],
-        [
-            2,
-            5
-        ],
-        [
-            3,
-            4
-        ],
-        [
-            3,
-            5
-        ],
-        [
-            4,
-            5
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                5,
-                0,
-                1,
-                6,
-                4,
-                2
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 1962
         },
         {
-            "beads": [
-                3,
-                6,
-                0,
-                2,
-                1,
-                5
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 2996
         },
         {
-            "beads": [
-                3,
-                0,
-                1,
-                6,
-                5,
-                2
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 1674
         },
         {
-            "beads": [
-                3,
-                0,
-                1,
-                5,
-                4,
-                2
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 4602
         },
         {
-            "beads": [
-                4,
-                6,
-                1,
-                2,
-                0,
-                5
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 2973
         },
         {
-            "beads": [
-                3,
-                4,
-                0,
-                2,
-                1,
-                6
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 692
         },
         {
-            "beads": [
-                3,
-                4,
-                0,
-                2,
-                6,
-                5
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 781
         },
         {
-            "beads": [
-                1,
-                6,
-                3,
-                5,
-                4,
-                2
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 3150
         },
         {
-            "beads": [
-                1,
-                0,
-                5,
-                6,
-                2,
-                4
-            ],
-            "rotation": 6
+            "rotation": 6,
+            "start": 1699
         },
         {
-            "beads": [
-                1,
-                5,
-                0,
-                6,
-                3,
-                4
-            ],
-            "rotation": 6
+            "rotation": 6,
+            "start": 1805
         },
         {
-            "beads": [
-                4,
-                5,
-                3,
-                1,
-                2,
-                6
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 444
         },
         {
-            "beads": [
-                3,
-                2,
-                1,
-                4,
-                6,
-                5
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 734
         },
         {
-            "beads": [
-                2,
-                5,
-                1,
-                6,
-                0,
-                3
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 1901
         },
         {
-            "beads": [
-                2,
-                5,
-                6,
-                1,
-                0,
-                4
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 2543
         },
         {
-            "beads": [
-                5,
-                4,
-                3,
-                2,
-                1,
-                6
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 566
         },
         {
-            "beads": [
-                5,
-                0,
-                6,
-                4,
-                2,
-                3
-            ],
-            "rotation": 2
+            "rotation": 2,
+            "start": 2689
         },
         {
-            "beads": [
-                5,
-                3,
-                6,
-                2,
-                0,
-                1
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 2758
         },
         {
-            "beads": [
-                5,
-                4,
-                3,
-                2,
-                0,
-                1
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 5038
         },
         {
-            "beads": [
-                5,
-                6,
-                1,
-                0,
-                4,
-                3
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 3389
         },
         {
-            "beads": [
-                4,
-                3,
-                6,
-                0,
-                2,
-                1
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 2876
         },
         {
-            "beads": [
-                4,
-                5,
-                3,
-                0,
-                2,
-                1
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 4916
         },
         {
-            "beads": [
-                6,
-                0,
-                5,
-                4,
-                3,
-                2
-            ],
-            "rotation": 2
+            "rotation": 2,
+            "start": 4015
         }
     ],
     "distance": 20,
-    "id": "001011011110001100111",
-    "permutation": 5025
+    "id": "L/MB",
+    "old_id": "001011011110001100111",
+    "layout": "J/cB"
 }

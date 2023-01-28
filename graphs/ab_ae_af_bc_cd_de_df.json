@@ -1,98 +1,32 @@
 {
-    "nodes": 6,
-    "edges": [
-        [
-            0,
-            1
-        ],
-        [
-            0,
-            4
-        ],
-        [
-            0,
-            5
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            2,
-            3
-        ],
-        [
-            3,
-            4
-        ],
-        [
-            3,
-            5
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                1,
-                2,
-                0,
-                5,
-                4
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 141
         },
         {
-            "beads": [
-                4,
-                2,
-                3,
-                1,
-                0
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 713
         },
         {
-            "beads": [
-                0,
-                5,
-                3,
-                4,
-                2
-            ],
-            "rotation": 5
+            "rotation": 5,
+            "start": 391
         },
         {
-            "beads": [
-                2,
-                1,
-                0,
-                4,
-                5
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 23
         },
         {
-            "beads": [
-                4,
-                3,
-                2,
-                1,
-                5
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 86
         },
         {
-            "beads": [
-                1,
-                5,
-                4,
-                3,
-                2
-            ],
-            "rotation": 2
+            "rotation": 2,
+            "start": 414
         }
     ],
     "distance": 26,
-    "id": "000001110111100",
-    "permutation": 568
+    "id": "7Aw=",
+    "old_id": "000001110111100",
+    "layout": "ZSY="
 }

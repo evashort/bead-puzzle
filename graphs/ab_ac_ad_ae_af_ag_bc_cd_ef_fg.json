@@ -1,127 +1,36 @@
 {
-    "nodes": 7,
-    "edges": [
-        [
-            0,
-            1
-        ],
-        [
-            0,
-            2
-        ],
-        [
-            0,
-            3
-        ],
-        [
-            0,
-            4
-        ],
-        [
-            0,
-            5
-        ],
-        [
-            0,
-            6
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            2,
-            3
-        ],
-        [
-            4,
-            5
-        ],
-        [
-            5,
-            6
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                3,
-                2,
-                1,
-                6,
-                5,
-                4
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 1574
         },
         {
-            "beads": [
-                1,
-                4,
-                3,
-                2,
-                0,
-                6
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 687
         },
         {
-            "beads": [
-                6,
-                2,
-                5,
-                4,
-                3,
-                1
-            ],
-            "rotation": 2
+            "rotation": 2,
+            "start": 4016
         },
         {
-            "beads": [
-                1,
-                0,
-                3,
-                6,
-                5,
-                4
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 1565
         },
         {
-            "beads": [
-                3,
-                2,
-                1,
-                4,
-                0,
-                6
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 647
         },
         {
-            "beads": [
-                6,
-                4,
-                3,
-                2,
-                5,
-                1
-            ],
-            "rotation": 5
+            "rotation": 5,
+            "start": 3806
         },
         {
-            "beads": [
-                1,
-                0,
-                5,
-                4,
-                3,
-                6
-            ],
-            "rotation": 6
+            "rotation": 6,
+            "start": 269
         }
     ],
     "distance": 14,
-    "id": "000000001111000111111",
-    "permutation": 4417
+    "id": "a40B",
+    "old_id": "000000001111000111111",
+    "layout": "b8QQ"
 }

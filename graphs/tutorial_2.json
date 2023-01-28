@@ -1,35 +1,12 @@
 {
-    "nodes": 5,
-    "edges": [
-        [
-            0,
-            2
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            2,
-            3
-        ],
-        [
-            2,
-            4
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                1,
-                0,
-                3,
-                4
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 5
         }
     ],
     "distance": 1,
-    "id": "0000001111",
-    "permutation": 4
+    "id": "SwA=",
+    "old_id": "0000001111",
+    "layout": "JgE="
 }

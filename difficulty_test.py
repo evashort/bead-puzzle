@@ -4,8 +4,9 @@ import itertools
 import json
 import numpy as np
 from pathlib import Path
+import permute
 import random
-import sys
+import simple_graph
 
 iterations = 1000
 src_folder = Path('graphs')
@@ -18,8 +19,22 @@ for i, src_path in enumerate(src_folder.iterdir()):
     with open(src_path, encoding='utf-8') as f:
         graph = json.load(f)
 
-    if 'permutation' in graph:
-        del graph['permutation']
+    # replace dictionary with one where nodes and edges come first
+    graph2 = {}
+    graph2['nodes'] = simple_graph.base64_to_nodes(graph['id'])
+    matrix = simple_graph.base64_to_matrix(graph['layout'])
+    del graph['layout']
+    graph2['edges'] = [
+        [int(x), int(y)] # avoid the following error:
+        # TypeError: Object of type int64 is not JSON serializable
+        for x, y in zip(*np.nonzero(matrix)) if x < y
+    ]
+    graph2.update(graph)
+    graph = graph2
+    for puzzle in graph['puzzles']:
+        start = permute.from_index(puzzle['start'], graph['nodes'])
+        del puzzle['start']
+        puzzle['beads'] = [start.index(i) for i in range(1, graph['nodes'])]
 
     dst_path = dst_folder / src_path.name
     difficulty = None
@@ -110,11 +125,11 @@ for i, src_path in enumerate(src_folder.iterdir()):
     graph['states'] = len(seen)
 
     id_array = np.fromiter(
-        map(int, graph['id']),
+        map(int, graph['old_id']),
         dtype=bool,
-        count=len(graph['id']),
+        count=len(graph['old_id']),
     )
-    graph['id'] = base64.b64encode(np.packbits(id_array)).decode('ascii')
+    graph['old_id'] = base64.b64encode(np.packbits(id_array)).decode('ascii')
 
     graphs.append(graph)
 
@@ -204,13 +219,17 @@ else:
 
 # sort by difficulty and add new graphs
 for graph in graphs:
-    id_names[graph['id']] = id_names.pop(graph['id'], '')
+    id_names[graph['id']] = id_names.pop(
+        graph['id'],
+        id_names.pop(graph['old_id'], ''),
+    )
 
 with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump(id_names, f, indent=2)
 
 for graph in graphs:
-    random.seed(graph['id'])
+    random.seed(graph['old_id'])
+    del graph['old_id']
     random.shuffle(graph['puzzles'])
     name = id_names[graph['id']]
     if isinstance(name, dict):

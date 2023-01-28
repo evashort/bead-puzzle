@@ -5,6 +5,9 @@ import base64
 import itertools
 import numpy as np
 
+def base64_to_matrix(b64):
+    return triangle_to_matrix(base64_to_triangle(b64))
+
 def triangle_to_base64(triangle):
     triangle_bytes = np.packbits(triangle, bitorder='little')
     return base64.b64encode(triangle_bytes).decode('ascii')
@@ -25,15 +28,39 @@ def base64_to_triangle(b64):
     )
     return triangle.astype(bool)
 
+def base64_to_nodes(b64):
+    triangle_bytes = np.frombuffer(base64.b64decode(b64), dtype=np.uint8)
+    byte_index = np.nonzero(triangle_bytes)[0][-1]
+    last_byte = triangle_bytes[byte_index]
+    bit_count = 8 * byte_index + int(last_byte).bit_length()
+    # https://oeis.org/A002024
+    n = (np.math.isqrt(8 * bit_count) + 1) // 2
+    return n + 1
+
 def matrix_to_triangle(matrix):
     square_to_triangle = triu_indices_flat(len(matrix))
     return matrix.flatten()[square_to_triangle]
+
+def triangle_to_matrix(triangle):
+    nodes = triangle_length_to_nodes(len(triangle))
+    triangle_to_square = square_indices_flat(nodes)
+    matrix = triangle[triangle_to_square]
+    matrix[::nodes + 1] = 0
+    return matrix.reshape((nodes, nodes))
+
+def permute_triangle(triangle, permutation):
+    nodes = triangle_length_to_nodes(len(triangle))
+    triangle_to_square = square_indices_flat(nodes)
+    square = triangle[triangle_to_square].reshape((nodes, nodes))
+    # add : in both orientations in case permutation is tuple
+    square = square[:, permutation][permutation, :]
+    return matrix_to_triangle(square)
 
 def get_canonical_permutation(triangle):
     nodes = triangle_length_to_nodes(len(triangle))
     transformer = get_triangle_permutations(nodes)
     triangles = triangle[transformer]
-    order = np.lexsort(triangles.T[::-1])
+    order = np.lexsort(triangles.T)
     return triangles[order[0]]
 
 def triangle_length_to_nodes(length):

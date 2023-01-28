@@ -1,198 +1,56 @@
 {
-    "nodes": 7,
-    "edges": [
-        [
-            0,
-            1
-        ],
-        [
-            0,
-            2
-        ],
-        [
-            0,
-            3
-        ],
-        [
-            0,
-            5
-        ],
-        [
-            0,
-            6
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            1,
-            3
-        ],
-        [
-            1,
-            5
-        ],
-        [
-            1,
-            6
-        ],
-        [
-            2,
-            3
-        ],
-        [
-            2,
-            4
-        ],
-        [
-            3,
-            4
-        ],
-        [
-            4,
-            5
-        ],
-        [
-            5,
-            6
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                5,
-                6,
-                3,
-                4,
-                1,
-                2
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 3420
         },
         {
-            "beads": [
-                6,
-                5,
-                3,
-                4,
-                2,
-                1
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 4142
         },
         {
-            "beads": [
-                4,
-                3,
-                1,
-                2,
-                0,
-                6
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 717
         },
         {
-            "beads": [
-                4,
-                3,
-                1,
-                2,
-                6,
-                5
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 804
         },
         {
-            "beads": [
-                3,
-                4,
-                2,
-                1,
-                0,
-                6
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 695
         },
         {
-            "beads": [
-                3,
-                4,
-                2,
-                1,
-                6,
-                5
-            ],
-            "rotation": 1
+            "rotation": 1,
+            "start": 782
         },
         {
-            "beads": [
-                6,
-                5,
-                4,
-                2,
-                3,
-                1
-            ],
-            "rotation": 2
+            "rotation": 2,
+            "start": 4160
         },
         {
-            "beads": [
-                3,
-                0,
-                1,
-                5,
-                4,
-                2
-            ],
-            "rotation": 4
+            "rotation": 4,
+            "start": 4602
         },
         {
-            "beads": [
-                6,
-                4,
-                5,
-                3,
-                2,
-                1
-            ],
-            "rotation": 2
+            "rotation": 2,
+            "start": 4046
         },
         {
-            "beads": [
-                1,
-                0,
-                6,
-                5,
-                3,
-                4
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 2405
         },
         {
-            "beads": [
-                3,
-                4,
-                0,
-                2,
-                6,
-                5
-            ],
-            "rotation": 5
+            "rotation": 5,
+            "start": 781
         },
         {
-            "beads": [
-                1,
-                0,
-                5,
-                6,
-                4,
-                3
-            ],
-            "rotation": 3
+            "rotation": 3,
+            "start": 1709
         }
     ],
     "distance": 14,
-    "id": "001011100111101111011",
-    "permutation": 4233
+    "id": "t+cD",
+    "old_id": "001011100111101111011",
+    "layout": "P88R"
 }

@@ -1,34 +1,12 @@
 {
-    "nodes": 4,
-    "edges": [
-        [
-            0,
-            1
-        ],
-        [
-            0,
-            3
-        ],
-        [
-            1,
-            2
-        ],
-        [
-            2,
-            3
-        ]
-    ],
     "puzzles": [
         {
-            "beads": [
-                3,
-                0,
-                1
-            ],
-            "rotation": 0
+            "rotation": 0,
+            "start": 16
         }
     ],
     "distance": 6,
-    "id": "011110",
-    "permutation": 2
+    "id": "Hg==",
+    "old_id": "011110",
+    "layout": "LQ=="
 }
