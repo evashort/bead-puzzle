@@ -411,9 +411,6 @@ def process_graph(graph, stem, folder, distances=None, out=None, temp=None):
         }
 
     if 'layout' not in result:
-        if 'old_id' in result:
-            del result['old_id']
-
         triangle = simple_graph.matrix_to_triangle(graph)
         result['id'] = simple_graph.triangle_to_base64(
             simple_graph.get_canonical_permutation(triangle)
