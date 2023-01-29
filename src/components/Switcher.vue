@@ -2,6 +2,9 @@
 import Game from './Game.vue'
 import graphData from '../assets/graphs.json'
 import Markdown from 'vue3-markdown-it'
+import base64js from 'base64-js'
+import SimpleGraph from '../SimpleGraph.js'
+import Permute from '../Permute.js'
 </script>
 
 <script>
@@ -38,23 +41,33 @@ export default {
     graph() {
       return this.graphs[this.graphIndex]
     },
+    idBytes() {
+      return base64js.toByteArray(this.graph.id)
+    },
     nodes() {
-      return this.graph.nodes
+      return SimpleGraph.bytesToNodeCount(this.idBytes)
+    },
+    rotations() {
+      let rotations = []
+      for (let [i, puzzles] of this.graph['puzzles'].entries()) {
+        if (puzzles.length > 0) {
+          rotations.push(i)
+        }
+      }
+      return rotations
     },
     letters() {
-      let letters = Object.keys(this.graph.puzzles)
-      letters.sort()
-      return letters
+      return this.rotations.map(i => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i])
+    },
+    rotation() {
+      return this.rotations[this.rotationIndex]
     },
     letter() {
       return this.letters[this.rotationIndex]
     },
-    rotation() {
-      return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(this.letter)
-    },
     maxVariations() {
       let maxVariations = 0
-      for (let puzzles of Object.values(this.graph.puzzles)) {
+      for (let puzzles of this.graph['puzzles']) {
         if (puzzles.length > maxVariations) {
           maxVariations = puzzles.length
         }
@@ -63,14 +76,23 @@ export default {
       return maxVariations
     },
     startingBeads() {
-      return this.graph.puzzles[this.letter][this.variation]
+      let index = this.graph.puzzles[this.rotation][this.variation]
+      let start = Permute.fromIndex(index, this.nodes)
+      let beads = []
+      for (let i = 1; i < this.nodes; i++) {
+        beads.push(start.indexOf(i))
+      }
+
+      return beads
     },
     edges() {
-      return this.graph.edges.map(
+      let index = this.graph['layout']
+      let layout = Permute.fromIndex(index, this.nodes)
+      return SimpleGraph.bytesToEdges(this.idBytes).map(
         function(edge, index, edges) {
           return [
-            (edge[0] + this.rotation) % this.nodes,
-            (edge[1] + this.rotation) % this.nodes,
+            (layout.indexOf(edge[0]) + this.rotation) % this.nodes,
+            (layout.indexOf(edge[1]) + this.rotation) % this.nodes,
           ]
         },
         this,
@@ -340,15 +362,15 @@ State space: ${this.graph.states} states
                 name="rotation"
               />
               <label :for="`rotation-${letter}`">
-                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[letter].length})` : ''}}
+                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[rotations[i]].length})` : ''}}
               </label>
               <br/>
             </div>
           </fieldset>
           <fieldset v-if="maxVariations > 1">
-            <legend>{{graph.puzzles[letter].length}} variations</legend>
+            <legend>{{graph.puzzles[rotation].length}} variations</legend>
             <div
-              v-for="i in graph.puzzles[letter].length"
+              v-for="i in graph.puzzles[rotation].length"
               :key="[graph.id, letter, i - 1].toString()"
               class="radioHolder"
             >

@@ -19,23 +19,6 @@ for i, src_path in enumerate(src_folder.iterdir()):
     with open(src_path, encoding='utf-8') as f:
         graph = json.load(f)
 
-    # replace dictionary with one where nodes and edges come first
-    graph2 = {}
-    graph2['nodes'] = simple_graph.base64_to_nodes(graph['id'])
-    matrix = simple_graph.base64_to_matrix(graph['layout'])
-    del graph['layout']
-    graph2['edges'] = [
-        [int(x), int(y)] # avoid the following error:
-        # TypeError: Object of type int64 is not JSON serializable
-        for x, y in zip(*np.nonzero(matrix)) if x < y
-    ]
-    graph2.update(graph)
-    graph = graph2
-    for puzzle in graph['puzzles']:
-        start = permute.from_index(puzzle['start'], graph['nodes'])
-        del puzzle['start']
-        puzzle['beads'] = [start.index(i) for i in range(1, graph['nodes'])]
-
     dst_path = dst_folder / src_path.name
     difficulty = None
     try:
@@ -49,20 +32,23 @@ for i, src_path in enumerate(src_folder.iterdir()):
             except json.decoder.JSONDecodeError:
                 pass
 
+    node_count = simple_graph.base64_to_nodes(graph['id'])
+    matrix = simple_graph.base64_to_matrix(graph['layout'])
     if difficulty is None:
-        node_count = graph['nodes']
         goal = tuple(range(1, node_count))
         total_difficulty = 0
         for i in range(iterations):
             puzzle = random.choice(graph['puzzles'])
-            beads = tuple(puzzle['beads'])
+            start = permute.from_index(puzzle['start'], node_count)
+            beads = tuple(start.index(i) for i in range(1, node_count))
             hole, = set(goal + (0,)).difference(beads)
             edges = {}
             rotation = puzzle['rotation']
-            for a, b in graph['edges']:
-                a, b = ((x + rotation) % node_count for x in (a, b))
-                edges.setdefault(a, set()).add(b)
-                edges.setdefault(b, set()).add(a)
+            for a, b in zip(*np.nonzero(matrix)):
+                if a < b:
+                    a, b = ((x + rotation) % node_count for x in (a, b))
+                    edges.setdefault(a, set()).add(b)
+                    edges.setdefault(b, set()).add(a)
 
             seen = collections.Counter()
             moves = 0
@@ -96,11 +82,11 @@ for i, src_path in enumerate(src_folder.iterdir()):
 
     graph['difficulty'] = difficulty
 
-    node_count = graph['nodes']
     edges = {}
-    for a, b in graph['edges']:
-        edges.setdefault(a, set()).add(b)
-        edges.setdefault(b, set()).add(a)
+    for a, b in zip(*np.nonzero(matrix)):
+        if a < b:
+            edges.setdefault(a, set()).add(b)
+            edges.setdefault(b, set()).add(a)
 
     # depth-first search all states reachable from goal
     stack = [tuple(range(node_count))]
@@ -124,32 +110,21 @@ for i, src_path in enumerate(src_folder.iterdir()):
 
     graph['states'] = len(seen)
 
-    id_array = np.fromiter(
-        map(int, graph['old_id']),
-        dtype=bool,
-        count=len(graph['old_id']),
-    )
-    graph['old_id'] = base64.b64encode(np.packbits(id_array)).decode('ascii')
-
     graphs.append(graph)
 
 graphs.sort(key=lambda graph: graph['difficulty'])
 
 size_graphs = {}
 for graph in graphs:
-    size_graphs.setdefault(graph['nodes'], []).append(graph)
+    node_count = simple_graph.base64_to_nodes(graph['id'])
+    size_graphs.setdefault(node_count, []).append(graph)
 
 size_matrices = {}
 size_permutations = {}
 for size, graph_list in size_graphs.items():
     matrices = np.zeros((len(graph_list), size, size), dtype=bool)
     for i, graph in enumerate(graph_list):
-        edges = graph['edges']
-        matrices[
-            i,
-            sum(zip(*edges), start=()),
-            sum(list(zip(*edges))[::-1], start=()),
-        ] = True
+        matrices[i] = simple_graph.base64_to_matrix(graph['layout'])
 
     matrices = matrices.reshape(len(graph_list), -1)
     size_matrices[size] = matrices
@@ -219,50 +194,43 @@ else:
 
 # sort by difficulty and add new graphs
 for graph in graphs:
-    id_names[graph['id']] = id_names.pop(
-        graph['id'],
-        id_names.pop(graph['old_id'], ''),
-    )
+    id_names[graph['id']] = id_names.pop(graph['id'], '')
 
-with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
-    json.dump(id_names, f, indent=2)
+# with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
+#     json.dump(id_names, f, indent=2)
 
 for graph in graphs:
-    random.seed(graph['old_id'])
-    del graph['old_id']
-    random.shuffle(graph['puzzles'])
+    nodes = simple_graph.base64_to_nodes(graph['id'])
+    puzzles = [[] for _ in range(nodes)]
+    for puzzle in graph['puzzles']:
+        puzzles[puzzle['rotation']].append(puzzle['start'])
+
+    for rotation_puzzles in puzzles:
+        rotation_puzzles.sort()
+
+    graph['puzzles'] = puzzles
+
+    id_matrix = simple_graph.base64_to_matrix(graph['id'])
+    matrix = simple_graph.base64_to_matrix(graph['layout'])
+
     name = id_names[graph['id']]
     if isinstance(name, dict):
         a_rotation = name['rotation']
+        matrix = np.roll(matrix, -a_rotation, (0, 1))
         rotation_orders = name.get('puzzles', {})
         name = name['name']
 
-        nodes = graph['nodes']
-        for edge in graph['edges']:
-            edge[0] = (edge[0] + nodes - a_rotation) % nodes
-            edge[1] = (edge[1] + nodes - a_rotation) % nodes
-
-        letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        letter_puzzles = {letter: [] for letter in letters[:nodes]}
-        for puzzle in graph['puzzles']:
-            rotation = (puzzle['rotation'] + a_rotation) % nodes
-            letter = letters[rotation]
-            letter_puzzles[letter].append(puzzle['beads'])
+        puzzles = puzzles[nodes - a_rotation:] + puzzles[:nodes - a_rotation]
+        graph['puzzles'] = puzzles
 
         for rotation, order in rotation_orders.items():
             rotation = (int(rotation) + nodes - a_rotation) % nodes
-            letter = letters[rotation]
-            puzzles = letter_puzzles[letter]
+            rotation_puzzles = puzzles[rotation]
             for i, j in enumerate(order):
-                puzzles.insert(i, puzzles.pop(j))
-
-        for letter in letters[:nodes]:
-            if not letter_puzzles[letter]:
-                del letter_puzzles[letter]
-
-        graph['puzzles'] = letter_puzzles
+                rotation_puzzles.insert(i, rotation_puzzles.pop(j))
 
     graph['name'] = name
+    graph['layout'] = permute.matrix_pair_to_index(id_matrix, matrix)
 
 graphs = [
     graph for graph in graphs

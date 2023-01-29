@@ -38,13 +38,14 @@ Your progress will not be saved. You can change this in Settings.
 # Save file format
 
 1. 16-bit version
+1. 16-bit settings length
+1. 8-bit number of settings
+    1. 8-bit setting type
 1. settings
 1. 32-bit last-played level ID
-1. 16-bit number of won levels
-    1. 32-bit level ID
 1. 16-bit number of variations
-1. 16-bit number of won variations
-    1. 32-bit rotation ID
+    1. 32-bit level ID
+    1. 16-bit permutation
     1. 16-bit original bead locations
 1. 16-bit number of started variations
     1. 16-bit current bead locations
@@ -52,7 +53,11 @@ Your progress will not be saved. You can change this in Settings.
     1. 4-bit history[0]
     1. 4-bit tail
     1. 16-bit history[1:-1]
+1. 16-bit number of won variations
 1. 32-bit CRC checksum
+
+for each won level: 32+16+16 = 64 bits = 11 characters
+for each started level: 32+16+16+16+8+4+4+16 = 112 bits = 19 characters
 
 ## graphs.json
 ```json
@@ -63,12 +68,13 @@ Your progress will not be saved. You can change this in Settings.
             "distance": 4,
             "difficulty": 4.0,
             "states": 5,
-            "rotations": {
-                "A": {
-                    "id": "BcA=",
-                    "variations": [21, 42, 79]
-                }
-            }
+            "layout": 58,
+            "puzzles": [
+                [21, 42, 79],
+                [],
+                [],
+                []
+            ]
         }
     ]
 }

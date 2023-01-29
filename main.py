@@ -326,39 +326,6 @@ def get_rotation_slice(n):
     result *= np.arange(n)
     return result
 
-def rotate_permutation_right(permutation_index, permutation_length):
-    factorial = 1 # factorial of n - 1
-    for n in range(1, permutation_length):
-        j = permutation_index // factorial % ((n + 1) * n * factorial)
-        offset = n + j % n * (n - 1) - j // n * n * 2 + j // (n + 1) * (n + 1)
-        permutation_index += offset * factorial
-        factorial *= n
-
-    return permutation_index
-
-# you can get there by swapping pairs
-# 0123 -> 0132 -> 0312 -> 3012
-
-# swap last two = i + 1 - 2 * (i % 2)
-
-# swap second-to-last two = [2,3,-2,2,-3,-2][i % 6]
-# i = np.arange(6)
-# 2 + 1 * (i % 2 - 4 * (i // 2) + 3 * (i // 3))
-# 2! + i % 2 - 2*2! * (i // 2) + (2! + 1!) * (i // 3)
-
-# swap first two = [6,10,14,-6,6,10,-10,-6,6,-14,-10,-6][i // 2 % 12]
-# i = np.arange(24)
-# 6 + 4 * (i % 6 // 2) - 12 * (i // 6) + 8 * (i // 8)
-# 6 + 4 * (i//2 % 3 - 3 * (i//2 // 3) + 2 * (i//2 // 4))
-# 3! + 2*2! * (i//2! % 3) - 2*3! * (i//2! // 3) + 4*2! * (i//2! // 4))
-# n! + (n-1)*(n-1)! * (i//(n-1)! % n) - 2*n! * (i//(n-1)! // n) + (n+1)*(n-1)! * (i//(n-1)! // (n + 1))
-# math.factorial(n) + i // math.factorial(n-1) % n * math.factorial(n-1) * (n-1) - i // math.factorial(n-1) // n * 2 * math.factorial(n) + i // (n+1) // math.factorial(n-1) * (n+1) * math.factorial(n-1)
-# math.factorial(n-1) * (n + i//math.factorial(n-1) % n * (n-1) - i//math.factorial(n-1) // n * n * 2 + i//math.factorial(n-1) // (n+1) * (n+1))
-# j = i // math.factorial(n-1)
-# math.factorial(n-1) * (n + j % n * (n-1) - j // n * n * 2 + j // (n+1) * (n+1))
-
-# print(tuple(index_to_permutation(5, rotate_permutation_right(permutation_to_index((2, 1, 4, 0, 3)), 5))))
-
 def get_max_distance_and_puzzles_help(n, distances, distinct_rotations):
     rotation_slice = get_rotation_slice(n)[distinct_rotations]
     # we can require the final permutation to be a rotation of 0123...n
@@ -444,29 +411,10 @@ def process_graph(graph, stem, folder, distances=None, out=None, temp=None):
         }
 
     if 'layout' not in result:
-        if 'nodes' in result:
-            del result['nodes']
-
-        if 'edges' in result:
-            del result['edges']
-
-        if 'permutation' in result:
-            del result['permutation']
-
-        for puzzle in result['puzzles']:
-            if 'beads' in puzzle:
-                start = np.zeros(nodes, dtype=int)
-                start[puzzle['beads']] = np.arange(1, nodes)
-                puzzle['start'] = int(permute.to_index(start))
-                del puzzle['beads']
+        if 'old_id' in result:
+            del result['old_id']
 
         triangle = simple_graph.matrix_to_triangle(graph)
-        transformer = simple_graph.get_triangle_permutations(nodes)
-        triangles = triangle[transformer]
-        order = np.lexsort(triangles.T[::-1])
-        best_index = order[0]
-        old_triangle = triangles[best_index].astype(np.uint8)
-        result['old_id'] = ''.join(map(str, old_triangle))
         result['id'] = simple_graph.triangle_to_base64(
             simple_graph.get_canonical_permutation(triangle)
         )

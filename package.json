@@ -7,6 +7,7 @@
     "preview": "vite preview --port 5050"
   },
   "dependencies": {
+    "base64-js": "^1.5.1",
     "vue": "^3.2.31",
     "vue3-markdown-it": "^1.0.10"
   },
