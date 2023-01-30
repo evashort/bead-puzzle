@@ -36,7 +36,19 @@ def to_index(permutation):
         for j in range(i):
             permutation[j] -= permutation[j] >= value
 
-    return index
+    return int(index)
+
+def invert(permutation):
+    inverse = np.zeros(len(permutation), dtype=int)
+    inverse[permutation] = np.arange(len(permutation))
+    return inverse
+
+def permute_index(index, permutation):
+    out = np.zeros(len(permutation), dtype=int)
+    from_index(index, out)
+    permuted = out[permutation]
+    result = to_index(permuted)
+    return result
 
 def matrix_pair_to_index(src, dst):
     permutation = np.zeros(len(src), dtype=int)
@@ -47,6 +59,13 @@ def matrix_pair_to_index(src, dst):
             return i
     
     raise ValueError('the matricies are not permutations of each other')
+
+def rotate_index(index, distance, length):
+    iterations = (length - distance) % length
+    for _ in range(iterations):
+        index = rotate_left(index, length)
+
+    return index
 
 def rotate_left(index, length):
     factorial = 1 # factorial of n - 1

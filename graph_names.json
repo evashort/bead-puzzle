@@ -1,24 +1,12 @@
 {
-  "SwA=": {
-    "name": "\ud83d\udc46 Selecting",
-    "rotation": 0
-  },
+  "SwA=": "\ud83d\udc46 Selecting",
   "Bw==": "#loop",
-  "VgA=": {
-    "name": "\u25b6\ufe0f Moving",
-    "rotation": 0
-  },
+  "VgA=": "\u25b6\ufe0f Moving",
   "Hg==": "#square",
   "Pw==": "#loop",
   "6wA=": "#split",
-  "7AA=": {
-    "name": "\ud83d\udcab Spinning",
-    "rotation": 0
-  },
-  "Hw==": {
-    "name": "\ud83e\udd6a Sandwich",
-    "rotation": 0
-  },
+  "7AA=": "\ud83d\udcab Spinning",
+  "Hw==": "\ud83e\udd6a Sandwich",
   "Iw8=": "#split",
   "cA0=": "#hexagon",
   "kpYB": "#split",
@@ -30,12 +18,7 @@
   "Io8B": "#split",
   "3gA=": {
     "name": "\ud83e\udd8a Fox",
-    "rotation": 1,
-    "puzzles": {
-      "1": [
-        6
-      ]
-    }
+    "layout": "BCDEA"
   },
   "TJYB": "#split",
   "6ww=": "#split",
@@ -47,7 +30,7 @@
   "+wE=": "#loop",
   "3wA=": {
     "name": "\ud83e\udd35 Bow tie",
-    "rotation": 4
+    "layout": "EABCD"
   },
   "aI0B": "#split",
   "/wA=": "#loop like Bow tie",
@@ -59,7 +42,7 @@
   "6owB": "#split",
   "7QA=": {
     "name": "\ud83c\udf6f Pot",
-    "rotation": 1
+    "layout": "BCDEA"
   },
   "Jo8B": "#split",
   "T+YD": "#split",
@@ -78,12 +61,7 @@
   "J58B": "#split",
   "+B0=": {
     "name": "\ud83c\udfc0 Half court",
-    "rotation": 5,
-    "puzzles": {
-      "5": [
-        3
-      ]
-    }
+    "layout": "FABCDE"
   },
   "Jp8B": "#split",
   "T5YB": "#split",
@@ -91,26 +69,13 @@
   "l5YB": "#split",
   "J48B": "#split",
   "2pYB": "#split",
-  "3gw=": {
-    "name": "\u2666\ufe0f Frog base",
-    "rotation": 0,
-    "puzzles": {
-      "0": [
-        1
-      ]
-    }
-  },
+  "3gw=": "\u2666\ufe0f Frog base",
   "4bMB": "#split",
   "YbcB": "#split",
   "/38=": "#loop",
   "+A0=": {
     "name": "\ud83d\udd2d Lens",
-    "rotation": 2,
-    "puzzles": {
-      "2": [
-        1
-      ]
-    }
+    "layout": "CDEFAB"
   },
   "K/MB": "#split",
   "TZYB": "#split",
@@ -125,10 +90,7 @@
   "/x4=": "#loop",
   "+R8=": "#loop",
   "/w8=": "#loop",
-  "eA0=": {
-    "name": "\ud83d\udee3\ufe0f Highway",
-    "rotation": 0
-  },
+  "eA0=": "\ud83d\udee3\ufe0f Highway",
   "fw8=": "#loop",
   "+x0=": "#loop",
   "fw0=": "#loop",
@@ -138,20 +100,12 @@
   "7x4=": "#loop",
   "/ww=": {
     "name": "\ud83c\udf09 Bridge",
-    "rotation": 4,
-    "puzzles": {
-      "4": [
-        1
-      ]
-    }
+    "layout": "EFABCD"
   },
   "/g8=": "#loop",
   "+R0=": "#loop",
   "+w0=": "#loop",
-  "3ww=": {
-    "name": "\ud83e\udda2 Bird base",
-    "rotation": 0
-  },
+  "3ww=": "\ud83e\udda2 Bird base",
   "/g0=": "#loop",
   "dw8=": "#loop",
   "7R4=": "#loop",
@@ -162,7 +116,7 @@
   "Pw8=": "#loop",
   "/gw=": {
     "name": "\ud83d\udc31 Cat",
-    "rotation": 1
+    "layout": "BCDEFA"
   },
   "+g0=": "#loop",
   "+Q0=": "#loop",
@@ -172,20 +126,20 @@
   "dg8=": "#loop",
   "7ww=": {
     "name": "\ud83c\udfe0 Floodlight",
-    "rotation": 5
+    "layout": "FABCDE"
   },
   "bg8=": "#loop",
   "dw0=": "#loop",
   "bw8=": "#loop like Floodlight",
   "7Qw=": {
     "name": "\ud83c\udf44 Mushroom",
-    "rotation": 5
+    "layout": "FABCDE"
   },
   "fA0=": "#loop",
   "cw0=": "#loop",
   "7gw=": {
     "name": "\ud83d\udcf1 Pocket calculator",
-    "rotation": 1
+    "layout": "BCDEFA"
   },
   "eQ0=": "#loop",
   "bQ8=": "#loop like Pocket calculator",
@@ -193,49 +147,31 @@
   "bA8=": "#loop",
   "7Aw=": {
     "name": "\ud83d\ude3d Cat ears",
-    "rotation": 2
+    "layout": "CDEFAB"
   },
   "cQ0=": "#loop",
   "VJYB": {
     "name": "\ud83d\udc1a Nautilus",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "+J0D": {
     "name": "\ud83c\udfad Marionette",
-    "rotation": 3,
-    "puzzles": {
-      "3": [
-        2
-      ]
-    }
+    "layout": "DEFGABC"
   },
   "3owB": {
     "name": "\ud83d\udca0 Cootie catcher",
-    "rotation": 6,
-    "puzzles": {
-      "6": [
-        1
-      ]
-    }
+    "layout": "GABCDEF"
   },
   "+J0B": {
     "name": "\u26bd Corner kick",
-    "rotation": 5,
-    "puzzles": {
-      "5": [
-        13
-      ]
-    }
+    "layout": "FGABCDE"
   },
   "//8f": "#loop",
   "//8P": "#loop",
   "+/0P": "#loop",
   "794H": "#loop",
   "/90H": "#loop",
-  "+JUB": {
-    "name": "\ud83d\udd73\ufe0f Cave entrance",
-    "rotation": 0
-  },
+  "+JUB": "\ud83d\udd73\ufe0f Cave entrance",
   "+98H": "#loop",
   "+/8D": "#loop",
   "//8H": "#loop",
@@ -245,12 +181,7 @@
   "/78H": "#loop",
   "+I0B": {
     "name": "\ud83e\udd9d Raccoon",
-    "rotation": 2,
-    "puzzles": {
-      "2": [
-        3
-      ]
-    }
+    "layout": "CDEFGAB"
   },
   "//8D": "#loop",
   "+78D": "#loop",
@@ -267,17 +198,12 @@
   "/7MB": "#loop",
   "/50D": {
     "name": "\u2728 Three lights",
-    "rotation": 3,
-    "puzzles": {
-      "3": [
-        3
-      ]
-    }
+    "layout": "DEFGABC"
   },
   "/+4D": "#loop",
   "/40B": {
     "name": "\ud83d\udc5a Do not bleach",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "+58D": "#loop",
   "+b8D": "#loop",
@@ -290,19 +216,14 @@
   "+P8D": "#loop",
   "uJUB": {
     "name": "\ud83d\udc94 Broken heart",
-    "rotation": 6,
-    "puzzles": {
-      "6": [
-        1
-      ]
-    }
+    "layout": "GABCDEF"
   },
   "/+cD": "#loop",
   "/54D": "#loop like Do not bleach",
   "zb8H": "#loop",
   "+50D": {
     "name": "\ud83c\udf5f Last French fry",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "3q8D": "#loop",
   "/5cB": "#loop",
@@ -332,7 +253,7 @@
   "+u8D": "#loop",
   "/o0B": {
     "name": "\ud83d\udc39 Hamster",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "7bMB": "#loop",
   "5q8D": "#loop",
@@ -348,7 +269,7 @@
   "7q8D": "#loop",
   "eI0B": {
     "name": "\ud83d\udc98 Cupid's arrow",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "fe8D": "#loop",
   "/vcB": "#loop",
@@ -360,7 +281,7 @@
   "+54D": "#loop",
   "/4wB": {
     "name": "\ud83e\udd73 Party cat",
-    "rotation": 2
+    "layout": "CDEFGAB"
   },
   "7a8D": "#loop",
   "/rcB": "#loop",
@@ -373,15 +294,7 @@
   "7N4H": "#loop",
   "z68D": "#loop",
   "fO8D": "#loop",
-  "/5UB": {
-    "name": "\ud83c\udff4 Anarchy symbol",
-    "rotation": 0,
-    "puzzles": {
-      "0": [
-        2
-      ]
-    }
-  },
+  "/5UB": "\ud83c\udff4 Anarchy symbol",
   "b/MB": "#loop",
   "//MB": "#loop",
   "554B": "#loop",
@@ -393,17 +306,12 @@
   "7O4D": "#loop",
   "+Z0D": {
     "name": "\ud83c\udf5f French fry box",
-    "rotation": 3,
-    "puzzles": {
-      "3": [
-        30
-      ]
-    }
+    "layout": "DEFGABC"
   },
   "P58B": "#loop",
   "f48B": {
     "name": "\ud83c\udfde\ufe0f Hiking trail",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "+p4D": "#loop",
   "zL8H": "#loop",
@@ -416,12 +324,7 @@
   "/50B": "#loop like Do not bleach, Hamster, Party cat, Anarchy symbol",
   "34wB": {
     "name": "\ud83e\ude82 Parachute",
-    "rotation": 6,
-    "puzzles": {
-      "6": [
-        30
-      ]
-    }
+    "layout": "GABCDEF"
   },
   "d+8D": "#loop",
   "/7cB": "#loop like Anarchy symbol and Hiking trail",
@@ -434,19 +337,14 @@
   "T68D": "#loop",
   "+50B": {
     "name": "\u26a1 Microwave",
-    "rotation": 5,
-    "puzzles": {
-      "5": [
-        1
-      ]
-    }
+    "layout": "FGABCDE"
   },
   "vecD": "#loop",
   "e+8D": "#loop",
   "2L8D": "#loop",
   "+40B": {
     "name": "\ud83d\udd26 Headlamp",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "578B": "#loop",
   "e58B": "#loop",
@@ -459,10 +357,7 @@
   "95YB": "#loop",
   "za8D": "#loop",
   "f58B": "#loop like Anarchy symbol, Hiking trail, Headlamp",
-  "+5UB": {
-    "name": "\ud83d\udca1 Ceiling light",
-    "rotation": 0
-  },
+  "+5UB": "\ud83d\udca1 Ceiling light",
   "O58B": "#loop",
   "9rcB": "#loop",
   "Pp8B": "#loop",
@@ -475,15 +370,7 @@
   "37cB": "#loop like Headlamp",
   "6rcB": "#loop",
   "/+8D": "#loop like 9 things",
-  "f5YB": {
-    "name": "\ud83c\udfd6\ufe0f Folding chair",
-    "rotation": 0,
-    "puzzles": {
-      "0": [
-        1
-      ]
-    }
-  },
+  "f5YB": "\ud83c\udfd6\ufe0f Folding chair",
   "/p4B": "#loop like Hamster",
   "97cB": "#loop",
   "+J8D": "#loop",
@@ -494,7 +381,7 @@
   "478B": "#loop",
   "+Z0B": {
     "name": "\ud83e\udeb4 Aloe",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "/5YB": "#loop like Folding chair",
   "Op8B": "#loop",
@@ -511,7 +398,7 @@
   "r7cB": "#loop",
   "d48B": {
     "name": "\ud83d\uddfb Mountain",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "++8D": "#loop like 8 things",
   "v5cB": "#loop",
@@ -519,34 +406,28 @@
   "f/MB": "#loop",
   "3p4B": {
     "name": "\ud83e\udd64 Forbidden drink",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "1rcB": "#loop",
   "X+YD": "#loop",
   "n5YB": {
     "name": "\ud83c\udf79 Cocktail",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "35YB": "#loop like Cocktail",
-  "cI0B": {
-    "name": "\u2764\ufe0f Heart",
-    "rotation": 0
-  },
+  "cI0B": "\u2764\ufe0f Heart",
   "d58B": "#loop like Mountain and Cocktail",
   "X5YB": {
     "name": "\ud83e\uddda Angel",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "/p0B": "#like Hamster",
   "778B": "#loop like 10 things",
   "+Z4D": "#loop like Aloe",
-  "b48B": {
-    "name": "\ud83c\udfaa Tent",
-    "rotation": 0
-  },
+  "b48B": "\ud83c\udfaa Tent",
   "b40B": {
     "name": "\u2600\ufe0f Sun",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "7p4B": "#loop",
   "t+cD": "#loop like Aloe",
@@ -557,13 +438,13 @@
   "T7cB": "#loop like Angel",
   "3ZYB": {
     "name": "\u26f5 Sailboat",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "7bcB": "#loop",
   "7J4D": "#loop",
   "7YwB": {
     "name": "\ud83d\ude48 Closed eye",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "/ZYB": "#loop like Sailboat and Closed eye",
   "zL8D": "#loop",
@@ -586,7 +467,7 @@
   "p+YD": "#loop",
   "fo0B": {
     "name": "\ud83c\udf55 Pizza",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "74wB": "#like Closed eye",
   "Vq8D": "#loop",
@@ -594,13 +475,13 @@
   "3rMB": "#loop",
   "+o0B": {
     "name": "\ud83e\uded6 Teapot",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "qrcB": "#loop",
   "V+YD": "#loop",
   "/owB": {
     "name": "\ud83d\udc78 Tiara cat",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "fo8B": "#loop like Pizza and Teapot",
   "fZ8B": "#loop like Mountain, Cocktail, Closed eye, Pizza",
@@ -618,7 +499,7 @@
   "eZ8B": "#loop",
   "/JUB": {
     "name": "\ud83d\udce1 Satellite dish",
-    "rotation": 2
+    "layout": "CDEFGAB"
   },
   "q7cB": "#loop",
   "frcB": "#loop like Sailboat, Closed eye",
@@ -628,7 +509,7 @@
   "4q8D": "#loop",
   "d40B": {
     "name": "\ud83d\udd3a Tetrahedron",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "nrcB": "#loop",
   "67cB": "#loop like Angel",
@@ -655,33 +536,30 @@
   "+JcB": "#loop",
   "3pYB": {
     "name": "\ud83d\udc20 Fish",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "ep8B": "#loop",
   "7owB": {
     "name": "\u2615 Coffee cup",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "+ZUB": {
     "name": "\ud83e\uded7 Spilled cocktail",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "dK8D": "#loop",
   "e40B": {
     "name": "\ud83d\udebc Stroller",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "s5cB": "#loop",
   "n7cB": "#loop like Cocktail and Tetrahedron",
   "u5UB": {
     "name": "\ud83d\udeb1 Non-potable",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "drcB": "#loop",
-  "d5YB": {
-    "name": "\ud83e\udd5b Half full",
-    "rotation": 0
-  },
+  "d5YB": "\ud83e\udd5b Half full",
   "6p4B": "#loop",
   "dvcB": "#loop",
   "bPcB": "#loop",
@@ -690,12 +568,12 @@
   "bfMB": "#loop",
   "V5YB": {
     "name": "\ud83e\ude83 Boomerang",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "V7cB": "#loop like Boomerang",
   "bY0B": {
     "name": "\ud83e\uddaa Clam",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "c58B": "#loop like Non-potable, Boomerang, Clam",
   "5p4B": "#loop",
@@ -704,7 +582,7 @@
   "ce8D": "#loop",
   "do8B": {
     "name": "\ud83d\udcb5 Pyramid",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "r+YD": "#loop like Spilled cocktail, Non-potable, Boomerang, Clam",
   "zbMB": "#loop",
@@ -717,13 +595,13 @@
   "bo8B": "#like Clam",
   "7IwB": {
     "name": "\ud83d\udc41\ufe0f Open eye",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "4rcB": "#loop",
   "3r8B": "#loop like 11 things",
   "+Y0B": {
     "name": "\ud83d\udc2e Cow",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "P/MB": "#loop like Cow",
   "P48B": "#like Cow",
@@ -754,22 +632,22 @@
   "ZbcB": "#loop",
   "Po8B": {
     "name": "\ud83d\ude10 Neutral face",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "7J4B": "#loop like Open eye",
   "eY0B": {
     "name": "\ud83e\udda2 Paper crane",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "47MB": "#loop",
   "cY0B": {
     "name": "\ud83c\udf33 Tree",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "bLcB": "#loop like Open eye",
   "do0B": {
     "name": "\u2b55 Ring",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "eJ8B": "#loop",
   "K58B": "#loop",
@@ -779,13 +657,10 @@
   "jbcB": "#loop",
   "VrcB": "#loop",
   "zLMB": "#loop",
-  "Lo8B": {
-    "name": "\ud83e\udd80 Claw",
-    "rotation": 0
-  },
+  "Lo8B": "\ud83e\udd80 Claw",
   "dZYB": {
     "name": "\ud83e\udea3 Bucket",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "f/cB": "#loop like 27 things",
   "VuYD": "#loop",
@@ -796,20 +671,17 @@
   "5bcB": "#loop like Croissant and Claw",
   "npYB": {
     "name": "\ud83c\udfa7 Headphones",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "3JYB": "#like Open eye",
   "eo0B": {
     "name": "\ud83c\udff9 Bow and arrow",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "6ZYB": "#loop",
   "fvcB": "#loop like 13 things",
   "6r8B": "#loop like 6 things",
-  "XpYB": {
-    "name": "\ud83e\udea8 Boulder",
-    "rotation": 0
-  },
+  "XpYB": "\ud83e\udea8 Boulder",
   "fI0B": "#like Open eye",
   "x7MB": "#loop",
   "rLcB": "#loop",
@@ -822,7 +694,7 @@
   "q5YB": "#loop",
   "7JYB": {
     "name": "\u26b0\ufe0f Coffin",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "uZcB": "#loop",
   "b/cB": "#loop like 16 things",
@@ -833,13 +705,13 @@
   "uZUB": "#like Tree",
   "VLcB": {
     "name": "\ud83d\udd77\ufe0f Jumping spider",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "PvMB": "#loop like Cow, Paper crane, Tree",
   "p5YB": "#loop",
   "bI8B": {
     "name": "\ud83c\udf80 Gift basket",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "rbcB": "#loop like Tree, Ring, Bucket, Headphones",
   "d/cB": "#loop like 22 things",
@@ -853,7 +725,7 @@
   "KZ8B": "#loop",
   "rJYB": {
     "name": "\ud83d\udee4\ufe0f Railroad crossing sign",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "9pYB": "#loop like Ring, Bucket, Headphones, Railroad crossing sign",
   "OZ8B": "#loop",
@@ -868,7 +740,7 @@
   "dfcB": "#loop like 6 things",
   "xrMB": {
     "name": "\ud83c\udfe1 Barn",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "dLcB": "#loop like Jumping spider, Railroad crossing sign",
   "tpYB": "#loop",
@@ -877,38 +749,38 @@
   "jLcB": "#loop",
   "VZYB": {
     "name": "\ud83d\udd5b Sundial",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "8JYB": "#loop",
   "ap8B": "#loop like Paper crane and tree",
   "4J4B": {
     "name": "\ud83c\udfad Mask",
-    "rotation": 1
+    "layout": "BCDEFGA"
   },
   "bI0B": {
     "name": "\u2712\ufe0f Pen nib",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "cJ8B": "#loop like Railroad crossing sign",
   "co0B": {
     "name": "\ud83d\udcd0 House on a hill",
-    "rotation": 3
+    "layout": "DEFGABC"
   },
   "tJcB": "#loop like Tree",
   "o5YB": "#loop",
   "VpYB": {
     "name": "\ud83d\udef8 Flying saucer",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "dJYB": {
     "name": "\ud83d\udc58 Kimono",
-    "rotation": 2
+    "layout": "CDEFGAB"
   },
   "aJ8B": "#loop",
   "9JYB": "#loop like Railroad crossing sign, House on a hill, Flying saucer, Kimono",
   "6JYB": {
     "name": "\ud83c\udfa1 Ferris wheel",
-    "rotation": 4
+    "layout": "EFGABCD"
   },
   "4Z4B": "#loop like Mask",
   "sJcB": "#loop",
@@ -917,12 +789,12 @@
   "spYB": "#loop",
   "pJYB": {
     "name": "\ud83c\udf30 Acorn",
-    "rotation": 6
+    "layout": "GABCDEF"
   },
   "LY8B": "#like Tree",
   "LI8B": {
     "name": "\ud83d\udc59 Bikini",
-    "rotation": 5
+    "layout": "FGABCDE"
   },
   "obcB": "#loop like Bikini",
   "LfMB": "#loop like Tree, Acorn, Bikini",

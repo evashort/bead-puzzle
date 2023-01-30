@@ -53,8 +53,11 @@ def permute_triangle(triangle, permutation):
     triangle_to_square = square_indices_flat(nodes)
     square = triangle[triangle_to_square].reshape((nodes, nodes))
     # add : in both orientations in case permutation is tuple
-    square = square[:, permutation][permutation, :]
+    square = permute_matrix(square, permutation)
     return matrix_to_triangle(square)
+
+def permute_matrix(matrix, permutation):
+    return matrix[:, permutation][permutation, :]
 
 def get_canonical_permutation(triangle):
     nodes = triangle_length_to_nodes(len(triangle))

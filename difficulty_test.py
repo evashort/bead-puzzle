@@ -1,4 +1,3 @@
-import base64
 import collections
 import itertools
 import json
@@ -196,8 +195,8 @@ else:
 for graph in graphs:
     id_names[graph['id']] = id_names.pop(graph['id'], '')
 
-# with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
-#     json.dump(id_names, f, indent=2)
+with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
+    json.dump(id_names, f, indent=2)
 
 for graph in graphs:
     nodes = simple_graph.base64_to_nodes(graph['id'])
@@ -215,19 +214,51 @@ for graph in graphs:
 
     name = id_names[graph['id']]
     if isinstance(name, dict):
-        a_rotation = name['rotation']
-        matrix = np.roll(matrix, -a_rotation, (0, 1))
-        rotation_orders = name.get('puzzles', {})
+        permutation = [
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".index(letter)
+            for letter in name['layout']
+        ]
         name = name['name']
+        matrix = simple_graph.permute_matrix(matrix, permutation)
+        inverse = permute.invert(permutation)
+        # if nodes = 3,
+        # puzzles[0] is all the puzzles where the hole is at index 0 in the original matrix
+        # puzzles[1] is all the puzzles where the hole is at index 3 in the original matrix, rotated so the hole is at index 0
+        # puzzles[2] is all the puzzles where the hole is at index 2 in the original matrix, rotated so the hole is at index 0
+        # puzzles[3] is all the puzzles where the hole is at index 1 in the original matrix, rotated so the hole is at index 0
+        # before applying the permutation to the puzzles, we have to rotate the hole back to where it was before
+        # for puzzles[1], this means shifting the beads left 1 space
+        # for puzzles[2], this means shifting the beads left 2 spaces
+        # for puzzles[3], this means shifting the beads left 3 spaces
+        # after applying the permutation, we have to rotate the hole back to index 0
+        # for puzzles[0], this means shifting the beads left by inverse[0] spaces
+        # for puzzles[1], this means shifting the beads left by inverse[3] spaces
+        # for puzzles[2], this means shifting the beads left by inverse[2] spaces
+        # for puzzles[3], this means shifting the beads left by inverse[1] spaces
+        # finally, we have to make sure that the index of each puzzle within
+        # the puzzles array corresponds the to position of the hole in the
+        # permuted matrix the way it used to for the original matrix.
+        # new_puzzles[(4 - inverse[0]) % 4] should be the old puzzles[0]
+        # new_puzzles[(4 - inverse[3]) % 4] should be the old puzzles[1]
+        # new_puzzles[(4 - inverse[2]) % 4] should be the old puzzles[2]
+        # new_puzzles[(4 - inverse[1]) % 4] should be the old puzzles[3]
+        new_puzzles = [None] * nodes
+        for i, rotation_puzzles in enumerate(puzzles):
+            for j, puzzle in enumerate(rotation_puzzles):
+                rotated = permute.rotate_index(puzzle, -i, nodes)
+                permuted = permute.permute_index(rotated, permutation)
+                new_puzzle = permute.rotate_index(
+                    permuted,
+                    -inverse[(nodes - i) % nodes],
+                    nodes,
+                )
+                rotation_puzzles[j] = new_puzzle
 
-        puzzles = puzzles[nodes - a_rotation:] + puzzles[:nodes - a_rotation]
-        graph['puzzles'] = puzzles
-
-        for rotation, order in rotation_orders.items():
-            rotation = (int(rotation) + nodes - a_rotation) % nodes
-            rotation_puzzles = puzzles[rotation]
-            for i, j in enumerate(order):
-                rotation_puzzles.insert(i, rotation_puzzles.pop(j))
+            rotation_puzzles.sort()
+            new_puzzles[(nodes - inverse[(nodes - i) % nodes]) % nodes] \
+                = rotation_puzzles
+            
+        graph['puzzles'] = new_puzzles
 
     graph['name'] = name
     graph['layout'] = permute.matrix_pair_to_index(id_matrix, matrix)
