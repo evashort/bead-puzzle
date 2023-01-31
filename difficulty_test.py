@@ -250,6 +250,66 @@ for graph in graphs:
         # finally, new_rotation is the negative of the original location of
         # the hole mod N, so it becomes the new index for these puzzles within
         # the puzzles array.
+        #
+        # here's an example using graph ID Hw== "Sandwich" and layout BACD
+        # (swapping the first two nodes). for rotation A, this means moving
+        # the hole so the puzzle becomes part of rotation D (not rotation B,
+        # think about it).
+        #
+        # start swap  spin  lookup
+        #   0     3     0     0
+        #  /|\    |\   /|\   /|\
+        # 1 | 3 1-+-0 3-+-2 2-+-1
+        #  \|/   \|/    |/    |/
+        #   2     2     1     3
+        #
+        # old goal...       new goal
+        #   0     1     0     0
+        #  /|\    |\   /|\   /|\
+        # 2 | 1 3-+-0 1-+-2 3-+-1
+        #  \|/   \|/    |/    |/
+        #   2     2     3     2
+
+        # permutation = [1,0,2,3]
+        # rotate it so zero comes first: [0,2,3,1]
+        # start = [0,3,2,1]
+        # apply the rotated pemutation to start: [0,3,2,1][[0,2,3,1]] = [0,2,1,3]
+        # invert the rotated permutation: invert([0,2,3,1]) = [0,3,1,2]
+        # apply the permuted start to the inverted permutation: [0,3,1,2][[0,2,1,3]] = [0,1,3,2]
+        # the result of the last step matches the "lookup" diagram above.
+        # "lookup" means taking the beads in the "spin" diagram, finding them
+        # in the third "old goal" diagram, and replacing them with the
+        # corresponding beads in the "new goal" diagram. that's what the last
+        # step effectively does.
+        #
+        # for rotation B, the hole stays where it was and the result is still in rotation B:
+        #
+        # start swap  lookup
+        #   2     2     1
+        #  / \   /|    /|
+        # 3---1 3-+-0 3-+-0
+        #  \ /   \|/   \|/
+        #   0     1     2
+        #
+        # old goal... new goal
+        #   0     0     0
+        #  / \   /|    /|
+        # 3---1 3-+-2 3-+-1
+        #  \ /   \|/   \|/
+        #   2     1     2
+        #
+        # permutation = [1,0,2,3]
+        # add 1 to it mod 4: [2,1,3,0]
+        # rotate it so zero comes first: [0,2,1,3]
+        # start = [2,1,0,3]
+        # apply the rotated pemutation to start: [2,1,0,3][[0,2,1,3]] = [2,0,1,3]
+        # invert the rotated permutation: invert([0,2,1,3]) = [0,2,1,3]
+        # apply the permuted start to the inverted permutation: [0,2,1,3][[2,0,1,3]] = [1,0,2,3]
+        # the result of the last step matches the "lookup" diagram above.
+        # "lookup" means taking the beads in the "swap" diagram, finding them
+        # in the second "old goal" diagram, and replacing them with the
+        # corresponding beads in the "new goal" diagram. that's what the last
+        # step effectively does.
         new_puzzles = [None] * nodes
         start = np.zeros(nodes, dtype=int)
         for i, rotation_puzzles in enumerate(puzzles):
