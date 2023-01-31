@@ -6,10 +6,7 @@
   "Pw==": "#loop",
   "6wA=": "#split",
   "7AA=": "\ud83d\udcab Spinning",
-  "Hw==": {
-    "name": "\ud83e\udd6a Sandwich",
-    "layout": "BACD"
-  },
+  "Hw==": "\ud83e\udd6a Sandwich",
   "Iw8=": "#split",
   "cA0=": "#hexagon",
   "kpYB": "#split",
@@ -21,7 +18,7 @@
   "Io8B": "#split",
   "3gA=": {
     "name": "\ud83e\udd8a Fox",
-    "layout": "BCDEA"
+    "layout": "DEABC"
   },
   "TJYB": "#split",
   "6ww=": "#split",
@@ -33,7 +30,7 @@
   "+wE=": "#loop",
   "3wA=": {
     "name": "\ud83e\udd35 Bow tie",
-    "layout": "EABCD"
+    "layout": "BCDEA"
   },
   "aI0B": "#split",
   "/wA=": "#loop like Bow tie",
@@ -45,7 +42,7 @@
   "6owB": "#split",
   "7QA=": {
     "name": "\ud83c\udf6f Pot",
-    "layout": "BCDEA"
+    "layout": "EABCD"
   },
   "Jo8B": "#split",
   "T+YD": "#split",
@@ -63,8 +60,8 @@
   "Y7cB": "#split",
   "J58B": "#split",
   "+B0=": {
-    "name": "\ud83c\udfc0 Half court",
-    "layout": "FABCDE"
+    "name": "\ud83e\uddca Cube",
+    "layout": "AFBCDE"
   },
   "Jp8B": "#split",
   "T5YB": "#split",
@@ -77,8 +74,8 @@
   "YbcB": "#split",
   "/38=": "#loop",
   "+A0=": {
-    "name": "\ud83d\udd2d Lens",
-    "layout": "CDEFAB"
+    "name": "\u23f3 Sand timer",
+    "layout": "CDEAFB"
   },
   "K/MB": "#split",
   "TZYB": "#split",
@@ -93,7 +90,10 @@
   "/x4=": "#loop",
   "+R8=": "#loop",
   "/w8=": "#loop",
-  "eA0=": "\ud83d\udee3\ufe0f Highway",
+  "eA0=": {
+    "name": "\ud83d\udeab Prohibited",
+    "layout": "EFABCD"
+  },
   "fw8=": "#loop",
   "+x0=": "#loop",
   "fw0=": "#loop",
@@ -103,7 +103,7 @@
   "7x4=": "#loop",
   "/ww=": {
     "name": "\ud83c\udf09 Bridge",
-    "layout": "EFABCD"
+    "layout": "CDEFAB"
   },
   "/g8=": "#loop",
   "+R0=": "#loop",
@@ -119,7 +119,7 @@
   "Pw8=": "#loop",
   "/gw=": {
     "name": "\ud83d\udc31 Cat",
-    "layout": "BCDEFA"
+    "layout": "FABCDE"
   },
   "+g0=": "#loop",
   "+Q0=": "#loop",

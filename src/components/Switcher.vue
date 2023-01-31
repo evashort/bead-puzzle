@@ -101,7 +101,7 @@ export default {
     instructions() {
       // https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/term-collections/keys-keyboard-shortcuts
       let fullInstructions = {
-        'DoA=': `
+        'VgA=': `
 ### Pointing device
 1. Select each bead to move it into the empty space.
 ### Keyboard
@@ -110,7 +110,7 @@ export default {
 ### Winning
 When every bead is where it belongs, a star will appear in the empty space and the **Next** button will be enabled.
 `,
-        'A8A=': `
+        'SwA=': `
 ### Pointing device
 1. Select a bead to move it into the empty space.
 
@@ -121,21 +121,21 @@ You can select the empty space to undo.
 
 You can select **Down arrow** or **S** to undo.
 `,
-        'NwA=': `
+        '7AA=': `
 ### Pointing device
 1. Select a bead to move it into the empty space. Two arrows will appear in the center.
 1. Select the arrows to move the beads around the loop until the star appears.
 ### Keyboard
 1. Select **Up arrow** or **W** to move the beads around the loop until the star appears.
 `,
-        'fA==': `
+        'Hw==': `
 This puzzle has 2 rotations.
 
 Each rotation can be solved in 7 moves.
 
 The rotations add replay value because they have different solutions.
 `,
-        'H4A=': `
+        '3gA=': `
 Each rotation of this puzzle has many variations.
 
 Each variation can be solved in 8 moves, but there's no reason to solve them all.
@@ -151,7 +151,7 @@ ${fullInstructions[this.graph.id]}
       }
 
       let comments = {
-        'H8A=': `
+        '3wA=': `
 This puzzle is harder than the last one even though there are more paths for the beads to move along.
 
 That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
@@ -160,7 +160,7 @@ I'll explain what a state space is when we get to level 10.
 
 ---
 `,
-        'N0A=': `
+        '7QA=': `
 This is the last puzzle that has a [loop going all the way around](https://en.wikipedia.org/wiki/Hamiltonian_path)
 and a shortcut that skips one space.
 
@@ -168,19 +168,19 @@ Once you find a strategy for solving this puzzle, other puzzles like it become b
 
 ---
 `,
-        'H7g=': `
+        '+B0=': `
 Every puzzle starts as far from the goal as possible, so restarting will never get you closer to winning.
 
 ---
 `,
-        'A/w=': `
+        '3gw=': `
 When you fold over one layer of an origami frog base, it becomes a diamond with no visible seams.
 
 A bird base has the same shape but a seam is always visible (see level 13).
 
 ---
 `,
-        'D7g=': `
+        '+B0=': `
 In this game, a *state* is an arrangement of beads.
 
 The [state space](https://en.wikipedia.org/wiki/State_space)
@@ -192,7 +192,7 @@ but only half of them can occur while playing, so the state space has size 360.
 
 ---
 `,
-        'Drg=': `
+        'eA0=': `
 Here's another puzzle where the state space contains exactly half the possible bead arrangements.
 
 Puzzles like this seem to have only even-length
