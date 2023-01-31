@@ -212,10 +212,12 @@ for graph in graphs:
     id_matrix = simple_graph.base64_to_matrix(graph['id'])
     matrix = simple_graph.base64_to_matrix(graph['layout'])
 
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
     name = id_names[graph['id']]
     if isinstance(name, dict):
         permutation = np.fromiter(
-            map("ABCDEFGHIJKLMNOPQRSTUVWXYZ".index, name['layout']),
+            map(letters.index, name['layout']),
             dtype=int,
             count=len(name['layout']),
         )
@@ -266,19 +268,21 @@ for graph in graphs:
             rotation_puzzles.sort()
             new_puzzles[new_rotation] = rotation_puzzles
 
+        graph['puzzles'] = new_puzzles
+
+    if name is not None and not name.startswith('#'):
         # make sure it starts with A
         empty_rotations = 0
-        for i, rotation_puzzles in enumerate(new_puzzles):
+        for i, rotation_puzzles in enumerate(graph['puzzles']):
             if rotation_puzzles:
                 empty_rotations = i
                 break
 
         if empty_rotations:
-            new_puzzles = new_puzzles[empty_rotations:] \
-                + [[]] * empty_rotations
-            matrix = np.roll(matrix, empty_rotations, (0, 1))
-
-        graph['puzzles'] = new_puzzles
+            print(
+                f'warning: {name} starts with {letters[empty_rotations]}, '
+                f'not A'
+            )
 
     graph['name'] = name
     graph['layout'] = permute.matrix_pair_to_index(id_matrix, matrix)

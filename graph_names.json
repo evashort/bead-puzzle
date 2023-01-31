@@ -129,7 +129,7 @@
   "dg8=": "#loop",
   "7ww=": {
     "name": "\u2708\ufe0f Paper airplane",
-    "layout": "ABCEDF"
+    "layout": "BCEDFA"
   },
   "bg8=": "#loop",
   "dw0=": "#loop",
@@ -209,7 +209,7 @@
   "/+4D": "#loop",
   "/40B": {
     "name": "\ud83d\udc5a Do not bleach",
-    "layout": "FGABCDE"
+    "layout": "CDEFGAB"
   },
   "+58D": "#loop",
   "+b8D": "#loop",
@@ -259,7 +259,7 @@
   "+u8D": "#loop",
   "/o0B": {
     "name": "\ud83d\udc39 Hamster",
-    "layout": "GABCDEF"
+    "layout": "DEFGABC"
   },
   "7bMB": "#loop",
   "5q8D": "#loop",
@@ -404,7 +404,7 @@
   "r7cB": "#loop",
   "d48B": {
     "name": "\ud83d\uddfb Mountain",
-    "layout": "EFGABCD"
+    "layout": "DEFGABC"
   },
   "++8D": "#loop like 8 things",
   "v5cB": "#loop",
@@ -418,7 +418,7 @@
   "X+YD": "#loop",
   "n5YB": {
     "name": "\ud83c\udf79 Cocktail",
-    "layout": "GABCDEF"
+    "layout": "FGABCDE"
   },
   "35YB": "#loop like Cocktail",
   "cI0B": "\u2764\ufe0f Heart",
@@ -450,7 +450,7 @@
   "7J4D": "#loop",
   "7YwB": {
     "name": "\ud83d\ude48 Closed eye",
-    "layout": "EFGABCD"
+    "layout": "DEFGABC"
   },
   "/ZYB": "#loop like Sailboat and Closed eye",
   "zL8D": "#loop",
@@ -473,7 +473,7 @@
   "p+YD": "#loop",
   "fo0B": {
     "name": "\ud83c\udf55 Pizza",
-    "layout": "EFGABCD"
+    "layout": "DEFGABC"
   },
   "74wB": "#like Closed eye",
   "Vq8D": "#loop",
@@ -481,7 +481,7 @@
   "3rMB": "#loop",
   "+o0B": {
     "name": "\ud83e\uded6 Teapot",
-    "layout": "GABCDEF"
+    "layout": "BCDEFGA"
   },
   "qrcB": "#loop",
   "V+YD": "#loop",
@@ -547,16 +547,16 @@
   "ep8B": "#loop",
   "7owB": {
     "name": "\u2615 Coffee cup",
-    "layout": "BCDEFGA"
+    "layout": "GABCDEF"
   },
   "+ZUB": {
     "name": "\ud83e\uded7 Spilled cocktail",
-    "layout": "BCDEFGA"
+    "layout": "GABCDEF"
   },
   "dK8D": "#loop",
   "e40B": {
     "name": "\ud83d\udebc Stroller",
-    "layout": "GABCDEF"
+    "layout": "CDEFGAB"
   },
   "s5cB": "#loop",
   "n7cB": "#loop like Cocktail and Tetrahedron",
@@ -574,12 +574,12 @@
   "bfMB": "#loop",
   "V5YB": {
     "name": "\ud83e\ude83 Boomerang",
-    "layout": "BCDEFGA"
+    "layout": "GABCDEF"
   },
   "V7cB": "#loop like Boomerang",
   "bY0B": {
     "name": "\ud83e\uddaa Clam",
-    "layout": "DEFGABC"
+    "layout": "ABCDEFG"
   },
   "c58B": "#loop like Non-potable, Boomerang, Clam",
   "5p4B": "#loop",
@@ -601,7 +601,7 @@
   "bo8B": "#like Clam",
   "7IwB": {
     "name": "\ud83d\udc41\ufe0f Open eye",
-    "layout": "EFGABCD"
+    "layout": "DEFGABC"
   },
   "4rcB": "#loop",
   "3r8B": "#loop like 11 things",
@@ -638,7 +638,7 @@
   "ZbcB": "#loop",
   "Po8B": {
     "name": "\ud83d\ude10 Neutral face",
-    "layout": "EFGABCD"
+    "layout": "DEFGABC"
   },
   "7J4B": "#loop like Open eye",
   "eY0B": {
@@ -648,7 +648,7 @@
   "47MB": "#loop",
   "cY0B": {
     "name": "\ud83c\udf33 Tree",
-    "layout": "BCDEFGA"
+    "layout": "GABCDEF"
   },
   "bLcB": "#loop like Open eye",
   "do0B": {
@@ -677,12 +677,12 @@
   "5bcB": "#loop like Croissant and Claw",
   "npYB": {
     "name": "\ud83c\udfa7 Headphones",
-    "layout": "FGABCDE"
+    "layout": "CDEFGAB"
   },
   "3JYB": "#like Open eye",
   "eo0B": {
     "name": "\ud83c\udff9 Bow and arrow",
-    "layout": "GABCDEF"
+    "layout": "BCDEFGA"
   },
   "6ZYB": "#loop",
   "fvcB": "#loop like 13 things",
@@ -761,7 +761,7 @@
   "ap8B": "#loop like Paper crane and tree",
   "4J4B": {
     "name": "\ud83c\udfad Mask",
-    "layout": "BCDEFGA"
+    "layout": "GABCDEF"
   },
   "bI0B": {
     "name": "\u2712\ufe0f Pen nib",
@@ -770,7 +770,7 @@
   "cJ8B": "#loop like Railroad crossing sign",
   "co0B": {
     "name": "\ud83d\udcd0 House on a hill",
-    "layout": "DEFGABC"
+    "layout": "ABCDEFG"
   },
   "tJcB": "#loop like Tree",
   "o5YB": "#loop",
@@ -780,7 +780,7 @@
   },
   "dJYB": {
     "name": "\ud83d\udc58 Kimono",
-    "layout": "CDEFGAB"
+    "layout": "BCDEFGA"
   },
   "aJ8B": "#loop",
   "9JYB": "#loop like Railroad crossing sign, House on a hill, Flying saucer, Kimono",
@@ -795,12 +795,12 @@
   "spYB": "#loop",
   "pJYB": {
     "name": "\ud83c\udf30 Acorn",
-    "layout": "GABCDEF"
+    "layout": "DEFGABC"
   },
   "LY8B": "#like Tree",
   "LI8B": {
     "name": "\ud83d\udc59 Bikini",
-    "layout": "FGABCDE"
+    "layout": "CDEFGAB"
   },
   "obcB": "#loop like Bikini",
   "LfMB": "#loop like Tree, Acorn, Bikini",
