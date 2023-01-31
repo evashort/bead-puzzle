@@ -133,7 +133,7 @@
   },
   "bg8=": "#loop",
   "dw0=": "#loop",
-  "bw8=": "#loop like Floodlight",
+  "bw8=": "#loop like Paper airplane",
   "7Qw=": {
     "name": "\ud83c\udfd4\ufe0f Mountain",
     "layout": "CEAFBD"
@@ -166,8 +166,8 @@
     "layout": "CDEFGAB"
   },
   "+J0B": {
-    "name": "\u26bd Corner kick",
-    "layout": "FGACBDE"
+    "name": "\ud83c\udfb2 20-sided die",
+    "layout": "FACBDEG"
   },
   "//8f": "#loop",
   "//8P": "#loop",
@@ -175,7 +175,7 @@
   "794H": "#loop",
   "/90H": "#loop",
   "+JUB": {
-    "name": "\ud83d\udd73\ufe0f Cave entrance",
+    "name": "\ud83c\udff4 Anarchy symbol",
     "layout": "ABDCEFG"
   },
   "+98H": "#loop",
@@ -202,15 +202,9 @@
   "/t4H": "#loop",
   "+d8H": "#loop",
   "/7MB": "#loop",
-  "/50D": {
-    "name": "\u2728 Three lights",
-    "layout": "ACEFGBD"
-  },
+  "/50D": "#not much easier than Pine tree, same number of moves, fewer puzzles",
   "/+4D": "#loop",
-  "/40B": {
-    "name": "\ud83d\udc5a Do not bleach",
-    "layout": "CDEFGAB"
-  },
+  "/40B": "#not much easier than Fenced in, same number of moves, fewer puzzles",
   "+58D": "#loop",
   "+b8D": "#loop",
   "/94H": "#loop like Do not bleach",
@@ -228,7 +222,7 @@
   "/54D": "#loop like Do not bleach",
   "zb8H": "#loop",
   "+50D": {
-    "name": "\ud83c\udf5f Last French fry",
+    "name": "\ud83c\udf32 Pine tree",
     "layout": "AGBCDEF"
   },
   "3q8D": "#loop",
@@ -258,8 +252,8 @@
   "bvcB": "#loop",
   "+u8D": "#loop",
   "/o0B": {
-    "name": "\ud83d\udc39 Hamster",
-    "layout": "DEFGABC"
+    "name": "\ud83e\udd45 Fenced in",
+    "layout": "CDEFGAB"
   },
   "7bMB": "#loop",
   "5q8D": "#loop",
@@ -275,19 +269,19 @@
   "7q8D": "#loop",
   "eI0B": {
     "name": "\ud83d\udc98 Cupid's arrow",
-    "layout": "BCDEFGA"
+    "layout": "GABCDEF"
   },
   "fe8D": "#loop",
   "/vcB": "#loop",
-  "3u4D": "#loop like Hamster",
+  "3u4D": "#loop like Fenced in",
   "++4D": "#loop",
   "f+8D": "#loop",
   "7LcB": "#loop",
-  "/v8B": "#loop like Hamster",
+  "/v8B": "#loop like Fenced in",
   "+54D": "#loop",
   "/4wB": {
     "name": "\ud83e\udd73 Party cat",
-    "layout": "CDEFGAB"
+    "layout": "FGABCDE"
   },
   "7a8D": "#loop",
   "/rcB": "#loop",
@@ -300,57 +294,60 @@
   "7N4H": "#loop",
   "z68D": "#loop",
   "fO8D": "#loop",
-  "/5UB": "\ud83c\udff4 Anarchy symbol",
+  "/5UB": {
+    "name": "\u26a0\ufe0f No pyramid",
+    "layout": "FEGACDB"
+  },
   "b/MB": "#loop",
   "//MB": "#loop",
   "554B": "#loop",
   "+5cB": "#loop",
   "brcB": "#loop",
-  "3p4D": "#loop like Hamster",
+  "3p4D": "#loop like Fenced in",
   "354B": "#like Party cat",
   "2b8D": "#loop",
   "7O4D": "#loop",
   "+Z0D": {
-    "name": "\ud83c\udf5f French fry box",
-    "layout": "DEFGABC"
+    "name": "\u2b50 Anthropomorphic starfish",
+    "layout": "EFAGCBD"
   },
   "P58B": "#loop",
   "f48B": {
     "name": "\ud83c\udfde\ufe0f Hiking trail",
-    "layout": "FGABCDE"
+    "layout": "CDEFGAB"
   },
   "+p4D": "#loop",
   "zL8H": "#loop",
   "y68D": "#loop",
   "zb8D": "#loop",
-  "+Z8D": "#loop like French fry box",
+  "+Z8D": "#loop like Anthropomorphic starfish",
   "ee8D": "#loop",
   "568D": "#loop",
   "7K8D": "#loop",
-  "/50B": "#loop like Do not bleach, Hamster, Party cat, Anarchy symbol",
+  "/50B": "#loop like Do not bleach, Fenced in, Party cat, No pyramid",
   "34wB": {
     "name": "\ud83e\ude82 Parachute",
-    "layout": "GABCDEF"
+    "layout": "CDEFGAB"
   },
   "d+8D": "#loop",
-  "/7cB": "#loop like Anarchy symbol and Hiking trail",
+  "/7cB": "#loop like No pyramid and Hiking trail",
   "feYD": "#loop",
   "X68D": "#loop",
   "f+YD": "#loop like Hiking trail",
   "deYD": "#loop",
   "/ZcB": "#loop",
-  "/o8B": "#like Hamster",
+  "/o8B": "#like Fenced in",
   "T68D": "#loop",
   "+50B": {
-    "name": "\u26a1 Microwave",
-    "layout": "FGABCDE"
+    "name": "\ud83c\udf04 Tree with shadow",
+    "layout": "ACBDFEG"
   },
   "vecD": "#loop",
   "e+8D": "#loop",
   "2L8D": "#loop",
   "+40B": {
-    "name": "\ud83d\udd26 Headlamp",
-    "layout": "BCDEFGA"
+    "name": "\ud83c\udf05 Sun and sea",
+    "layout": "GACBDEF"
   },
   "578B": "#loop",
   "e58B": "#loop",
@@ -362,7 +359,7 @@
   "vuYD": "#loop",
   "95YB": "#loop",
   "za8D": "#loop",
-  "f58B": "#loop like Anarchy symbol, Hiking trail, Headlamp",
+  "f58B": "#loop like No pyramid, Hiking trail, Sun and sea",
   "+5UB": "\ud83d\udca1 Ceiling light",
   "O58B": "#loop",
   "9rcB": "#loop",
@@ -373,17 +370,17 @@
   "4a8D": "#loop",
   "vrcB": "#loop",
   "v/cB": "#loop",
-  "37cB": "#loop like Headlamp",
+  "37cB": "#loop like Sun and sea",
   "6rcB": "#loop",
   "/+8D": "#loop like 9 things",
   "f5YB": "\ud83c\udfd6\ufe0f Folding chair",
-  "/p4B": "#loop like Hamster",
+  "/p4B": "#loop like Fenced in",
   "97cB": "#loop",
   "+J8D": "#loop",
-  "+58B": "#loop like Hiking trail, Microwave, Headlamp, Ceiling light",
+  "+58B": "#loop like Hiking trail, Tree with shadow, Sun and sea, Ceiling light",
   "3rcB": "#loop",
   "9uYD": "#loop",
-  "754B": "#loop like Headlamp",
+  "754B": "#loop like Sun and sea",
   "478B": "#loop",
   "+Z0B": {
     "name": "\ud83e\udeb4 Aloe",
@@ -427,7 +424,7 @@
     "name": "\ud83e\uddda Angel",
     "layout": "EFGABCD"
   },
-  "/p0B": "#like Hamster",
+  "/p0B": "#like Fenced in",
   "778B": "#loop like 10 things",
   "+Z4D": "#loop like Aloe",
   "b48B": "\ud83c\udfaa Tent",
@@ -460,7 +457,7 @@
   "z7MB": "#loop",
   "7Z4B": "#loop like Cocktail and Closed eye",
   "TrcB": "#loop",
-  "/p8B": "#loop like Hamster, Forbidden drink, Sailboat, Closed eye",
+  "/p8B": "#loop like Fenced in, Forbidden drink, Sailboat, Closed eye",
   "L58B": "#loop like Cocktail",
   "zrcB": "#loop",
   "fp8B": "#loop like Sailboat and Closed eye",
