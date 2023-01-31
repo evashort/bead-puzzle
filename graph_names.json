@@ -18,7 +18,7 @@
   "Io8B": "#split",
   "3gA=": {
     "name": "\ud83e\udd8a Fox",
-    "layout": "DEABC"
+    "layout": "EABCD"
   },
   "TJYB": "#split",
   "6ww=": "#split",
@@ -92,7 +92,7 @@
   "/w8=": "#loop",
   "eA0=": {
     "name": "\ud83d\udeab Prohibited",
-    "layout": "EFABCD"
+    "layout": "FEDCBA"
   },
   "fw8=": "#loop",
   "+x0=": "#loop",
@@ -128,21 +128,21 @@
   "Lw8=": "#loop",
   "dg8=": "#loop",
   "7ww=": {
-    "name": "\ud83c\udfe0 Floodlight",
-    "layout": "FABCDE"
+    "name": "\u2708\ufe0f Paper airplane",
+    "layout": "ABCEDF"
   },
   "bg8=": "#loop",
   "dw0=": "#loop",
   "bw8=": "#loop like Floodlight",
   "7Qw=": {
-    "name": "\ud83c\udf44 Mushroom",
-    "layout": "FABCDE"
+    "name": "\ud83c\udfd4\ufe0f Mountain",
+    "layout": "CEAFBD"
   },
   "fA0=": "#loop",
   "cw0=": "#loop",
   "7gw=": {
     "name": "\ud83d\udcf1 Pocket calculator",
-    "layout": "BCDEFA"
+    "layout": "FABCDE"
   },
   "eQ0=": "#loop",
   "bQ8=": "#loop like Pocket calculator",
@@ -150,31 +150,34 @@
   "bA8=": "#loop",
   "7Aw=": {
     "name": "\ud83d\ude3d Cat ears",
-    "layout": "CDEFAB"
+    "layout": "FABCDE"
   },
   "cQ0=": "#loop",
   "VJYB": {
     "name": "\ud83d\udc1a Nautilus",
-    "layout": "GABCDEF"
+    "layout": "ABCDEFG"
   },
   "+J0D": {
-    "name": "\ud83c\udfad Marionette",
-    "layout": "DEFGABC"
+    "name": "\ud83d\udd6f\ufe0f Lighthouse",
+    "layout": "ADEFCBG"
   },
   "3owB": {
     "name": "\ud83d\udca0 Cootie catcher",
-    "layout": "GABCDEF"
+    "layout": "CDEFGAB"
   },
   "+J0B": {
     "name": "\u26bd Corner kick",
-    "layout": "FGABCDE"
+    "layout": "FGACBDE"
   },
   "//8f": "#loop",
   "//8P": "#loop",
   "+/0P": "#loop",
   "794H": "#loop",
   "/90H": "#loop",
-  "+JUB": "\ud83d\udd73\ufe0f Cave entrance",
+  "+JUB": {
+    "name": "\ud83d\udd73\ufe0f Cave entrance",
+    "layout": "ABDCEFG"
+  },
   "+98H": "#loop",
   "+/8D": "#loop",
   "//8H": "#loop",
@@ -184,7 +187,7 @@
   "/78H": "#loop",
   "+I0B": {
     "name": "\ud83e\udd9d Raccoon",
-    "layout": "CDEFGAB"
+    "layout": "GABCDEF"
   },
   "//8D": "#loop",
   "+78D": "#loop",
@@ -201,7 +204,7 @@
   "/7MB": "#loop",
   "/50D": {
     "name": "\u2728 Three lights",
-    "layout": "DEFGABC"
+    "layout": "ACEFGBD"
   },
   "/+4D": "#loop",
   "/40B": {
@@ -219,14 +222,14 @@
   "+P8D": "#loop",
   "uJUB": {
     "name": "\ud83d\udc94 Broken heart",
-    "layout": "GABCDEF"
+    "layout": "CDEFGAB"
   },
   "/+cD": "#loop",
   "/54D": "#loop like Do not bleach",
   "zb8H": "#loop",
   "+50D": {
     "name": "\ud83c\udf5f Last French fry",
-    "layout": "DEFGABC"
+    "layout": "AGBCDEF"
   },
   "3q8D": "#loop",
   "/5cB": "#loop",
