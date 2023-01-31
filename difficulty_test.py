@@ -254,7 +254,7 @@ for graph in graphs:
         # here's an example using graph ID Hw== "Sandwich" and layout BACD
         # (swapping the first two nodes). for rotation A, this means moving
         # the hole so the puzzle becomes part of rotation D (not rotation B,
-        # think about it).
+        # think about it):
         #
         # start swap  spin  lookup
         #   0     3     0     0
