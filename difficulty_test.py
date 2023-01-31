@@ -214,50 +214,70 @@ for graph in graphs:
 
     name = id_names[graph['id']]
     if isinstance(name, dict):
-        permutation = [
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".index(letter)
-            for letter in name['layout']
-        ]
+        permutation = np.fromiter(
+            map("ABCDEFGHIJKLMNOPQRSTUVWXYZ".index, name['layout']),
+            dtype=int,
+            count=len(name['layout']),
+        )
         name = name['name']
         matrix = simple_graph.permute_matrix(matrix, permutation)
-        inverse = permute.invert(permutation)
         # if nodes = 3,
         # puzzles[0] is all the puzzles where the hole is at index 0 in the original matrix
-        # puzzles[1] is all the puzzles where the hole is at index 3 in the original matrix, rotated so the hole is at index 0
-        # puzzles[2] is all the puzzles where the hole is at index 2 in the original matrix, rotated so the hole is at index 0
-        # puzzles[3] is all the puzzles where the hole is at index 1 in the original matrix, rotated so the hole is at index 0
-        # before applying the permutation to the puzzles, we have to rotate the hole back to where it was before
-        # for puzzles[1], this means shifting the beads left 1 space
-        # for puzzles[2], this means shifting the beads left 2 spaces
-        # for puzzles[3], this means shifting the beads left 3 spaces
-        # after applying the permutation, we have to rotate the hole back to index 0
-        # for puzzles[0], this means shifting the beads left by inverse[0] spaces
-        # for puzzles[1], this means shifting the beads left by inverse[3] spaces
-        # for puzzles[2], this means shifting the beads left by inverse[2] spaces
-        # for puzzles[3], this means shifting the beads left by inverse[1] spaces
-        # finally, we have to make sure that the index of each puzzle within
-        # the puzzles array corresponds the to position of the hole in the
-        # permuted matrix the way it used to for the original matrix.
-        # new_puzzles[(4 - inverse[0]) % 4] should be the old puzzles[0]
-        # new_puzzles[(4 - inverse[3]) % 4] should be the old puzzles[1]
-        # new_puzzles[(4 - inverse[2]) % 4] should be the old puzzles[2]
-        # new_puzzles[(4 - inverse[1]) % 4] should be the old puzzles[3]
+        # puzzles[1] is all the puzzles where the hole is at index 3 in the original matrix, rotated right by 1 so the hole is at index 0
+        # puzzles[2] is all the puzzles where the hole is at index 2 in the original matrix, rotated right by 2 so the hole is at index 0
+        # puzzles[3] is all the puzzles where the hole is at index 1 in the original matrix, rotated right by 3 so the hole is at index 0
+        # before applying the permutation to the puzzles, we have to rotate it
+        # to match the puzzles. rotating a permutation right means adding to
+        # each element mod N so it selects inputs further to the right, and
+        # rotating the elements right so it produces outputs further to the
+        # right
+        # for puzzles[1], this means adding 1 to each element mod N and shifting the elements right 1 space
+        # for puzzles[2], this means adding 2 to each element mod N and shifting the elements right 2 spaces
+        # for puzzles[3], this means adding 3 to each element mod N and shifting the elements right 3 spaces
+        # however, we need the hole to be in index 0 after applying the
+        # premutation, so we shift the elements intil the permutation starts
+        # with 0 instead. the number of spaces by which we had to shift the
+        # elements right is called new_rotation
+        # applying the permutation accounts for the change in the graph
+        # layout, but we still have to account for the change in goal. since
+        # the old goal was 0,1,2,3, applying the permutation to it gives the
+        # permutation itself. in order to get from the permuted old goal to
+        # the new goal of 0,1,2,3, we can use the inverse of the permutation
+        # as a lookup table for each element in the puzzle, or in other words,
+        # use the puzzle as a permutation for the inverse permutation.
+        # finally, new_rotation is the negative of the original location of
+        # the hole mod N, so it becomes the new index for these puzzles within
+        # the puzzles array.
         new_puzzles = [None] * nodes
+        start = np.zeros(nodes, dtype=int)
         for i, rotation_puzzles in enumerate(puzzles):
+            new_rotation = -np.where(permutation == -i % nodes)[0][0] % nodes
+            rotated = np.roll(permutation, new_rotation)
+            rotated += i
+            rotated %= nodes
+            inverse = permute.invert(rotated)
             for j, puzzle in enumerate(rotation_puzzles):
-                rotated = permute.rotate_index(puzzle, -i, nodes)
-                permuted = permute.permute_index(rotated, permutation)
-                new_puzzle = permute.rotate_index(
-                    permuted,
-                    -inverse[(nodes - i) % nodes],
-                    nodes,
-                )
+                permute.from_index(puzzle, start)
+                permuted_start = start[rotated]
+                new_start = inverse[permuted_start]
+                new_puzzle = permute.to_index(new_start)
                 rotation_puzzles[j] = new_puzzle
 
             rotation_puzzles.sort()
-            new_puzzles[(nodes - inverse[(nodes - i) % nodes]) % nodes] \
-                = rotation_puzzles
-            
+            new_puzzles[new_rotation] = rotation_puzzles
+
+        # make sure it starts with A
+        empty_rotations = 0
+        for i, rotation_puzzles in enumerate(new_puzzles):
+            if rotation_puzzles:
+                empty_rotations = i
+                break
+
+        if empty_rotations:
+            new_puzzles = new_puzzles[empty_rotations:] \
+                + [[]] * empty_rotations
+            matrix = np.roll(matrix, empty_rotations, (0, 1))
+
         graph['puzzles'] = new_puzzles
 
     graph['name'] = name

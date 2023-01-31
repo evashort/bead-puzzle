@@ -6,7 +6,10 @@
   "Pw==": "#loop",
   "6wA=": "#split",
   "7AA=": "\ud83d\udcab Spinning",
-  "Hw==": "\ud83e\udd6a Sandwich",
+  "Hw==": {
+    "name": "\ud83e\udd6a Sandwich",
+    "layout": "BACD"
+  },
   "Iw8=": "#split",
   "cA0=": "#hexagon",
   "kpYB": "#split",

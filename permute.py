@@ -43,13 +43,6 @@ def invert(permutation):
     inverse[permutation] = np.arange(len(permutation))
     return inverse
 
-def permute_index(index, permutation):
-    out = np.zeros(len(permutation), dtype=int)
-    from_index(index, out)
-    permuted = out[permutation]
-    result = to_index(permuted)
-    return result
-
 def matrix_pair_to_index(src, dst):
     permutation = np.zeros(len(src), dtype=int)
     for i in range(np.math.factorial(len(src))):
