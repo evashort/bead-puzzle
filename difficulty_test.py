@@ -269,7 +269,7 @@ for graph in graphs:
         # 2 | 1 3-+-0 1-+-2 3-+-1
         #  \|/   \|/    |/    |/
         #   2     2     3     2
-
+        #
         # permutation = [1,0,2,3]
         # rotate it so zero comes first: [0,2,3,1]
         # start = [0,3,2,1]
