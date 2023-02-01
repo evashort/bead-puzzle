@@ -138,7 +138,10 @@
     "name": "\ud83c\udfd4\ufe0f Mountain",
     "layout": "CEAFBD"
   },
-  "fA0=": "#loop",
+  "fA0=": {
+    "name": "\u2602\ufe0f Umbrella",
+    "layout": "EDFABC"
+  },
   "cw0=": "#loop",
   "7gw=": {
     "name": "\ud83d\udcf1 Pocket calculator",
@@ -152,7 +155,10 @@
     "name": "\ud83c\udfc1 Finish line",
     "layout": "ECDFAB"
   },
-  "cQ0=": "#loop",
+  "cQ0=": {
+    "name": "cQ0=",
+    "layout": "FABCDE"
+  },
   "VJYB": {
     "name": "\u26be Baseball field",
     "layout": "CDEGFAB"
@@ -670,7 +676,10 @@
   "tJcB": "#loop",
   "o5YB": "#loop",
   "VpYB": "#semiloop",
-  "dJYB": "#semiloop",
+  "dJYB": {
+    "name": "\ud83d\udc55 T-shirt",
+    "layout": "BCEDGFA"
+  },
   "aJ8B": "#loop",
   "9JYB": "#loop like Railroad crossing sign",
   "6JYB": {
