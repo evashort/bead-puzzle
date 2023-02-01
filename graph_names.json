@@ -154,8 +154,8 @@
   },
   "cQ0=": "#loop",
   "VJYB": {
-    "name": "\ud83d\udc1a Nautilus",
-    "layout": "ABCDEFG"
+    "name": "\u26be Baseball field",
+    "layout": "CDEGFAB"
   },
   "+J0D": {
     "name": "\ud83d\udd6f\ufe0f Lighthouse",
@@ -795,12 +795,9 @@
     "layout": "DEFGABC"
   },
   "LY8B": "#like Tree",
-  "LI8B": {
-    "name": "\ud83d\udc59 Bikini",
-    "layout": "CDEFGAB"
-  },
-  "obcB": "#loop like Bikini",
-  "LfMB": "#loop like Tree, Acorn, Bikini",
+  "LI8B": "#loop if you just don't move one of the bottom two beads",
+  "obcB": "#loop",
+  "LfMB": "#loop like Tree, Acorn",
   "KJ8B": "#loop like Acorn",
   "oZYB": "#loop"
 }

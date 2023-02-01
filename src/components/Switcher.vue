@@ -157,28 +157,20 @@ This puzzle is harder than the last one even though it has more paths for the be
 That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
 
 I'll explain what a state space is at level 10.
-
----
 `,
         '7QA=': `
 This is the last puzzle that has a [loop going all the way around](https://en.wikipedia.org/wiki/Hamiltonian_path)
 with a shortcut that skips one space.
 
 Once you find a strategy for solving this puzzle, other puzzles like it become boring, so I removed them.
-
----
 `,
         '+B0=': `
 Every puzzle starts as far from the goal as possible, so restarting will never get you closer to winning.
-
----
 `,
         '3gw=': `
 When you fold over one layer of an origami frog base, it becomes a diamond with no visible seams.
 
 A bird base has the same shape but a seam is always visible (see level 13).
-
----
 `,
         '+A0=': `
 In this game, a *state* is an arrangement of beads.
@@ -189,16 +181,21 @@ is the set of all possible ways to arrange the beads while playing the game.
 In this puzzle, there are [6! = 720](https://en.wikipedia.org/wiki/Factorial) ways to
 [arrange](https://en.wikipedia.org/wiki/Permutation) the beads,
 but only half of them can occur while playing, so the state space has size 360.
-
----
 `,
         'eA0=': `
 Here's another puzzle where the state space contains exactly half the possible bead arrangements.
 
 Puzzles like this seem to have only even-length
 [cycles](https://en.wikipedia.org/wiki/Cycle_%28graph_theory%29) (loops).
+`,
+        '7gw=': `
+If you can solve level 7 (Pot) you can solve this one.
 
----
+See the two spaces that are next to each other but not connected?
+
+If one of those spaces was removed, the remaining spaces would form a pot shape.
+
+Instead of removing a space, you can fill it with the correct bead and then pretend it doesn't exist.
 `,
       }
       let comment = Object.hasOwn(comments, this.graph.id) ?
@@ -206,13 +203,15 @@ Puzzles like this seem to have only even-length
         ''
       return `
 ## ${this.graph.name}
-${comment}
-
 Minimum: ${this.graph.distance} moves
 
 Without thinking ahead: ${Math.round(this.graph.difficulty)} moves
 
 State space: ${this.graph.states} states
+
+---
+
+${comment}
 `
     },
   },
