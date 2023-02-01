@@ -152,17 +152,17 @@ ${fullInstructions[this.graph.id]}
 
       let comments = {
         '3wA=': `
-This puzzle is harder than the last one even though there are more paths for the beads to move along.
+This puzzle is harder than the last one even though it has more paths for the beads to move along.
 
 That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
 
-I'll explain what a state space is when we get to level 10.
+I'll explain what a state space is at level 10.
 
 ---
 `,
         '7QA=': `
 This is the last puzzle that has a [loop going all the way around](https://en.wikipedia.org/wiki/Hamiltonian_path)
-and a shortcut that skips one space.
+with a shortcut that skips one space.
 
 Once you find a strategy for solving this puzzle, other puzzles like it become boring, so I removed them.
 
@@ -180,7 +180,7 @@ A bird base has the same shape but a seam is always visible (see level 13).
 
 ---
 `,
-        '+B0=': `
+        '+A0=': `
 In this game, a *state* is an arrangement of beads.
 
 The [state space](https://en.wikipedia.org/wiki/State_space)
