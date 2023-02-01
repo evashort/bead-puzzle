@@ -616,10 +616,7 @@
   "OJ8B": "#loop",
   "c40B": "#semiloop",
   "uZUB": "#semiloop",
-  "VLcB": {
-    "name": "\u2622\ufe0f Radioactive",
-    "layout": "BCDFEGA"
-  },
+  "VLcB": "#Radioactive - sort of like Railroad crossing sign, one fewer move is not enough to justify it",
   "PvMB": "#loop",
   "p5YB": "#loop",
   "bI8B": "#semiloop",
@@ -648,10 +645,7 @@
   "vvcB": "#loop like 16 things",
   "4p4B": "#loop like Railroad crossing sign",
   "dfcB": "#loop like 6 things",
-  "xrMB": {
-    "name": "\ud83c\udfe1 Barn",
-    "layout": "FGABCDE"
-  },
+  "xrMB": "#Barn - fewer moves than Railroad crossing sign despite being more difficult, have to complete subgraphs Mask and Ferris wheel soon after",
   "dLcB": "#loop like Radioactive, Railroad crossing sign",
   "tpYB": "#loop",
   "qpYB": "#loop",
