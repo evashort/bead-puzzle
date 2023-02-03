@@ -2,7 +2,7 @@
   "SwA=": "\ud83d\udc46 Selecting",
   "Bw==": "#loop",
   "VgA=": "\u25b6\ufe0f Moving",
-  "Hg==": "#square",
+  "Hg==": "\ud83d\udd37 Square",
   "Pw==": "#loop",
   "6wA=": "#split",
   "7AA=": "\ud83d\udcab Spinning",
@@ -156,8 +156,8 @@
     "layout": "ECDFAB"
   },
   "cQ0=": {
-    "name": "cQ0=",
-    "layout": "FABCDE"
+    "name": "\ud83c\udf05 Setting sun",
+    "layout": "CDEFAB"
   },
   "VJYB": {
     "name": "\u26be Baseball field",
@@ -622,7 +622,10 @@
   "OJ8B": "#loop",
   "c40B": "#semiloop",
   "uZUB": "#semiloop",
-  "VLcB": "#Radioactive - sort of like Railroad crossing sign, one fewer move is not enough to justify it",
+  "VLcB": {
+    "name": "\u2622\ufe0f Radioactive",
+    "layout": "BCDFEGA"
+  },
   "PvMB": "#loop",
   "p5YB": "#loop",
   "bI8B": "#semiloop",
@@ -651,7 +654,10 @@
   "vvcB": "#loop like 16 things",
   "4p4B": "#loop like Railroad crossing sign",
   "dfcB": "#loop like 6 things",
-  "xrMB": "#Barn - fewer moves than Railroad crossing sign despite being more difficult, have to complete subgraphs Mask and Ferris wheel soon after",
+  "xrMB": {
+    "name": "\ud83c\udfe0 Barn",
+    "layout": "FGABCDE"
+  },
   "dLcB": "#loop like Radioactive, Railroad crossing sign",
   "tpYB": "#loop",
   "qpYB": "#loop",

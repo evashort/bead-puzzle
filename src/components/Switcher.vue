@@ -11,28 +11,107 @@ import Permute from '../Permute.js'
 export default {
   data() {
     let groups = [
-      { name: '📖 Tutorial', stop: 3 },
-      { name: '🍰 Piece of cake', stop: 14 },
-      { name: '🍪 Soft baked', stop: 25 },
-      { name: '🥨 Stick with it', stop: 35 },
-      { name: '🥜 Crunch time', stop: 46 },
-      { name: '🌰 Tough nut to crack', stop: 57 },
-      { name: '🪵 Logjam', stop: 67 },
-      { name: '🪨 Rocky road', stop: 78 },
-      { name: '💎 Pure pressure', stop: 89 },
+      {
+        name: '📖 Tutorial',
+        ids: [
+          "VgA=",
+          "SwA=",
+          "7AA=",
+        ],
+      },
+      {
+        name: 'Part 1',
+        ids: [
+          "Hw==",
+          "3wA=",
+          "+B0=",
+          "3gw=",
+          "/ww=",
+          "3ww=",
+          "+J0B",
+        ],
+      },
+      {
+        name: '🔄 Loops',
+        ids: [
+          "7QA=",
+          "fA0=",
+          "cQ0=",
+          "7gw=",
+          "dJYB",
+        ],
+      },
+      {
+        name: '🪆 recursion',
+        ids: [
+          "Hg==",
+          "3gA=",
+          "+A0=",
+          "+I0B",
+          "+JUB",
+          "eA0=",
+          "eI0B",
+        ],
+      },
+      {
+        name: 'Part 4',
+        ids: [
+          "7Aw=",
+          "VJYB",
+          "cI0B",
+          "VZYB",
+          "6JYB",
+          "pJYB",
+        ],
+      },
     ]
-    let start = 0
+    let groupBoundaries = []
+    let groupStart = 0
     for (let group of groups) {
-      group.start = start
-      start = group.stop
+      let groupStop = groupStart + group.ids.length
+      groupBoundaries.push(
+        {
+          name: group.name,
+          start: groupStart,
+          stop: groupStop,
+        },
+      )
+      groupStart = groupStop
+    }
+
+    groupBoundaries.push(
+      {
+        name: "Misc",
+        start: groupStart,
+        stop: graphData.graphs.length,
+      },
+    )
+
+    let idGraphs = {}
+    for (let graph of graphData.graphs) {
+      idGraphs[graph.id] = graph
+    }
+
+    let graphs = []
+    for (let group of groups) {
+      for (let id of group.ids) {
+        graphs.push(idGraphs[id])
+        delete idGraphs[id]
+      }
+    }
+
+    for (let graph of graphData.graphs) {
+      if (Object.hasOwn(idGraphs, graph.id)) {
+        graphs.push(graph)
+      }
     }
 
     return {
       graphIndex: 0,
       rotationIndex: 0,
       variation: 0,
-      groups: groups,
-      graphs: graphData.graphs,
+      groups: groupBoundaries,
+      graphs: graphs,
       autofocus: false,
       playing: false,
     }

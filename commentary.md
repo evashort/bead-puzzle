@@ -84,37 +84,74 @@ for each started level: 32+16+16+16+8+4+4+16 = 112 bits = 19 characters
 
 Levels that reduce to other levels (old number of moves -> new number)
 - sandwich -> triangle (6 -> 3)
-- fox -> square (8 -> 6)
 - bow tie -> sandwich (9 -> 7)
+- roadblock -> bowtie (12 -> 9)
+- bird base -> bowtie (13 -> 9)
+- treasure chest -> bowtie (15 -> 9)
+- parachute -> bird base (15 -> 13)
+- sun -> treasure chest (18 -> 15)
+
+- fox -> square (8 -> 6)
 - cube -> fox (10 -> 8)
 - frog base -> fox (12 -> 8)
 - sand timer -> fox (15 -> 8)
-- roadblock -> bowtie (12 -> 9)
-- bird base -> bowtie (13 -> 9)
-- star -> pot (13 -> 18)
-- treasure chest -> bowtie (15 -> 9)
-- mountain -> pot (19 -> 1)
-- pocket calculator -> pot (19 -> 18)
 - lighthouse -> cube (12 -> 10)
 - cootie catcher -> frog base (14 -> 12)
 - anarchy symbol -> sand timer (14 -> 15)
 - hmmm -> sand timer (20 -> 15)
 - raccoon -> sand timer (18 -> 15)
-- broken heart -> prohibited (20 -> 21)
-- cupid's arrow -> prohibited (23 -> 21)
+- coffin -> sand timer (18 -> 15)
+- radioactive -> sand timer (23 -> 15)
+
+- star -> pot (13 -> 18)
+- mountain -> pot (19 -> 1)
+- pocket calculator -> pot (19 -> 18)
 - party cat -> star (15 -> 13)
-- parachute -> bird base (15 -> 13)
-- sun -> treasure chest (18 -> 15)
 - closed eye -> mountain (21 -> 19)
 - tiara cat -> star (15 -> 13)
 - coffee cup -> pocket calculator (21 -> 19)
 - clam -> mountain (21 -> 19)
+- barn -> mountain (22 -> 19)
+
+- broken heart -> prohibited (20 -> 21)
+- cupid's arrow -> prohibited (23 -> 21)
+
 - open eye -> finish line (27 -> 26)
-- coffin -> sand timer (18 -> 15)
-- radioactive -> sand timer
 - railroad crossing sign -> finish line (24 -> 26)
-- barn -> mountain
 - mask -> finish line (29 -> 26)
 - pen nib -> finish line (24 -> 26)
 
 Level that don't reduce: triangle, square, pot, prohibited, finish line, baseball field, heart, sundial, ferris wheel, acorn
+
+sandwich
+bow tie
+cube
+frog base
+bridge
+bird base
+roadblock
+anarchy symbol
+
+🔄 loops:
+pot
+umbrella
+cQ0=
+pocket calculator
+T-shirt
+
+🪆 recursion:
+square
+fox
+sand timer
+raccoon
+hmmm (as d20)
+...
+prohibited
+cupid's arrow flipped and called broken heart
+
+finish line
+baseball field
+heart
+sundial
+ferris wheel
+acorn
