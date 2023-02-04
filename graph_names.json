@@ -34,7 +34,10 @@
   },
   "aI0B": "#split",
   "/wA=": "#loop like Bow tie",
-  "/gA=": "#loop",
+  "/gA=": {
+    "name": "\u2709\ufe0f Envelope",
+    "layout": "EABCD"
+  },
   "I48B": "#split",
   "7wA=": "#loop",
   "aY0B": "#split",
@@ -102,8 +105,8 @@
   "/w0=": "#loop",
   "7x4=": "#loop",
   "/ww=": {
-    "name": "\ud83d\udea7 Roadblock",
-    "layout": "ECDFAB"
+    "name": "\ud83c\udfd7\ufe0f Truss",
+    "layout": "DEFABC"
   },
   "/g8=": "#loop",
   "+R0=": "#loop",
@@ -181,8 +184,8 @@
   "794H": "#loop",
   "/90H": "#loop",
   "+JUB": {
-    "name": "\ud83c\udfb2 Hmmm",
-    "layout": "ACBDEFG"
+    "name": "\ud83d\udeaa Doorway",
+    "layout": "ABCDEFG"
   },
   "+98H": "#loop",
   "+/8D": "#loop",
@@ -447,8 +450,8 @@
   "qrcB": "#loop",
   "V+YD": "#loop",
   "/owB": {
-    "name": "\ud83d\udc78 Tiara cat",
-    "layout": "FBAGEDC"
+    "name": "\ud83d\udc2d Mouse",
+    "layout": "GABFCDE"
   },
   "fo8B": "#loop",
   "fZ8B": "#loop like Closed eye",
@@ -613,7 +616,7 @@
   "q5YB": "#loop",
   "7JYB": {
     "name": "\u26b0\ufe0f Coffin",
-    "layout": "AFEGBDC"
+    "layout": "EFAGBDC"
   },
   "uZcB": "#loop",
   "b/cB": "#loop like 16 things",
