@@ -98,6 +98,7 @@ export default {
 
     let idGraphs = {}
     for (let graph of graphData.graphs) {
+      graph.won = []
       idGraphs[graph.id] = graph
     }
 
@@ -239,18 +240,12 @@ ${fullInstructions[this.graph.id]}
       }
 
       let comments = {
-        '3wA=': `
+        '/ww=': `
 This puzzle is harder than the last one even though it has more paths for the beads to move along.
 
 That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
 
 I'll explain what a state space is at level 10.
-`,
-        '7QA=': `
-This is the last puzzle that has a [loop going all the way around](https://en.wikipedia.org/wiki/Hamiltonian_path)
-with a shortcut that skips one space.
-
-Once you find a strategy for solving this puzzle, other puzzles like it become boring, so I removed them.
 `,
         '+B0=': `
 Every puzzle starts as far from the goal as possible, so restarting will never get you closer to winning.
@@ -258,7 +253,7 @@ Every puzzle starts as far from the goal as possible, so restarting will never g
         '3gw=': `
 When you fold over one layer of an origami frog base, it becomes a diamond with no visible seams.
 
-A bird base has the same shape but a seam is always visible (see level 13).
+A bird base has the same shape but a seam is always visible (see level 9).
 `,
         '+A0=': `
 In this game, a *state* is an arrangement of beads.
@@ -338,7 +333,10 @@ ${comment}
     },
     wonChanged(won) {
       if (won) {
-        this.graph.won = true
+        let index = this.graph.puzzles[this.rotation][this.variation]
+        if (!this.graph.won.includes(index)) {
+          this.graph.won.push(index)
+        }
       }
     },
   },
@@ -408,7 +406,7 @@ ${comment}
             />
             <label :for="`level-${group.start + j}`">
               {{group.start + j + 1}}
-              {{graph.name || graph.id}}{{graph.won ? ' ✅' : ''}}
+              {{graph.name || graph.id}}{{graph.won.length ? ' ✅' : ''}}
             </label>
           </div>
         </fieldset>
@@ -449,7 +447,7 @@ ${comment}
                 name="rotation"
               />
               <label :for="`rotation-${letter}`">
-                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[rotations[i]].length})` : ''}}
+                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[rotations[i]].length})` : ''}}{{graph.won.filter(permutation => graph.puzzles[rotations[i]].includes(permutation)).length ? ' ✅' : ''}}
               </label>
               <br/>
             </div>
@@ -457,19 +455,19 @@ ${comment}
           <fieldset v-if="maxVariations > 1">
             <legend>{{graph.puzzles[rotation].length}} variations</legend>
             <div
-              v-for="i in graph.puzzles[rotation].length"
-              :key="[graph.id, letter, i - 1].toString()"
+              v-for="[i, permutation] of graph.puzzles[rotation].entries()"
+              :key="[graph.id, letter, i].toString()"
               class="radioHolder"
             >
               <input
                 type="radio"
-                :value="(i - 1)"
+                :value="i"
                 v-model="variation"
-                :id="`variation-${i - 1}`"
+                :id="`variation-${i}`"
                 name="variation"
               />
-              <label :for="`variation-${i - 1}`">
-                {{letter}}{{(i)}}
+              <label :for="`variation-${i}`">
+                {{letter}}{{i + 1}}{{graph.won.includes(permutation) ? ' ✅' : ''}}
               </label>
               <br/>
             </div>
