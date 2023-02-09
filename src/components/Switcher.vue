@@ -98,7 +98,18 @@ export default {
 
     let idGraphs = {}
     for (let graph of graphData.graphs) {
-      graph.won = []
+      let nodes = SimpleGraph.bytesToNodeCount(base64js.toByteArray(graph.id))
+      for (let rotationPuzzles of graph.puzzles) {
+        for (let [i, puzzle] of rotationPuzzles.entries()) {
+          rotationPuzzles[i] = {
+            start: puzzle,
+            won: false,
+            beads: this.permutationToBeads(puzzle, nodes),
+            history: [],
+          }
+        }
+      }
+
       idGraphs[graph.id] = graph
     }
 
@@ -164,15 +175,8 @@ export default {
 
       return maxVariations
     },
-    startingBeads() {
-      let index = this.graph.puzzles[this.rotation][this.variation]
-      let start = Permute.fromIndex(index, this.nodes)
-      let beads = []
-      for (let i = 1; i < this.nodes; i++) {
-        beads.push(start.indexOf(i))
-      }
-
-      return beads
+    puzzle() {
+      return this.graph.puzzles[this.rotation][this.variation]
     },
     edges() {
       let index = this.graph['layout']
@@ -333,11 +337,17 @@ ${comment}
     },
     wonChanged(won) {
       if (won) {
-        let index = this.graph.puzzles[this.rotation][this.variation]
-        if (!this.graph.won.includes(index)) {
-          this.graph.won.push(index)
-        }
+        this.puzzle.won = true
       }
+    },
+    permutationToBeads(permutationIndex, nodes) {
+      let start = Permute.fromIndex(permutationIndex, nodes)
+      let beads = []
+      for (let i = 1; i < nodes; i++) {
+        beads.push((start.indexOf(i) + nodes) % nodes)
+      }
+
+      return beads
     },
   },
   watch: {
@@ -406,7 +416,7 @@ ${comment}
             />
             <label :for="`level-${group.start + j}`">
               {{group.start + j + 1}}
-              {{graph.name || graph.id}}{{graph.won.length ? ' ✅' : ''}}
+              {{graph.name || graph.id}}{{graph.puzzles.some(rp => rp.some(puzzle => puzzle.won)) ? ' ✅' : ''}}
             </label>
           </div>
         </fieldset>
@@ -415,7 +425,7 @@ ${comment}
     <dialog id="play">
       <div class="gameHolder">
         <Game
-          :startingBeads="startingBeads"
+          :startingBeads="puzzle.beads"
           :edges="edges"
           :autofocus="autofocus"
           @update:won="wonChanged"
@@ -423,7 +433,7 @@ ${comment}
         <button
           class="next"
           @click="nextLevel"
-          :disabled="!graph.won || graphIndex >= graphs.length - 1"
+          :disabled="!puzzle.won || graphIndex >= graphs.length - 1"
         >
           <img src="../assets/forward-step.svg"/>
           Next
@@ -447,7 +457,7 @@ ${comment}
                 name="rotation"
               />
               <label :for="`rotation-${letter}`">
-                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[rotations[i]].length})` : ''}}{{graph.won.filter(permutation => graph.puzzles[rotations[i]].includes(permutation)).length ? ' ✅' : ''}}
+                {{letter}}{{maxVariations > 1 ? ` (${graph.puzzles[rotations[i]].length})` : ''}}{{graph.puzzles[rotations[i]].some(puzzle => puzzle.won) ? ' ✅' : ''}}
               </label>
               <br/>
             </div>
@@ -455,7 +465,7 @@ ${comment}
           <fieldset v-if="maxVariations > 1">
             <legend>{{graph.puzzles[rotation].length}} variations</legend>
             <div
-              v-for="[i, permutation] of graph.puzzles[rotation].entries()"
+              v-for="[i, puzzle] of graph.puzzles[rotation].entries()"
               :key="[graph.id, letter, i].toString()"
               class="radioHolder"
             >
@@ -467,7 +477,7 @@ ${comment}
                 name="variation"
               />
               <label :for="`variation-${i}`">
-                {{letter}}{{i + 1}}{{graph.won.includes(permutation) ? ' ✅' : ''}}
+                {{letter}}{{i + 1}}{{puzzle.won ? ' ✅' : ''}}
               </label>
               <br/>
             </div>
