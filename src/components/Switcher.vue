@@ -133,6 +133,7 @@ export default {
       variation: 0,
       groups: groupBoundaries,
       graphs: graphs,
+      startingBeads: graphs[0].puzzles[0][0].beads,
       autofocus: false,
       playing: false,
     }
@@ -228,12 +229,12 @@ Each rotation can be solved in 7 moves.
 
 The rotations add replay value because they have different solutions.
 `,
-        '3gA=': `
+        '3wA=': `
 Each rotation of this puzzle has many variations.
 
-Each variation can be solved in 8 moves, but there's no reason to solve them all.
+Each variation can be solved in 9 moves, but there's no reason to solve them all.
 
-If you can win in less than 27 moves, you must be thinking ahead.
+If you can win in less than 44 moves, you must be thinking ahead.
 `,
       }
       if (Object.hasOwn(fullInstructions, this.graph.id)) {
@@ -340,6 +341,9 @@ ${comment}
         this.puzzle.won = true
       }
     },
+    stateChanged(state) {
+      this.puzzle.beads = state.beads
+    },
     permutationToBeads(permutationIndex, nodes) {
       let start = Permute.fromIndex(permutationIndex, nodes)
       let beads = []
@@ -354,9 +358,14 @@ ${comment}
     graphIndex(newGraphIndex, oldGraphIndex) {
       this.rotationIndex = 0
       this.variation = 0
+      this.startingBeads = this.puzzle.beads
     },
     rotationIndex(newRotationIndex, oldRotationIndex) {
       this.variation = 0
+      this.startingBeads = this.puzzle.beads
+    },
+    variation(newVariation, oldVariation) {
+      this.startingBeads = this.puzzle.beads
     },
     playing(newPlaying, oldPlaying) {
       let play = document.getElementById('play')
@@ -425,10 +434,11 @@ ${comment}
     <dialog id="play">
       <div class="gameHolder">
         <Game
-          :startingBeads="puzzle.beads"
+          :startingBeads="startingBeads"
           :edges="edges"
           :autofocus="autofocus"
           @update:won="wonChanged"
+          @update:state="stateChanged"
         />
         <button
           class="next"

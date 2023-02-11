@@ -37,7 +37,7 @@ export default {
     edges: Array,
     autofocus: Boolean,
   },
-  emits: ['update:won'],
+  emits: ['update:won', 'update:state'],
   computed: {
     size() {
       return this.startingBeads.length + 1
@@ -612,9 +612,12 @@ export default {
           this.history.push(this.tail)
           this.pushedBeforeMove = false
         }
+
+        this.stateChanged()
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history, this.chosenTail))
+        this.stateChanged()
       }
 
       this.pushedSinceMove = this.hole != this.tail
@@ -733,10 +736,13 @@ export default {
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
+
+        this.stateChanged()
       }
     },
     selectLeft() {
       if (this.ensureTail() && this.hole != this.tail) {
+        // TODO: history changed
         return
       }
 
@@ -748,12 +754,14 @@ export default {
           this.chosenTail = newTail
           this.clickTarget = null
           this.pushedSinceMove = true
+          // TODO: history changed (maybe)
           return
         }
       }
     },
     selectRight() {
       if (this.ensureTail() && this.hole != this.tail) {
+        // TODO: history changed
         return
       }
 
@@ -765,6 +773,7 @@ export default {
           this.chosenTail = newTail
           this.clickTarget = null
           this.pushedSinceMove = true
+          // TODO: history changed (maybe)
           return
         }
       }
@@ -790,6 +799,7 @@ export default {
       if (this.clickTarget == this.hole && this.history.length <= 2) {
         this.clickTarget = -1
         this.history[this.history.length - 1] = this.hole
+        // TODO: history changed (maybe)
       } else if (this.clickTarget != null && this.clickTarget >= 0) {
         let newTail = this.clickTarget == this.hole ?
           this.history[this.history.length - 3] : this.clickTarget
@@ -798,9 +808,12 @@ export default {
         if (this.matrix[this.size * this.hole + newTail]) {
           this.chosenTail = newTail
         }
+
+        // TODO: history changed (maybe)
       } else if (this.clickTarget == -2 || this.clickTarget == -3) {
         this.pushWasUndo = this.reversing
         this.history[this.history.length - 1] = this.hole
+        // TODO: history changed (maybe)
       }
     },
     clicked(event) {
@@ -819,14 +832,17 @@ export default {
         this.clickTarget = oldTarget
         this.history[this.history.length - 1] = this.hole
         this.pushedSinceMove = false
+        // TODO: history changed (again)
       } else if (this.clickTarget != null && this.clickTarget == this.tail) {
         if (this.matrix[this.hole * this.size + this.tail]) {
           let oldTarget = this.hole
           this.goForwardHelp()
           this.clickTarget = oldTarget
           this.history.push(this.tail)
+          this.stateChanged()
         } else {
           this.history[this.history.length - 1] = this.hole
+          // TODO: history changed
         }
       } else if (this.clickTarget == -2 && this.canSpin) {
         if (this.history[0] == this.hole) {
@@ -841,11 +857,13 @@ export default {
         this.history.push(this.tail)
         this.pushedBeforeMove = false
         this.clickTarget = -2
+        this.stateChanged()
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
         this.history[this.history.length - 1] = this.hole
         this.pushedSinceMove = false
         this.clickTarget = -3
+        // TODO: history changed (again)
       }
     },
     getClickTarget(offsetX, offsetY) {
@@ -884,6 +902,8 @@ export default {
         this.pushWasUndo = this.reversing
         this.history[this.history.length - 1] = this.hole
       }
+
+      // TODO: history changed
     },
     onFocus() {
       if (
@@ -891,12 +911,17 @@ export default {
           this.clickTarget != -3
       ) {
         this.ensureTail()
+        // TODO: history changed (maybe)
       }
     },
     onBlur() {
       this.clickTarget = null
       this.pushWasUndo = this.reversing
       this.history[this.history.length - 1] = this.hole
+      // TODO: history changed (maybe)
+    },
+    stateChanged() {
+      this.$emit('update:state', { beads: this.beads })
     },
     getIngress(center, egress) {
       let result = egress
@@ -953,6 +978,7 @@ export default {
       if (newWon) {
         this.history[this.history.length - 1] = this.hole
         this.pushedSinceMove = false
+        // TODO: history changed (maybe)
       }
 
       this.$emit('update:won', newWon)
