@@ -3,6 +3,7 @@ export default {
   data() {
     return {
       beads: [],
+      won: false,
       history: [],
       chosenTail: null,
       // if clickTarget is null, clicking is treated as false no matter its
@@ -21,6 +22,9 @@ export default {
       */
       animations: new Uint8Array(0),
       oldBeads: [],
+
+      // change triggers
+      beadChanges: 0,
 
       // trophy state
       trophyAlternate: false,
@@ -158,13 +162,6 @@ export default {
       }
 
       return ys
-    },
-    won() {
-      for (let [id, node] of this.beads.entries()) {
-        if (node != id + 1) { return false }
-      }
-
-      return true
     },
     edgePaths() {
       let controlLength = 30
@@ -612,22 +609,17 @@ export default {
           this.history.push(this.tail)
           this.pushedBeforeMove = false
         }
-
-        this.stateChanged()
       } else if (this.matrix[this.hole * this.size + this.tail]) {
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history, this.chosenTail))
-        this.stateChanged()
       }
 
       this.pushedSinceMove = this.hole != this.tail
     },
     goForwardHelp() {
-      this.justWon = this.won
-      this.hasWon = this.hasWon || this.justWon
-
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
+      this.beadChanges = (this.beadChanges + 1) % 1000
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
@@ -718,12 +710,11 @@ export default {
         this.pushedBeforeMove = this.reversing
         this.pushedSinceMove = !hideTail
         this.pushWasUndo = false
-        this.justWon = this.won
-        this.hasWon = this.hasWon || this.justWon
         this.history.pop()
 
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
+        this.beadChanges = (this.beadChanges + 1) % 1000
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         this.trophyAlternate = !this.trophyAlternate
@@ -736,8 +727,6 @@ export default {
         if (hideTail) {
           this.history[this.history.length - 1] = this.hole
         }
-
-        this.stateChanged()
       }
     },
     selectLeft() {
@@ -839,7 +828,6 @@ export default {
           this.goForwardHelp()
           this.clickTarget = oldTarget
           this.history.push(this.tail)
-          this.stateChanged()
         } else {
           this.history[this.history.length - 1] = this.hole
           // TODO: history changed
@@ -857,7 +845,6 @@ export default {
         this.history.push(this.tail)
         this.pushedBeforeMove = false
         this.clickTarget = -2
-        this.stateChanged()
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
         this.history[this.history.length - 1] = this.hole
@@ -920,9 +907,6 @@ export default {
       this.history[this.history.length - 1] = this.hole
       // TODO: history changed (maybe)
     },
-    stateChanged() {
-      this.$emit('update:state', { beads: this.beads })
-    },
     getIngress(center, egress) {
       let result = egress
       // calculations are easier with center = 0
@@ -949,7 +933,9 @@ export default {
   watch: {
     startingBeads: {
       handler(newStartingBeads, oldStartingBeads) {
+        this.hasWon = false
         this.beads = [...newStartingBeads]
+        this.beadChanges = (this.beadChanges + 1) % 1000
         this.oldBeads = [...newStartingBeads]
         this.animations = new Uint8Array(this.beads.length)
         let beadSet = new Set(this.beads)
@@ -959,29 +945,30 @@ export default {
         this.history = [hole, hole]
         this.chosenTail = null
         this.clickTarget = null
-        this.justWon = false
-        this.hasWon = false
       },
       immediate: true,
     },
-    small(newSmall, oldSmall) {
-      if (newSmall) {
-        let newAnimations = new Uint8Array(this.beads.length)
-        for (let [i, animation] of this.animations.entries()) {
-          newAnimations[i] = animation >= 3 ? 6 : 0
+    beadChanges(newBeadChanges, oldBeadChanges) {
+      let newWon = true
+      for (let [id, node] of this.beads.entries()) {
+        if (node != id + 1) { newWon = false }
+      }
+
+      this.justWon = false
+      if (newWon != this.won) {
+        if (newWon) {
+          this.history[this.history.length - 1] = this.hole
+          this.pushedSinceMove = false
+        } else {
+          this.justWon = true
+          this.hasWon = true
         }
 
-        this.animations = newAnimations
-      }
-    },
-    won(newWon, oldWon) {
-      if (newWon) {
-        this.history[this.history.length - 1] = this.hole
-        this.pushedSinceMove = false
-        // TODO: history changed (maybe)
+        this.won = newWon
+        this.$emit('update:won', newWon)
       }
 
-      this.$emit('update:won', newWon)
+      this.$emit('update:state', { beads: this.beads })
     },
   },
 }
