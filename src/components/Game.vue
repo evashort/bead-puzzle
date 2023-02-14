@@ -5,7 +5,8 @@ export default {
       beads: [],
       won: false,
       history: [],
-      chosenTail: null,
+      showTail: false,
+      showCross: false,
       // if clickTarget is null, clicking is treated as false no matter its
       // actual value
       clicking: false,
@@ -98,7 +99,7 @@ export default {
     },
     activeStart() {
       return this.history.length > 2 &&
-        this.hole == this.history[0] && this.tail == this.history[1] ?
+        this.hole == this.history[0] && this.tail == this.history[1] && this.showTail ?
         0 : this.loopStart
     },
     deadEnd() {
@@ -221,10 +222,7 @@ export default {
         edgeClasses[[b, a].toString()]['active'] = true
       }
 
-      if (
-        this.hole != this.tail &&
-          this.matrix[this.hole * this.size + this.tail]
-      ) {
+      if (this.showTail) {
         edgeClasses[[this.hole, this.tail].toString()]['arrow'] = true
         edgeClasses[[this.tail, this.hole].toString()]['arrow'] = true
       }
@@ -250,24 +248,12 @@ export default {
       let r = this.headRadius, hr = 0.5 * this.headHeight
       return `M ${hr} ${-r} L ${-hr} ${0} L ${hr} ${r}`
     },
-    showHead() {
-      return this.hole != this.tail &&
-        this.matrix[this.hole * this.size + this.tail]
-    },
     crossRadius() {
       return 18
     },
     crossPath() {
       let d = this.crossRadius * Math.sqrt(0.5)
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
-    },
-    showCross() {
-      return this.clickTarget != null && this.clicking && (
-        this.clickTarget == -1 || (
-          this.hole != this.tail &&
-            !this.matrix[this.hole * this.size + this.tail]
-        )
-      )
     },
     arrowEdge() {
       let a = this.hole, b = this.tail
@@ -301,8 +287,7 @@ export default {
           let historyIndex = this.extra.indexOf(node, this.activeStart)
           return {
             bead: true,
-            tail: node == this.tail && this.hole != this.tail &&
-              this.matrix[this.hole * this.size + this.tail],
+            tail: node == this.tail && this.showTail,
             onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
             animate: this.animations[id] % 6,
             alternate: this.animations[id] % 2,
@@ -322,7 +307,7 @@ export default {
           let edge =
             node != this.extra[this.loopStart] &&
             node == this.tail &&
-            this.matrix[this.hole * this.size + this.tail] ?
+            this.showTail ?
             [this.hole, this.tail] :
             [this.oldBeads[id], node]
           let path = this.edgePaths[edge.toString()]
@@ -359,7 +344,7 @@ export default {
     },
     trophyPushedEnd() {
       if (this.history.length >= 3) {
-        let undoing = this.showHead ? this.reversing : this.pushWasUndo
+        let undoing = this.showTail ? this.reversing : this.pushWasUndo
         if (this.hole == this.history[0]) {
           if (undoing) {
             return this.history[1]
@@ -402,7 +387,7 @@ export default {
       return `path('${path}')`
     },
     trophyPushed() {
-      return this.showHead || this.pushedSinceMove
+      return this.showTail || this.pushedSinceMove
     },
     trophyEnterPath() {
       let edge = this.trophyPushed ?
@@ -424,12 +409,12 @@ export default {
         enter: true,
         reverse: this.trophyPushed ?
           (
-            this.showHead ?
+            this.showTail ?
               this.reversing :
               this.pushWasUndo || this.deadEnd
           ) :
           this.undoneHole >= 0,
-        pushed: this.showHead,
+        pushed: this.showTail,
         wasPushed: this.pushedSinceMove,
       }
     },
@@ -460,8 +445,7 @@ export default {
     extra() {
       // extrapolate history to the future if there's no choice of moves
       if (this.history.length <= 2) {
-        return this.matrix[this.hole * this.size + this.tail] ?
-          this.history : [this.hole]
+        return this.showTail ? this.history : [this.hole]
       }
 
       let loop = [...this.history]
@@ -484,7 +468,7 @@ export default {
       if (
         loop.length == this.history.length - 1 &&
         !this.reversing &&
-        this.matrix[this.hole * this.size + this.tail]
+        this.showTail
       ) {
         loop.push(this.tail)
       }
@@ -606,15 +590,24 @@ export default {
         if (this.canSpin) {
           // continue going around the loop with the tail hidden
           this.goForwardHelp()
-          this.history.push(this.tail)
+          this.history.push(this.getNextTail(this.history))
           this.pushedBeforeMove = false
         }
-      } else if (this.matrix[this.hole * this.size + this.tail]) {
+      } else {
         this.goForwardHelp()
-        this.history.push(this.getNextTail(this.history, this.chosenTail))
+        if (this.undoneHole >= 0) {
+          if (this.history.length >= 2) {
+            this.history.push(this.hole) // keep going back
+          } else {
+            this.history.push(this.undoneHole)
+          }
+        } else {
+          this.history.push(this.getNextTail(this.history))
+          this.showTail = !this.reversing
+        }
       }
 
-      this.pushedSinceMove = this.hole != this.tail
+      this.pushedSinceMove = this.showTail
     },
     goForwardHelp() {
       let id = this.beads.indexOf(this.tail)
@@ -624,7 +617,6 @@ export default {
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
       this.undoneHole = -1
-      this.chosenTail = null
       this.clickTarget = null
       this.pushedBeforeMove = true
       this.pushedSinceMove = false
@@ -640,7 +632,6 @@ export default {
           this.undoneHole = -1
         } else {
           this.animations[id] += 2
-          this.chosenTail = this.hole // keep going back
         }
       }
 
@@ -656,24 +647,19 @@ export default {
 
       return history
     },
-    getNextTail(history, chosenTail) {
-      // first choice: restore chosen tail
-      if (chosenTail != null) {
-        return chosenTail
-      }
-
+    getNextTail(history) {
       let end = history.length - 1
       if (end >= 1 && history[end - 1] == history[end]) {
         end--
       }
 
-      // second choice: continue the loop
+      // first choice: continue the loop
       let hole = history[end]
       if (history[0] == hole && end >= 3) {
         return history[1]
       }
 
-      // third choice: new tail creates the longest possible loop
+      // second choice: new tail creates the longest possible loop
       let oldHole = history[end - 1]
       let longest = history.indexOf(history[0], 1) >= 0 ? 1 : 0
       for (let i = longest; i < end - 1; i++) {
@@ -685,7 +671,7 @@ export default {
         ) { return tail }
       }
 
-      // fourth choice: iterate clockwise and choose the first edge
+      // third choice: iterate clockwise and choose the first edge
       for (let i = 1; i < this.size; i++) {
         let tail = (hole + i) % this.size
         if (
@@ -694,8 +680,8 @@ export default {
         ) { return tail }
       }
 
-      // fifth choice: dead end
-      return hole
+      // fourth choice: go back (dead end)
+      return oldHole
     },
     goBack() {
       this.clickTarget = null
@@ -705,10 +691,10 @@ export default {
         // tutorial levels have dead ends which cause the tail to be hidden
         // even when using the keyboard. it's confusing if going back
         // doesn't cause the tail to be shown again.
-        let hideTail = this.hole == this.tail && !this.won && !this.deadEnd
+        this.showTail = this.showTail || this.won || this.deadEnd
         this.undoneHole = this.hole
         this.pushedBeforeMove = this.reversing
-        this.pushedSinceMove = !hideTail
+        this.pushedSinceMove = this.showTail
         this.pushWasUndo = false
         this.history.pop()
 
@@ -722,16 +708,10 @@ export default {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
         }
-
-        this.chosenTail = this.tail
-        if (hideTail) {
-          this.history[this.history.length - 1] = this.hole
-        }
       }
     },
     selectLeft() {
-      if (this.ensureTail() && this.hole != this.tail) {
-        // TODO: history changed
+      if (this.ensureTail()) {
         return
       }
 
@@ -740,7 +720,6 @@ export default {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
-          this.chosenTail = newTail
           this.clickTarget = null
           this.pushedSinceMove = true
           // TODO: history changed (maybe)
@@ -749,8 +728,7 @@ export default {
       }
     },
     selectRight() {
-      if (this.ensureTail() && this.hole != this.tail) {
-        // TODO: history changed
+      if (this.ensureTail()) {
         return
       }
 
@@ -759,7 +737,6 @@ export default {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
-          this.chosenTail = newTail
           this.clickTarget = null
           this.pushedSinceMove = true
           // TODO: history changed (maybe)
@@ -768,11 +745,13 @@ export default {
       }
     },
     ensureTail() {
-      if (this.hole == this.tail) {
+      if (!this.showTail) {
         this.clickTarget = null
-        this.history[this.history.length - 1] =
-          this.getNextTail(this.history, this.chosenTail)
-        this.pushedSinceMove = this.pushedSinceMove || this.hole != this.tail
+        if (this.history.length <= 2 || !this.deadEnd) {
+          this.showTail = true
+          this.pushedSinceMove = true
+        }
+
         return true
       }
 
@@ -785,24 +764,26 @@ export default {
 
       this.clickTarget = this.getClickTarget(event.offsetX, event.offsetY)
       this.clicking = true
+      this.showCross = false
       if (this.clickTarget == this.hole && this.history.length <= 2) {
         this.clickTarget = -1
-        this.history[this.history.length - 1] = this.hole
-        // TODO: history changed (maybe)
+        this.showTail = false
+        this.showCross = true
       } else if (this.clickTarget != null && this.clickTarget >= 0) {
         let newTail = this.clickTarget == this.hole ?
           this.history[this.history.length - 3] : this.clickTarget
         this.pushWasUndo = this.reversing
-        this.history[this.history.length - 1] = newTail
-        if (this.matrix[this.size * this.hole + newTail]) {
-          this.chosenTail = newTail
+        this.showTail = this.matrix[this.size * this.hole + newTail]
+        if (this.showTail) {
+          this.history[this.history.length - 1] = newTail
+          // TODO: history changed (maybe)
+        } else {
+          this.clickTarget = -1
+          this.showCross = true
         }
-
-        // TODO: history changed (maybe)
       } else if (this.clickTarget == -2 || this.clickTarget == -3) {
         this.pushWasUndo = this.reversing
-        this.history[this.history.length - 1] = this.hole
-        // TODO: history changed (maybe)
+        this.showTail = false
       }
     },
     clicked(event) {
@@ -812,26 +793,21 @@ export default {
 
       this.clicking = false
       let newTarget = this.getClickTarget(event.offsetX, event.offsetY)
-      if (newTarget == this.hole && this.clickTarget == -1) {
+      if (this.clickTarget == -1) {
       } else if (newTarget != this.clickTarget) {
         this.clicking = true
       } else if (this.clickTarget == this.hole && this.reversing) {
         let oldTarget = this.hole
         this.goBack()
         this.clickTarget = oldTarget
-        this.history[this.history.length - 1] = this.hole
+        this.showTail = false
         this.pushedSinceMove = false
-        // TODO: history changed (again)
       } else if (this.clickTarget != null && this.clickTarget == this.tail) {
-        if (this.matrix[this.hole * this.size + this.tail]) {
-          let oldTarget = this.hole
-          this.goForwardHelp()
-          this.clickTarget = oldTarget
-          this.history.push(this.tail)
-        } else {
-          this.history[this.history.length - 1] = this.hole
-          // TODO: history changed
-        }
+        let oldTarget = this.hole
+        this.goForwardHelp()
+        this.clickTarget = oldTarget
+        this.history.push(this.getNextTail(this.history))
+        this.showTail = false
       } else if (this.clickTarget == -2 && this.canSpin) {
         if (this.history[0] == this.hole) {
           this.history[this.history.length - 1] = this.history[1]
@@ -842,15 +818,14 @@ export default {
           )
         }
         this.goForwardHelp()
-        this.history.push(this.tail)
-        this.pushedBeforeMove = false
+        this.history.push(this.getNextTail(this.history))
+        this.pushedBeforeMove = this.showTail
         this.clickTarget = -2
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
-        this.history[this.history.length - 1] = this.hole
-        this.pushedSinceMove = false
+        this.showTail = false
+        this.pushedSinceMove = this.showTail
         this.clickTarget = -3
-        // TODO: history changed (again)
       }
     },
     getClickTarget(offsetX, offsetY) {
@@ -887,10 +862,8 @@ export default {
     buttonClicked() {
       if (!this.ensureTail()) {
         this.pushWasUndo = this.reversing
-        this.history[this.history.length - 1] = this.hole
+        this.showTail = false
       }
-
-      // TODO: history changed
     },
     onFocus() {
       if (
@@ -898,14 +871,12 @@ export default {
           this.clickTarget != -3
       ) {
         this.ensureTail()
-        // TODO: history changed (maybe)
       }
     },
     onBlur() {
       this.clickTarget = null
       this.pushWasUndo = this.reversing
-      this.history[this.history.length - 1] = this.hole
-      // TODO: history changed (maybe)
+      this.showTail = false
     },
     getIngress(center, egress) {
       let result = egress
@@ -933,6 +904,7 @@ export default {
   watch: {
     startingBeads: {
       handler(newStartingBeads, oldStartingBeads) {
+        this.won = false
         this.hasWon = false
         this.beads = [...newStartingBeads]
         this.beadChanges = (this.beadChanges + 1) % 1000
@@ -942,8 +914,8 @@ export default {
         let hole = 0
         for (; beadSet.has(hole); hole++) { }
 
-        this.history = [hole, hole]
-        this.chosenTail = null
+        this.history = [hole]
+        this.history.push(this.getNextTail(this.history))
         this.clickTarget = null
       },
       immediate: true,
@@ -957,7 +929,7 @@ export default {
       this.justWon = false
       if (newWon != this.won) {
         if (newWon) {
-          this.history[this.history.length - 1] = this.hole
+          this.showTail = false
           this.pushedSinceMove = false
         } else {
           this.justWon = true
@@ -1005,7 +977,7 @@ export default {
         <path
           id="cross-path"
           :d="crossPath"
-          :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
+          :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
           fill="none"
           stroke="black"
           stroke-width="12"
@@ -1046,7 +1018,7 @@ export default {
         :class="{touchCircle: true}"
       />
       <path
-        :opacity="showHead ? 1 : 0"
+        :opacity="showTail ? 1 : 0"
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
@@ -1057,7 +1029,7 @@ export default {
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use
           href="#cross-path"
-          :opacity="showCross ? 1 : 0"
+          :opacity="showCross && clicking ? 1 : 0"
           :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
@@ -1065,13 +1037,13 @@ export default {
         <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
         <use
           href="#head-path"
-          :opacity="showHead ? 1 : 0"
+          :opacity="showTail ? 1 : 0"
           :class="{ghost: clickTarget != null && !clicking}"
         />
         <!-- replace with black shape and make sure it covers the trophy -->
         <use
           href="#cross-path"
-          :opacity="showCross ? 1 : 0"
+          :opacity="showCross && clicking ? 1 : 0"
           :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
@@ -1086,12 +1058,12 @@ export default {
         </circle>
         <use
           href="#head-path"
-          :opacity="showHead ? 1 : 0"
+          :opacity="showTail ? 1 : 0"
           :class="{ghost: clickTarget != null && !clicking}"
         />
         <use
           href="#cross-path"
-          :opacity="showCross ? 1 : 0"
+          :opacity="showCross && clicking ? 1 : 0"
           :class="{ghost: clickTarget != null && !clicking}"
         />
       </mask>
@@ -1132,10 +1104,10 @@ export default {
         />
       </g>
       <path
-        :opacity="showCross ? 1 : 0"
+        :opacity="showCross && clicking ? 1 : 0"
         class="head"
         :d="crossPath"
-        :transform="`translate(${this.nodeXs[this.hole]}, ${this.nodeYs[this.hole]})`"
+        :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
         :class="{ghost: clickTarget != null && !clicking}"
         fill="none"
       />
@@ -1157,27 +1129,27 @@ export default {
       </template>
       <image v-if="colorIds[0] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[0]]"
         href="../assets/heart.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[colorIds[0]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[0]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[colorIds[0]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[0]] }"
       />
       <image v-if="colorIds[1] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[1]]"
         href="../assets/butterfly.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[colorIds[1]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[1]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[colorIds[1]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[1]] }"
       />
       <image v-if="colorIds[2] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[2]]"
         href="../assets/saturn.svg"
-        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[colorIds[2]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[2]] }"
+        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[colorIds[2]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[2]] }"
       />
       <image v-if="colorIds[3] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[3]]"
         href="../assets/leaf.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[3]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[3]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[3]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[3]] }"
       />
       <image v-if="colorIds[4] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[4]]"
         href="../assets/mushroom.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[colorIds[4]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[4]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[colorIds[4]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[4]] }"
       />
       <image v-if="colorIds[5] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[5]]"
         href="../assets/flower.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[5]] && hole != tail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[5]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[5]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[5]] }"
       />
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
