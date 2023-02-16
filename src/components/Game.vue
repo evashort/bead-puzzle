@@ -578,23 +578,15 @@ export default {
     },
     goForward() {
       if (this.ensureTail()) {
-        if (this.canSpin) {
+        if (this.canSpin && !this.won) {
           // continue going around the loop with the tail hidden
           this.showTail = this.won
           this.goForwardHelp()
-          this.history.push(this.getNextTail(this.history))
         }
       } else {
         this.goForwardHelp()
-        if (this.undoneHole >= 0) {
-          if (this.history.length >= 2) {
-            this.history.push(this.hole) // keep going back
-          } else {
-            this.history.push(this.undoneHole)
-          }
-        } else {
-          this.history.push(this.getNextTail(this.history))
-          this.showTail = !this.reversing
+        if (this.undoneHole < 0 && this.reversing) {
+          this.showTail = false // dead end
         }
       }
     },
@@ -619,28 +611,28 @@ export default {
           this.undoneHole = -1
         } else {
           this.animations[id] += 2
+          if (this.history.length >= 2) {
+            this.history.push(this.hole) // keep going back
+          } else {
+            this.history.push(this.undoneHole)
+          }
+
+          return
         }
       }
 
-      this.history = this.removeBeforeLoop(this.history)
-    },
-    removeBeforeLoop(history) {
-      let hole = history[history.length - 1]
-      for (let offset = history.length - 4; offset >= 0; offset--) {
-        if (history[offset] == hole) {
-          return history.slice(offset)
+      // remove before loop
+      for (let offset = this.history.length - 4; offset >= 0; offset--) {
+        if (this.history[offset] == this.tail) {
+          this.history = this.history.slice(offset)
         }
       }
 
-      return history
+      this.history.push(this.getNextTail(this.history))
     },
     getNextTail(history) {
-      let end = history.length - 1
-      if (end >= 1 && history[end - 1] == history[end]) {
-        end--
-      }
-
       // first choice: continue the loop
+      let end = history.length - 1
       let hole = history[end]
       if (history[0] == hole && end >= 3) {
         return history[1]
@@ -790,7 +782,6 @@ export default {
         let oldTarget = this.hole
         this.goForwardHelp()
         this.clickTarget = oldTarget
-        this.history.push(this.getNextTail(this.history))
         this.showTail = false
       } else if (this.clickTarget == -2 && this.canSpin) {
         if (this.history[0] == this.hole) {
@@ -802,7 +793,6 @@ export default {
           )
         }
         this.goForwardHelp()
-        this.history.push(this.getNextTail(this.history))
         this.clickTarget = -2
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
