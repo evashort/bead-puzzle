@@ -30,9 +30,8 @@ export default {
       // trophy state
       trophyAlternate: false,
       undoneHole: -1,
-      pushedBeforeMove: false,
-      pushedSinceMove: false,
-      pushWasUndo: false,
+      trophyPushed: false,
+      trophyWasPushed: false,
       justWon: false,
       hasWon: false,
     }
@@ -344,14 +343,13 @@ export default {
     },
     trophyPushedEnd() {
       if (this.history.length >= 3) {
-        let undoing = this.showTail ? this.reversing : this.pushWasUndo
         if (this.hole == this.history[0]) {
-          if (undoing) {
+          if (this.reversing) {
             return this.history[1]
           }
 
           return this.history[this.history.length - 3]
-        } else if (undoing) {
+        } else if (this.reversing) {
           return this.getIngress(this.hole, this.history[this.history.length - 3])
         }
 
@@ -361,7 +359,7 @@ export default {
       return this.getIngress(this.hole, this.tail)
     },
     trophyEnterStart() {
-      if (this.undoneHole >= 0) {
+        if (this.undoneHole >= 0) {
         if (this.history.length >= 3) {
           return this.history[this.history.length - 3]
         } else {
@@ -386,9 +384,6 @@ export default {
       let path = this.edgePaths[edge.toString()]
       return `path('${path}')`
     },
-    trophyPushed() {
-      return this.showTail || this.pushedSinceMove
-    },
     trophyEnterPath() {
       let edge = this.trophyPushed ?
         [this.trophyPushedStart, this.trophyPushedEnd] :
@@ -400,7 +395,7 @@ export default {
       return {
         trophy: true,
         reverse: this.undoneHole >= 0,
-        wasPushed: this.pushedBeforeMove,
+        wasPushed: this.trophyWasPushed,
       }
     },
     trophyEnterClasses() {
@@ -408,14 +403,10 @@ export default {
         trophy: true,
         enter: true,
         reverse: this.trophyPushed ?
-          (
-            this.showTail ?
-              this.reversing :
-              this.pushWasUndo || this.deadEnd
-          ) :
+          this.reversing :
           this.undoneHole >= 0,
         pushed: this.showTail,
-        wasPushed: this.pushedSinceMove,
+        wasPushed: this.trophyPushed,
       }
     },
     normalBeadScale() {
@@ -589,9 +580,9 @@ export default {
       if (this.ensureTail()) {
         if (this.canSpin) {
           // continue going around the loop with the tail hidden
+          this.showTail = this.won
           this.goForwardHelp()
           this.history.push(this.getNextTail(this.history))
-          this.pushedBeforeMove = false
         }
       } else {
         this.goForwardHelp()
@@ -606,10 +597,9 @@ export default {
           this.showTail = !this.reversing
         }
       }
-
-      this.pushedSinceMove = this.showTail
     },
     goForwardHelp() {
+      this.trophyWasPushed = this.showTail
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
       this.beadChanges = (this.beadChanges + 1) % 1000
@@ -618,9 +608,6 @@ export default {
       this.trophyAlternate = !this.trophyAlternate
       this.undoneHole = -1
       this.clickTarget = null
-      this.pushedBeforeMove = true
-      this.pushedSinceMove = false
-      this.pushWasUndo = false
       if (this.reversing) {
         let loop = this.history[0] == this.hole
         this.undoneHole = this.hole
@@ -686,16 +673,19 @@ export default {
     goBack() {
       this.clickTarget = null
       if (this.history.length > 2) {
+        this.trophyWasPushed = this.showTail
         // always show tail when undoing win because winning hides tail.
         //
         // tutorial levels have dead ends which cause the tail to be hidden
         // even when using the keyboard. it's confusing if going back
         // doesn't cause the tail to be shown again.
         this.showTail = this.showTail || this.won || this.deadEnd
+
         this.undoneHole = this.hole
-        this.pushedBeforeMove = this.reversing
-        this.pushedSinceMove = this.showTail
-        this.pushWasUndo = false
+        if (!this.reversing) {
+          this.trophyPushed = false
+        }
+
         this.history.pop()
 
         let id = this.beads.indexOf(this.hole)
@@ -721,7 +711,6 @@ export default {
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
           this.clickTarget = null
-          this.pushedSinceMove = true
           // TODO: history changed (maybe)
           return
         }
@@ -738,7 +727,6 @@ export default {
         if (this.matrix[this.hole * this.size + newTail]) {
           this.history[this.history.length - 1] = newTail
           this.clickTarget = null
-          this.pushedSinceMove = true
           // TODO: history changed (maybe)
           return
         }
@@ -749,7 +737,6 @@ export default {
         this.clickTarget = null
         if (this.history.length <= 2 || !this.deadEnd) {
           this.showTail = true
-          this.pushedSinceMove = true
         }
 
         return true
@@ -772,7 +759,6 @@ export default {
       } else if (this.clickTarget != null && this.clickTarget >= 0) {
         let newTail = this.clickTarget == this.hole ?
           this.history[this.history.length - 3] : this.clickTarget
-        this.pushWasUndo = this.reversing
         this.showTail = this.matrix[this.size * this.hole + newTail]
         if (this.showTail) {
           this.history[this.history.length - 1] = newTail
@@ -782,7 +768,6 @@ export default {
           this.showCross = true
         }
       } else if (this.clickTarget == -2 || this.clickTarget == -3) {
-        this.pushWasUndo = this.reversing
         this.showTail = false
       }
     },
@@ -801,7 +786,6 @@ export default {
         this.goBack()
         this.clickTarget = oldTarget
         this.showTail = false
-        this.pushedSinceMove = false
       } else if (this.clickTarget != null && this.clickTarget == this.tail) {
         let oldTarget = this.hole
         this.goForwardHelp()
@@ -819,12 +803,10 @@ export default {
         }
         this.goForwardHelp()
         this.history.push(this.getNextTail(this.history))
-        this.pushedBeforeMove = this.showTail
         this.clickTarget = -2
       } else if (this.clickTarget == -3 && this.canSpin) {
         this.goBack()
         this.showTail = false
-        this.pushedSinceMove = this.showTail
         this.clickTarget = -3
       }
     },
@@ -861,7 +843,6 @@ export default {
     },
     buttonClicked() {
       if (!this.ensureTail()) {
-        this.pushWasUndo = this.reversing
         this.showTail = false
       }
     },
@@ -875,7 +856,6 @@ export default {
     },
     onBlur() {
       this.clickTarget = null
-      this.pushWasUndo = this.reversing
       this.showTail = false
     },
     getIngress(center, egress) {
@@ -906,6 +886,7 @@ export default {
       handler(newStartingBeads, oldStartingBeads) {
         this.won = false
         this.hasWon = false
+        this.showTail = false
         this.beads = [...newStartingBeads]
         this.beadChanges = (this.beadChanges + 1) % 1000
         this.oldBeads = [...newStartingBeads]
@@ -930,7 +911,6 @@ export default {
       if (newWon != this.won) {
         if (newWon) {
           this.showTail = false
-          this.pushedSinceMove = false
         } else {
           this.justWon = true
           this.hasWon = true
@@ -940,8 +920,14 @@ export default {
         this.$emit('update:won', newWon)
       }
 
+      this.trophyPushed = this.showTail
       this.$emit('update:state', { beads: this.beads })
     },
+    showTail(newShowTail, oldShowTail) {
+      if (newShowTail) {
+        this.trophyPushed = true
+      }
+    }
   },
 }
 </script>
