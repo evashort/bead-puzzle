@@ -26,10 +26,12 @@ export default {
 
       // change triggers
       beadChanges: 0,
+      historyChanges: 0,
 
       // trophy state
       trophyAlternate: false,
-      undoneHole: -1,
+      oldHole: 0,
+      reversed: false,
       trophyPushed: false,
       trophyWasPushed: false,
       justWon: false,
@@ -255,21 +257,11 @@ export default {
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
     },
     arrowEdge() {
-      let a = this.hole, b = this.tail
-      if (
-        this.clickTarget != null && this.clickTarget >= 0 && !this.clicking
-      ) {
-        b = a
-        a = this.clickTarget
-      } else if (a == b && this.history.length >= 3) {
-        a = this.history[this.history.length - 3]
+      if (this.showTail) {
+        return [this.hole, this.tail]
+      } else {
+        return [this.oldHole, this.hole]
       }
-
-      if (this.matrix[a * this.size + b]) {
-        return [a, b]
-      }
-
-      return[a, a]
     },
     arrowPath() {
       return this.edgePaths[this.arrowEdge.toString()]
@@ -316,8 +308,8 @@ export default {
       )
     },
     trophyExitStart() {
-      if (this.undoneHole >= 0) {
-        return this.undoneHole
+      if (this.reversed) {
+        return this.oldHole
       } else if (this.history.length >= 3) {
         return this.history[this.history.length - 3]
       }
@@ -325,10 +317,13 @@ export default {
       return this.hole
     },
     trophyExitEnd() {
-      if (this.history.length >= 3 && this.undoneHole == this.history[1]) {
+      if (
+        this.history.length >= 3 && this.reversed &&
+        this.oldHole == this.history[1]
+      ) {
         return this.history[2]
-      } else if (this.undoneHole >= 0) {
-        return this.getIngress(this.undoneHole, this.hole)
+      } else if (this.reversed) {
+        return this.getIngress(this.oldHole, this.hole)
       } else if (this.history.length >= 4) {
         return this.history[this.history.length - 4]
       } else if (this.history.length >= 3) {
@@ -359,11 +354,11 @@ export default {
       return this.getIngress(this.hole, this.tail)
     },
     trophyEnterStart() {
-        if (this.undoneHole >= 0) {
+        if (this.reversed) {
         if (this.history.length >= 3) {
           return this.history[this.history.length - 3]
         } else {
-          return this.getIngress(this.hole, this.undoneHole)
+          return this.getIngress(this.hole, this.oldHole)
         }
       } else if (this.history.length >= 3) {
         if (this.history[0] == this.hole) {
@@ -394,7 +389,7 @@ export default {
     trophyExitClasses() {
       return {
         trophy: true,
-        reverse: this.undoneHole >= 0,
+        reverse: this.reversed,
         wasPushed: this.trophyWasPushed,
       }
     },
@@ -402,9 +397,7 @@ export default {
       return {
         trophy: true,
         enter: true,
-        reverse: this.trophyPushed ?
-          this.reversing :
-          this.undoneHole >= 0,
+        reverse: this.trophyPushed ? this.reversing : this.reversed,
         pushed: this.showTail,
         wasPushed: this.trophyPushed,
       }
@@ -585,7 +578,7 @@ export default {
         }
       } else {
         this.goForwardHelp()
-        if (this.undoneHole < 0 && this.reversing) {
+        if (!this.reversed && this.reversing) {
           this.showTail = false // dead end
         }
       }
@@ -598,23 +591,23 @@ export default {
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
-      this.undoneHole = -1
-      this.clickTarget = null
+      this.oldHole = this.hole
+      this.reversed = false
       if (this.reversing) {
-        let loop = this.history[0] == this.hole
-        this.undoneHole = this.hole
         this.history.pop()
         this.history.pop()
-        if (loop) {
+        if (this.history[0] == this.oldHole) {
+          // reverse the loop
           this.history.reverse()
           this.history.push(this.history[0])
-          this.undoneHole = -1
         } else {
+          // not a loop
+          this.reversed = true
           this.animations[id] += 2
           if (this.history.length >= 2) {
             this.history.push(this.hole) // keep going back
           } else {
-            this.history.push(this.undoneHole)
+            this.history.push(this.oldHole)
           }
 
           return
@@ -629,6 +622,7 @@ export default {
       }
 
       this.history.push(this.getNextTail(this.history))
+      this.historyChanges = (this.historyChanges + 1) % 1000
     },
     getNextTail(history) {
       // first choice: continue the loop
@@ -663,7 +657,6 @@ export default {
       return oldHole
     },
     goBack() {
-      this.clickTarget = null
       if (this.history.length > 2) {
         this.trophyWasPushed = this.showTail
         // always show tail when undoing win because winning hides tail.
@@ -673,7 +666,8 @@ export default {
         // doesn't cause the tail to be shown again.
         this.showTail = this.showTail || this.won || this.deadEnd
 
-        this.undoneHole = this.hole
+        this.oldHole = this.hole
+        this.reversed = true
         if (!this.reversing) {
           this.trophyPushed = false
         }
@@ -690,6 +684,8 @@ export default {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
         }
+
+        this.historyChanges = (this.historyChanges + 1) % 1000
       }
     },
     selectLeft() {
@@ -701,9 +697,11 @@ export default {
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
-          this.history[this.history.length - 1] = newTail
-          this.clickTarget = null
-          // TODO: history changed (maybe)
+          if (newTail != this.tail) {
+            this.history[this.history.length - 1] = newTail
+            this.historyChanges = (this.historyChanges + 1) % 1000
+          }
+
           return
         }
       }
@@ -717,16 +715,17 @@ export default {
       for (let i = 1; i <= this.size; i++) {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
-          this.history[this.history.length - 1] = newTail
-          this.clickTarget = null
-          // TODO: history changed (maybe)
+          if (newTail != this.tail) {
+            this.history[this.history.length - 1] = newTail
+            this.historyChanges = (this.historyChanges + 1) % 1000
+          }
+
           return
         }
       }
     },
     ensureTail() {
       if (!this.showTail) {
-        this.clickTarget = null
         if (this.history.length <= 2 || !this.deadEnd) {
           this.showTail = true
         }
@@ -753,8 +752,10 @@ export default {
           this.history[this.history.length - 3] : this.clickTarget
         this.showTail = this.matrix[this.size * this.hole + newTail]
         if (this.showTail) {
-          this.history[this.history.length - 1] = newTail
-          // TODO: history changed (maybe)
+          if (newTail != this.tail) {
+            this.history[this.history.length - 1] = newTail
+            this.historyChanges = (this.historyChanges + 1) % 1000
+          }
         } else {
           this.clickTarget = -1
           this.showCross = true
@@ -774,14 +775,10 @@ export default {
       } else if (newTarget != this.clickTarget) {
         this.clicking = true
       } else if (this.clickTarget == this.hole && this.reversing) {
-        let oldTarget = this.hole
         this.goBack()
-        this.clickTarget = oldTarget
         this.showTail = false
       } else if (this.clickTarget != null && this.clickTarget == this.tail) {
-        let oldTarget = this.hole
         this.goForwardHelp()
-        this.clickTarget = oldTarget
         this.showTail = false
       } else if (this.clickTarget == -2 && this.canSpin) {
         if (this.history[0] == this.hole) {
@@ -887,7 +884,7 @@ export default {
 
         this.history = [hole]
         this.history.push(this.getNextTail(this.history))
-        this.clickTarget = null
+        this.historyChanges = (this.historyChanges + 1) % 1000
       },
       immediate: true,
     },
@@ -911,13 +908,18 @@ export default {
       }
 
       this.trophyPushed = this.showTail
-      this.$emit('update:state', { beads: this.beads })
     },
     showTail(newShowTail, oldShowTail) {
       if (newShowTail) {
         this.trophyPushed = true
+        if (!this.clicking) {
+          this.clickTarget = null
+        }
       }
-    }
+    },
+    historyChanges(newHistoryChanges, oldHistoryChanges) {
+      this.$emit('update:state', { beads: this.beads, history: this.history })
+    },
   },
 }
 </script>
@@ -998,7 +1000,7 @@ export default {
         class="head"
         :d="headPath"
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        :class="{ghost: clickTarget != null && !clicking}"
+        :class="{ghost: clickTarget != null && !clicking && !showTail}"
         fill="none"
       />
       <mask id="cross-mask">
@@ -1014,7 +1016,7 @@ export default {
         <use
           href="#head-path"
           :opacity="showTail ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking}"
+          :class="{ghost: clickTarget != null && !clicking && !showTail}"
         />
         <!-- replace with black shape and make sure it covers the trophy -->
         <use
@@ -1035,7 +1037,7 @@ export default {
         <use
           href="#head-path"
           :opacity="showTail ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking}"
+          :class="{ghost: clickTarget != null && !clicking && !showTail}"
         />
         <use
           href="#cross-path"
