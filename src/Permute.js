@@ -20,8 +20,26 @@ export function fromIndex(index, length) {
     return out
 }
 
+export function findZero(index) {
+    let result = 0
+    let n = 1
+    while (index > 0) {
+        let remainder = index % (n + 1)
+        if (remainder == n) {
+            result = n
+        }
+
+        n += 1
+        index -= remainder
+        index /= n
+    }
+    
+    return result
+}
+
 var Permute = {
     fromIndex: fromIndex,
+    findZero: findZero,
 }
 
 export default Permute

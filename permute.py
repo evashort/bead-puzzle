@@ -91,6 +91,18 @@ def rotate_left(index, length):
 # j = i // math.factorial(n-1)
 # math.factorial(n-1) * (n + j % n * (n-1) - j // n * n * 2 + j // (n+1) * (n+1))
 
+def find_zero(index):
+    result = 0
+    n = 1
+    while index > 0:
+        if index % (n + 1) == n:
+            result = n
+
+        n += 1
+        index //= n
+    
+    return result
+
 if __name__ == '__main__':
     import itertools
     assert [
@@ -105,3 +117,5 @@ if __name__ == '__main__':
 
     assert from_index(rotate_left(to_index((2, 1, 4, 0, 3)), 5), 5) \
         == [1, 4, 0, 3, 2]
+    
+    assert find_zero(to_index((2, 1, 4, 0, 3))) == 3

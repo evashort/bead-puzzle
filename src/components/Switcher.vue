@@ -105,7 +105,7 @@ export default {
             start: puzzle,
             won: false,
             beads: this.permutationToBeads(puzzle, nodes),
-            history: [],
+            history: [Permute.findZero(puzzle)],
           }
         }
       }
@@ -133,7 +133,10 @@ export default {
       variation: 0,
       groups: groupBoundaries,
       graphs: graphs,
-      startingBeads: graphs[0].puzzles[0][0].beads,
+      initialState: {
+        beads: graphs[0].puzzles[0][0].beads,
+        history: graphs[0].puzzles[0][0].history,
+      },
       autofocus: false,
       playing: false,
     }
@@ -343,6 +346,7 @@ ${comment}
     },
     stateChanged(state) {
       this.puzzle.beads = state.beads
+      this.puzzle.history = state.history
     },
     permutationToBeads(permutationIndex, nodes) {
       let start = Permute.fromIndex(permutationIndex, nodes)
@@ -358,14 +362,23 @@ ${comment}
     graphIndex(newGraphIndex, oldGraphIndex) {
       this.rotationIndex = 0
       this.variation = 0
-      this.startingBeads = this.puzzle.beads
+      this.initialState = {
+        beads: this.puzzle.beads,
+        history: this.puzzle.history,
+      }
     },
     rotationIndex(newRotationIndex, oldRotationIndex) {
       this.variation = 0
-      this.startingBeads = this.puzzle.beads
+      this.initialState = {
+        beads: this.puzzle.beads,
+        history: this.puzzle.history,
+      }
     },
     variation(newVariation, oldVariation) {
-      this.startingBeads = this.puzzle.beads
+      this.initialState = {
+        beads: this.puzzle.beads,
+        history: this.puzzle.history,
+      }
     },
     playing(newPlaying, oldPlaying) {
       let play = document.getElementById('play')
@@ -434,8 +447,8 @@ ${comment}
     <dialog id="play">
       <div class="gameHolder">
         <Game
-          :startingBeads="startingBeads"
-          :edges="edges"
+          :edges=edges
+          :state="initialState"
           :autofocus="autofocus"
           @update:won="wonChanged"
           @update:state="stateChanged"

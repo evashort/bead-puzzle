@@ -39,14 +39,14 @@ export default {
     }
   },
   props: {
-    startingBeads: Array,
-    edges: Array,
+    edges: Array, 
+    state: { beads: Array, history: Array },
     autofocus: Boolean,
   },
   emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
     size() {
-      return this.startingBeads.length + 1
+      return this.state.beads.length + 1
     },
     matrix() {
       let matrix = new Uint8Array(this.size * this.size)
@@ -604,6 +604,7 @@ export default {
             this.tail = this.oldHole
           }
 
+          this.stateChanges = (this.stateChanges + 1) % 1000
           return
         }
       } else {
@@ -854,21 +855,24 @@ export default {
     }
   },
   watch: {
-    startingBeads: {
-      handler(newStartingBeads, oldStartingBeads) {
+    state: {
+      handler(newState, oldState) {
         this.won = false
         this.hasWon = false
         this.showTail = false
-        this.beads = [...newStartingBeads]
-        this.oldBeads = [...newStartingBeads]
+        this.beads = [...newState.beads]
+        this.oldBeads = [...newState.beads]
         this.animations = new Uint8Array(this.beads.length)
-        let beadSet = new Set(this.beads)
-        let hole = 0
-        for (; beadSet.has(hole); hole++) { }
-
-        this.history = [hole]
+        this.history = [...newState.history]
         this.tail = this.getNextTail(this.history)
-        this.stateChanges = (this.stateChanges + 1) % 1000
+      },
+      immediate: true,
+    },
+    edges: {
+      handler(newEdges, oldEdges) {
+        this.won = false
+        this.hasWon = false
+        this.showTail = false
       },
       immediate: true,
     },
