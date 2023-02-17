@@ -5,6 +5,7 @@ export default {
       beads: [],
       won: false,
       history: [],
+      tail: null,
       showTail: false,
       showCross: false,
       // if clickTarget is null, clicking is treated as false no matter its
@@ -25,8 +26,7 @@ export default {
       oldBeads: [],
 
       // change triggers
-      beadChanges: 0,
-      historyChanges: 0,
+      stateChanges: 0,
 
       // trophy state
       trophyAlternate: false,
@@ -43,7 +43,7 @@ export default {
     edges: Array,
     autofocus: Boolean,
   },
-  emits: ['update:won', 'update:state'],
+  emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
     size() {
       return this.startingBeads.length + 1
@@ -77,9 +77,6 @@ export default {
       return colorIds
     },
     hole() {
-      return this.history[this.history.length - 2]
-    },
-    tail() {
       return this.history[this.history.length - 1]
     },
     loopEnd() {
@@ -96,10 +93,10 @@ export default {
       return 0
     },
     activeEnd() {
-      return this.history.length - 2
+      return this.history.length - 1
     },
     activeStart() {
-      return this.history.length > 2 &&
+      return this.history.length >= 2 &&
         this.hole == this.history[0] && this.tail == this.history[1] && this.showTail ?
         0 : this.loopStart
     },
@@ -115,8 +112,8 @@ export default {
       return true
     },
     reversing() {
-      return this.history.length >= 3 &&
-        this.tail == this.history[this.history.length - 3]
+      return this.history.length >= 2 &&
+        this.tail == this.history[this.history.length - 2]
     },
     nodeXs() {
       let xs = new Float64Array(this.size)
@@ -310,8 +307,8 @@ export default {
     trophyExitStart() {
       if (this.reversed) {
         return this.oldHole
-      } else if (this.history.length >= 3) {
-        return this.history[this.history.length - 3]
+      } else if (this.history.length >= 2) {
+        return this.history[this.history.length - 2]
       }
 
       return this.hole
@@ -324,10 +321,10 @@ export default {
         return this.history[2]
       } else if (this.reversed) {
         return this.getIngress(this.oldHole, this.hole)
-      } else if (this.history.length >= 4) {
-        return this.history[this.history.length - 4]
       } else if (this.history.length >= 3) {
-        let center = this.history[this.history.length - 3]
+        return this.history[this.history.length - 3]
+      } else if (this.history.length >= 2) {
+        let center = this.history[this.history.length - 2]
         return this.getIngress(center, this.hole)
       }
 
@@ -337,35 +334,35 @@ export default {
       return this.hole
     },
     trophyPushedEnd() {
-      if (this.history.length >= 3) {
+      if (this.history.length >= 2) {
         if (this.hole == this.history[0]) {
           if (this.reversing) {
             return this.history[1]
           }
 
-          return this.history[this.history.length - 3]
+          return this.history[this.history.length - 2]
         } else if (this.reversing) {
-          return this.getIngress(this.hole, this.history[this.history.length - 3])
+          return this.getIngress(this.hole, this.history[this.history.length - 2])
         }
 
-        return this.history[this.history.length - 3]
+        return this.history[this.history.length - 2]
       }
 
       return this.getIngress(this.hole, this.tail)
     },
     trophyEnterStart() {
         if (this.reversed) {
-        if (this.history.length >= 3) {
-          return this.history[this.history.length - 3]
+        if (this.history.length >= 2) {
+          return this.history[this.history.length - 2]
         } else {
           return this.getIngress(this.hole, this.oldHole)
         }
-      } else if (this.history.length >= 3) {
+      } else if (this.history.length >= 2) {
         if (this.history[0] == this.hole) {
           return this.history[1]
         }
 
-        let egress = this.history[this.history.length - 3]
+        let egress = this.history[this.history.length - 2]
         return this.getIngress(this.hole, egress)
       }
 
@@ -428,12 +425,11 @@ export default {
     },
     extra() {
       // extrapolate history to the future if there's no choice of moves
-      if (this.history.length <= 2) {
-        return this.showTail ? this.history : [this.hole]
+      if (this.history.length <= 1) {
+        return this.showTail ? [this.hole, this.tail] : this.history
       }
 
       let loop = [...this.history]
-      loop.pop()
       loop.pop()
       let seen = new Set(loop)
       let prev = loop[loop.length - 1]
@@ -450,7 +446,7 @@ export default {
       }
 
       if (
-        loop.length == this.history.length - 1 &&
+        loop.length == this.history.length &&
         !this.reversing &&
         this.showTail
       ) {
@@ -460,12 +456,12 @@ export default {
       return loop
     },
     canSpin() {
-      return this.history.length >= 3 && ( // must be 3 and not 4
+      return this.history.length >= 2 && ( // must be 2 and not 3
         this.hole == this.history[0] || (
           this.extra[this.loopStart] == this.extra[this.loopEnd] && (
-            this.extra.length > this.history.length ||
+            this.extra.length > this.history.length + 1 ||
             this.getForcedTail(
-              this.history[this.history.length - 3],
+              this.history[this.history.length - 2],
               this.hole,
             ) >= 0
           )
@@ -587,14 +583,12 @@ export default {
       this.trophyWasPushed = this.showTail
       let id = this.beads.indexOf(this.tail)
       this.beads[id] = this.hole
-      this.beadChanges = (this.beadChanges + 1) % 1000
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
       this.oldHole = this.hole
       this.reversed = false
       if (this.reversing) {
-        this.history.pop()
         this.history.pop()
         if (this.history[0] == this.oldHole) {
           // reverse the loop
@@ -605,24 +599,26 @@ export default {
           this.reversed = true
           this.animations[id] += 2
           if (this.history.length >= 2) {
-            this.history.push(this.hole) // keep going back
+            this.tail = this.history[this.history.length - 2] // keep going back
           } else {
-            this.history.push(this.oldHole)
+            this.tail = this.oldHole
           }
 
           return
         }
+      } else {
+        this.history.push(this.tail)
       }
 
       // remove before loop
       for (let offset = this.history.length - 4; offset >= 0; offset--) {
-        if (this.history[offset] == this.tail) {
+        if (this.history[offset] == this.hole) {
           this.history = this.history.slice(offset)
         }
       }
 
-      this.history.push(this.getNextTail(this.history))
-      this.historyChanges = (this.historyChanges + 1) % 1000
+      this.tail = this.getNextTail(this.history)
+      this.stateChanges = (this.stateChanges + 1) % 1000
     },
     getNextTail(history) {
       // first choice: continue the loop
@@ -657,7 +653,7 @@ export default {
       return oldHole
     },
     goBack() {
-      if (this.history.length > 2) {
+      if (this.history.length >= 2) {
         this.trophyWasPushed = this.showTail
         // always show tail when undoing win because winning hides tail.
         //
@@ -672,11 +668,11 @@ export default {
           this.trophyPushed = false
         }
 
+        this.tail = this.hole
         this.history.pop()
 
         let id = this.beads.indexOf(this.hole)
         this.beads[id] = this.tail
-        this.beadChanges = (this.beadChanges + 1) % 1000
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         this.trophyAlternate = !this.trophyAlternate
@@ -685,7 +681,7 @@ export default {
           this.history.unshift(this.hole)
         }
 
-        this.historyChanges = (this.historyChanges + 1) % 1000
+        this.stateChanges = (this.stateChanges + 1) % 1000
       }
     },
     selectLeft() {
@@ -697,11 +693,7 @@ export default {
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
-          if (newTail != this.tail) {
-            this.history[this.history.length - 1] = newTail
-            this.historyChanges = (this.historyChanges + 1) % 1000
-          }
-
+          this.tail = newTail
           return
         }
       }
@@ -715,18 +707,14 @@ export default {
       for (let i = 1; i <= this.size; i++) {
         let newTail = (this.tail + i) % this.size
         if (this.matrix[this.hole * this.size + newTail]) {
-          if (newTail != this.tail) {
-            this.history[this.history.length - 1] = newTail
-            this.historyChanges = (this.historyChanges + 1) % 1000
-          }
-
+          this.tail = newTail
           return
         }
       }
     },
     ensureTail() {
       if (!this.showTail) {
-        if (this.history.length <= 2 || !this.deadEnd) {
+        if (this.history.length <= 1 || !this.deadEnd) {
           this.showTail = true
         }
 
@@ -743,19 +731,16 @@ export default {
       this.clickTarget = this.getClickTarget(event.offsetX, event.offsetY)
       this.clicking = true
       this.showCross = false
-      if (this.clickTarget == this.hole && this.history.length <= 2) {
+      if (this.clickTarget == this.hole && this.history.length <= 1) {
         this.clickTarget = -1
         this.showTail = false
         this.showCross = true
       } else if (this.clickTarget != null && this.clickTarget >= 0) {
         let newTail = this.clickTarget == this.hole ?
-          this.history[this.history.length - 3] : this.clickTarget
+          this.history[this.history.length - 2] : this.clickTarget
         this.showTail = this.matrix[this.size * this.hole + newTail]
         if (this.showTail) {
-          if (newTail != this.tail) {
-            this.history[this.history.length - 1] = newTail
-            this.historyChanges = (this.historyChanges + 1) % 1000
-          }
+          this.tail = newTail
         } else {
           this.clickTarget = -1
           this.showCross = true
@@ -782,10 +767,10 @@ export default {
         this.showTail = false
       } else if (this.clickTarget == -2 && this.canSpin) {
         if (this.history[0] == this.hole) {
-          this.history[this.history.length - 1] = this.history[1]
+          this.tail = this.history[1]
         } else {
-          this.history[this.history.length - 1] = this.getForcedTail(
-            this.history[this.history.length - 3],
+          this.tail = this.getForcedTail(
+            this.history[this.history.length - 2],
             this.hole,
           )
         }
@@ -875,7 +860,6 @@ export default {
         this.hasWon = false
         this.showTail = false
         this.beads = [...newStartingBeads]
-        this.beadChanges = (this.beadChanges + 1) % 1000
         this.oldBeads = [...newStartingBeads]
         this.animations = new Uint8Array(this.beads.length)
         let beadSet = new Set(this.beads)
@@ -883,12 +867,12 @@ export default {
         for (; beadSet.has(hole); hole++) { }
 
         this.history = [hole]
-        this.history.push(this.getNextTail(this.history))
-        this.historyChanges = (this.historyChanges + 1) % 1000
+        this.tail = this.getNextTail(this.history)
+        this.stateChanges = (this.stateChanges + 1) % 1000
       },
       immediate: true,
     },
-    beadChanges(newBeadChanges, oldBeadChanges) {
+    stateChanges(newStateChanges, oldStateChanges) {
       let newWon = true
       for (let [id, node] of this.beads.entries()) {
         if (node != id + 1) { newWon = false }
@@ -908,6 +892,10 @@ export default {
       }
 
       this.trophyPushed = this.showTail
+      this.$emit('update:state', { beads: this.beads, history: this.history })
+    },
+    tail(newTail, oldTail) {
+      this.$emit('update:tail', newTail)
     },
     showTail(newShowTail, oldShowTail) {
       if (newShowTail) {
@@ -916,9 +904,6 @@ export default {
           this.clickTarget = null
         }
       }
-    },
-    historyChanges(newHistoryChanges, oldHistoryChanges) {
-      this.$emit('update:state', { beads: this.beads, history: this.history })
     },
   },
 }
