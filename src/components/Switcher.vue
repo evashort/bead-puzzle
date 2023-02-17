@@ -106,6 +106,7 @@ export default {
             won: false,
             beads: this.permutationToBeads(puzzle, nodes),
             history: [Permute.findZero(puzzle)],
+            tail: null,
           }
         }
       }
@@ -137,6 +138,7 @@ export default {
         beads: graphs[0].puzzles[0][0].beads,
         history: graphs[0].puzzles[0][0].history,
       },
+      initialTail: null,
       autofocus: false,
       playing: false,
     }
@@ -348,6 +350,9 @@ ${comment}
       this.puzzle.beads = state.beads
       this.puzzle.history = state.history
     },
+    tailChanged(tail) {
+      this.puzzle.tail = tail
+    },
     permutationToBeads(permutationIndex, nodes) {
       let start = Permute.fromIndex(permutationIndex, nodes)
       let beads = []
@@ -366,6 +371,7 @@ ${comment}
         beads: this.puzzle.beads,
         history: this.puzzle.history,
       }
+      this.initialTail = this.puzzle.tail
     },
     rotationIndex(newRotationIndex, oldRotationIndex) {
       this.variation = 0
@@ -373,12 +379,14 @@ ${comment}
         beads: this.puzzle.beads,
         history: this.puzzle.history,
       }
+      this.initialTail = this.puzzle.tail
     },
     variation(newVariation, oldVariation) {
       this.initialState = {
         beads: this.puzzle.beads,
         history: this.puzzle.history,
       }
+      this.initialTail = this.puzzle.tail
     },
     playing(newPlaying, oldPlaying) {
       let play = document.getElementById('play')
@@ -449,9 +457,11 @@ ${comment}
         <Game
           :edges=edges
           :state="initialState"
+          :initialTail="initialTail"
           :autofocus="autofocus"
           @update:won="wonChanged"
           @update:state="stateChanged"
+          @update:tail="tailChanged"
         />
         <button
           class="next"

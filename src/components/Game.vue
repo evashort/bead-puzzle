@@ -41,6 +41,7 @@ export default {
   props: {
     edges: Array, 
     state: { beads: Array, history: Array },
+    initialTail: Number,
     autofocus: Boolean,
   },
   emits: ['update:won', 'update:state', 'update:tail'],
@@ -873,6 +874,14 @@ export default {
         this.won = false
         this.hasWon = false
         this.showTail = false
+      },
+      immediate: true,
+    },
+    initialTail: {
+      handler(newInitialTail, oldInitialTail) {
+        if (newInitialTail != null) {
+          this.tail = newInitialTail
+        }
       },
       immediate: true,
     },
