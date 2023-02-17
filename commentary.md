@@ -49,15 +49,13 @@ Your progress will not be saved. You can change this in Settings.
     1. 16-bit original bead locations
 1. 16-bit number of started variations
     1. 16-bit current bead locations
-    1. 8-bit history length
-    1. 4-bit history[0]
-    1. 4-bit tail
-    1. 16-bit history[1:-1]
+    1. 13-bit history not including hole or tail
+    1. 3-bit history length
 1. 16-bit number of won variations
 1. 32-bit CRC checksum
 
 for each won level: 32+16+16 = 64 bits = 11 characters
-for each started level: 32+16+16+16+8+4+4+16 = 112 bits = 19 characters
+for each started level: 32+16+16+16+13+3 = 96 bits = 16 characters
 
 ## graphs.json
 ```json
