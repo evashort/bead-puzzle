@@ -29,7 +29,7 @@ export function findZero(index) {
             result = n
         }
 
-        n += 1
+        n++
         index -= remainder
         index /= n
     }
@@ -37,9 +37,34 @@ export function findZero(index) {
     return result
 }
 
+export function findValue(index, value) {
+    let unit = 1
+    let n = 1
+    while (unit <= index) {
+        n++
+        unit *= n
+    }
+
+    while (n > value) {
+        unit /= n
+        remainder = index % unit
+        quantity = (index - remainder) / unit
+        index = remainder
+        n--
+        if (quantity == n - value) {
+            return n
+        } else if (quantity > n - value) {
+            value--
+        }
+    }
+    
+    return value
+}
+
 var Permute = {
     fromIndex: fromIndex,
     findZero: findZero,
+    findValue: findValue,
 }
 
 export default Permute

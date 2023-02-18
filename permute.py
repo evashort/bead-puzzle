@@ -103,6 +103,25 @@ def find_zero(index):
     
     return result
 
+def find_value(index, value):
+    unit = 1
+    n = 1
+    while unit <= index:
+        n += 1
+        unit *= n
+
+    while n > value:
+        unit //= n
+        quantity = index // unit
+        index %= unit
+        n -= 1
+        if quantity == n - value:
+            return n
+        elif quantity > n - value:
+            value -= 1
+    
+    return value
+
 if __name__ == '__main__':
     import itertools
     assert [
@@ -119,3 +138,32 @@ if __name__ == '__main__':
         == [1, 4, 0, 3, 2]
     
     assert find_zero(to_index((2, 1, 4, 0, 3))) == 3
+
+    assert [find_value(to_index((2, 1, 4, 0, 3)), i) for i in range(5)] == [3, 1, 0, 4, 2]
+
+    assert [[find_value(i, j) for j in range(4)] for i in range(24)] == [
+        [0, 1, 2, 3],
+        [1, 0, 2, 3],
+        [0, 2, 1, 3],
+        [1, 2, 0, 3],
+        [2, 0, 1, 3],
+        [2, 1, 0, 3],
+        [0, 1, 3, 2],
+        [1, 0, 3, 2],
+        [0, 2, 3, 1],
+        [1, 2, 3, 0],
+        [2, 0, 3, 1],
+        [2, 1, 3, 0],
+        [0, 3, 1, 2],
+        [1, 3, 0, 2],
+        [0, 3, 2, 1],
+        [1, 3, 2, 0],
+        [2, 3, 0, 1],
+        [2, 3, 1, 0],
+        [3, 0, 1, 2],
+        [3, 1, 0, 2],
+        [3, 0, 2, 1],
+        [3, 1, 2, 0],
+        [3, 2, 0, 1],
+        [3, 2, 1, 0],
+    ]
