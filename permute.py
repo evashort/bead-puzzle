@@ -104,19 +104,7 @@ def swap2(i, n):
     return i + \
         f(n+2) * (2 + i // f(n) - i // f(n+1) * (n+2) + i // (f(n)+f(n+1)) - (i // (f(n+1)+f(n+2)) + n - i // f(n) + i // f(n+1) * (n+1)) // (n+1) + i // f(n+3) * (n+4)) \
         + f(n) * (n + 1 - i // f(n) + i // (f(n)+f(n+1)) * (n+1) - (i // (f(n+1)+f(n+2)) + n - i // f(n) + i // f(n+1) * (n+1)) // (n+1) + i // (f(n+1)+f(n+2)) * (n+2)) \
-
-def real_swap2(i, n):
-    p = from_index(i, n + 3)
-    temp = p[n]
-    p[n] = p[n+2]
-    p[n+2] = temp
-    return to_index(p)
-
-i = np.arange(100)
-np.array([real_swap2(x, 0) for x in np.arange(100)]) - swap2(np.arange(100), 0) - i // 6 * 3
-np.array([real_swap2(x, 1) for x in np.arange(100)]) - swap2(np.arange(100), 1) - i // 24 * 7 + (i + i // 8) // 2 * 7 - i // 2 * 7 - (i - i // 2 * 2 + i // 8 + 1) // 3 * 7
-j = np.arange(500)
-np.array([real_swap2(x, 2) for x in np.arange(500)]) - swap2(np.arange(500), 2) - (2 - j // 2 - j // 30 * 2) // 3 * 26 - j // 6 * 26 - (j - j // 6 * 6 + j // 30 * 6) // 8 * 26
+        + (n - i // f(n) - i // (f(n+2)+f(n+1)) * n) // (n+1) * (f(n+2)+f(n)) + i // f(n+1) * (f(n+2)+f(n)) + (i - i // f(n+1) * f(n+1) + i // (f(n+2)+f(n+1)) * f(n+1)) // (f(n+1)+f(n)) * (f(n+2)+f(n))
 
 # swap second and fourth = [14, 19,  6, 19,  6, 11,  6, 11, -6, 14, -6,  6, -6,  6,-14,  6,-11, -6,-11, -6,-19, -6,-19,-14]
 #                        = [12, 18,  6, 18,  6, 12,  6, 12, -6, 12, -6,  6, -6,  6,-12,  6,-12, -6,-12, -6,-18, -6,-18,-12]
@@ -221,6 +209,7 @@ def find_value(index, value):
 
 if __name__ == '__main__':
     import itertools
+    import random
     assert [
         tuple(from_index(i, out=[0]*4)) for i in range(24)
     ] == [
@@ -268,3 +257,12 @@ if __name__ == '__main__':
     assert from_index(swap2(to_index([5, 0, 3, 4, 2, 1]), 3), 6) == [5, 0, 3, 1, 2, 4]
     assert from_index(swap2(to_index([5, 0, 4, 3, 6, 2, 1]), 4), 7) == [5, 0, 4, 3, 1, 2, 6]
     assert from_index(swap2(to_index([6, 1, 4, 5, 3, 2, 0]), 3), 7) == [6, 1, 4, 2, 3, 5, 0]
+    random.seed("an arbitrary string that stays the same every time but can be changed if needed")
+    for i in range(100000):
+        index = random.randrange(100000)
+        n = random.randrange(25)
+        actual = swap2(index, n)
+        permutation = from_index(index, n + 3)
+        permutation[n], permutation[n + 2] = permutation[n + 2], permutation[n]
+        expected = to_index(permutation)
+        assert actual == expected
