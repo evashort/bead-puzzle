@@ -116,7 +116,7 @@ i = np.arange(100)
 np.array([real_swap2(x, 0) for x in np.arange(100)]) - swap2(np.arange(100), 0) - i // 6 * 3
 np.array([real_swap2(x, 1) for x in np.arange(100)]) - swap2(np.arange(100), 1) - i // 24 * 7 + (i + i // 8) // 2 * 7 - i // 2 * 7 - (i - i // 2 * 2 + i // 8 + 1) // 3 * 7
 j = np.arange(500)
-np.array([real_swap2(x, 2) for x in np.arange(500)]) - swap2(np.arange(500), 2) - (2 - j // 2 + j // 30 + (j // 2 - j // 30 + j // 120) // 3 - (2 - j // 2 + j // 30 - j // 120) // 3 * 2) // 3 * 26
+np.array([real_swap2(x, 2) for x in np.arange(500)]) - swap2(np.arange(500), 2) - (2 - j // 2 - j // 30 * 2) // 3 * 26 - j // 6 * 26 - (j - j // 6 * 6 + j // 30 * 6) // 8 * 26
 
 # swap second and fourth = [14, 19,  6, 19,  6, 11,  6, 11, -6, 14, -6,  6, -6,  6,-14,  6,-11, -6,-11, -6,-19, -6,-19,-14]
 #                        = [12, 18,  6, 18,  6, 12,  6, 12, -6, 12, -6,  6, -6,  6,-12,  6,-12, -6,-12, -6,-18, -6,-18,-12]
