@@ -95,16 +95,30 @@ def rotate_left(index, length):
 # math.factorial(n-1) * (n + j * (n-1) + (j // (n+1) - j // n * n) * (n+1))
 
 def swap1(i, n):
-    f = np.math.factorial
-    return i + \
-        f(n+1) + i // f(n) * (f(n+1)-f(n)) - i // f(n+1) * f(n+2) + i // (f(n)+f(n+1)) * (f(n)+f(n+1)) + i // f(n+2) * f(n+2)
+    j = i // np.math.factorial(n)
+    return i + np.math.factorial(n) * (
+        n + 1 \
+        + j * n \
+        - j // (n+1) * (n+2) * (n+1) \
+        + j // (n+2) * (n+2) \
+        + j // ((n+1)*(n+2)) * (n+2) * (n+1)
+    )
 
 def swap2(i, n):
-    f = np.math.factorial
-    return i + \
-        f(n+2) * (2 + i // f(n) - i // f(n+1) * (n+2) + i // (f(n)+f(n+1)) - (i // (f(n+1)+f(n+2)) + n - i // f(n) + i // f(n+1) * (n+1)) // (n+1) + i // f(n+3) * (n+4)) \
-        + f(n) * (n + 1 - i // f(n) + i // (f(n)+f(n+1)) * (n+1) - (i // (f(n+1)+f(n+2)) + n - i // f(n) + i // f(n+1) * (n+1)) // (n+1) + i // (f(n+1)+f(n+2)) * (n+2)) \
-        + (n - i // f(n) - i // (f(n+2)+f(n+1)) * n) // (n+1) * (f(n+2)+f(n)) + i // f(n+1) * (f(n+2)+f(n)) + (i - i // f(n+1) * f(n+1) + i // (f(n+2)+f(n+1)) * f(n+1)) // (f(n+1)+f(n)) * (f(n+2)+f(n))
+    j = i // np.math.factorial(n)
+    return i + np.math.factorial(n) * (
+        (2 * n + 5) * (n+1) \
+        + j * ((n+2)*(n+1)-1) \
+        - j // (n+1) * (n+2) * (n+2) * (n+1) \
+        + j // ((n+3)*(n+2)*(n+1)) * (n+4) * (n+2) * (n+1) \
+        + j // (n+2) * (n+3) * (n+1) \
+        - j // ((n+3)*(n+1)) * (n+1) * (n+1) \
+        + (
+            j \
+            - j // (n+1) * (n+1) \
+            + j // ((n+3)*(n+1)) * (n+1)
+        ) // (n+2) * ((n+2)*(n+1)+1)
+    )
 
 # swap second and fourth = [14, 19,  6, 19,  6, 11,  6, 11, -6, 14, -6,  6, -6,  6,-14,  6,-11, -6,-11, -6,-19, -6,-19,-14]
 #                        = [12, 18,  6, 18,  6, 12,  6, 12, -6, 12, -6,  6, -6,  6,-12,  6,-12, -6,-12, -6,-18, -6,-18,-12]
@@ -253,6 +267,16 @@ if __name__ == '__main__':
         [3, 2, 0, 1],
         [3, 2, 1, 0],
     ]
+
+    random.seed("first arbitrary string that stays the same every time but can be changed if needed")
+    for i in range(10000):
+        index = random.randrange(10000)
+        n = random.randrange(25)
+        actual = swap1(index, n)
+        permutation = from_index(index, n + 2)
+        permutation[n], permutation[n + 1] = permutation[n + 1], permutation[n]
+        expected = to_index(permutation)
+        assert actual == expected
 
     assert from_index(swap2(to_index([5, 0, 3, 4, 2, 1]), 3), 6) == [5, 0, 3, 1, 2, 4]
     assert from_index(swap2(to_index([5, 0, 4, 3, 6, 2, 1]), 4), 7) == [5, 0, 4, 3, 1, 2, 6]
