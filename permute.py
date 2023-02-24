@@ -94,42 +94,36 @@ def rotate_left(index, length):
 # math.factorial(n-1) * (n + j * (n-1) - j // n * n * (n+1) + j // (n+1) * (n+1))
 # math.factorial(n-1) * (n + j * (n-1) + (j // (n+1) - j // n * n) * (n+1))
 
-def swap1(i, n):
-    j = i // np.math.factorial(n)
-    return i + np.math.factorial(n) * (
-        n + 1 \
-        + j * n \
-        + j // (n+2) * (n+2) \
-        + (n+2) * (n+1) * (
-            + j // ((n+1)*(n+2))
-            - j // (n+1)
-        )
-    )
+def swap1(index, n):
+    f = np.math.factorial(n)
+    g = f * (n+1)
+    h = g * (n+2)
+    i = index // f
+    j = i // (n+1)
+    k = j // (n+2)
+    ii = i * f
+    jj = j * g
+    kk = k * h
+    return index + kk + g + i * g - j * h - ii % (g + f)
 
-def swap2(i, n):
-    j = i // np.math.factorial(n)
-    return i + np.math.factorial(n) * (
-        + (n+1) \
-        - j \
-        + j // (n+2) * (n+3) * (n+1) \
-        - j // ((n+3)*(n+1)) * (n+1) * (n+1) \
-        + (
-            j \
-            - j // (n+1) * (n+1) \
-            + j // ((n+3)*(n+1)) * (n+1)
-        ) // (n+2)
-        + (n+2) * (n+1) * (
-            2 \
-            + j \
-            - j // (n+1) * (n+2)
-            + j // ((n+3)*(n+2)*(n+1)) * (n+4)
-            + (
-                j \
-                - j // (n+1) * (n+1) \
-                + j // ((n+3)*(n+1)) * (n+1)
-            ) // (n+2)
-        )
-    )
+def swap2(index, n):
+    f = np.math.factorial(n)
+    g = f * (n+1)
+    h = g * (n+2)
+    x = h * (n+3)
+    i = index // f
+    j = i // (n+1)
+    k = j // (n+2)
+    l = k // (n+3)
+    ii = i * f
+    jj = j * g
+    kk = k * h
+    ll = l * x
+    return index + l * (h + x) + g + 2 * h - ii \
+        + i * g // h * (g + h) \
+        + j * h // x * (g - h) \
+        + (i * g - j * h) * (n+2) \
+        + (i + (j // (n+3) - j) * (n+1)) // (n+2) * (h + f)
 
 # swap second and fourth = [14, 19,  6, 19,  6, 11,  6, 11, -6, 14, -6,  6, -6,  6,-14,  6,-11, -6,-11, -6,-19, -6,-19,-14]
 #                        = [12, 18,  6, 18,  6, 12,  6, 12, -6, 12, -6,  6, -6,  6,-12,  6,-12, -6,-12, -6,-18, -6,-18,-12]
