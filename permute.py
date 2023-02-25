@@ -95,35 +95,32 @@ def rotate_left(index, length):
 # math.factorial(n-1) * (n + j * (n-1) + (j // (n+1) - j // n * n) * (n+1))
 
 def swap1(index, n):
-    f = np.math.factorial(n)
-    g = f * (n+1)
-    h = g * (n+2)
-    i = index // f
-    j = i // (n+1)
-    k = j // (n+2)
-    ii = i * f
-    jj = j * g
-    kk = k * h
-    return index + kk + g + i * g - j * h - ii % (g + f)
+    f = 1 # adding f = decreasing the first digit
+    g = f * (n+1) # adding g = decreasing the second digit
+    h = g * (n+2) # adding h = decreasing the third digit
+    i = index // np.math.factorial(n) # i % g = first digit
+    j = i // g # i % h = second digit
+    k = i // h # i % x = third digit
+    return index + np.math.factorial(n) * (
+        g + h * k - h * j + g * i - i % (g + f)
+    )
 
 def swap2(index, n):
-    f = np.math.factorial(n)
+    f = 1
     g = f * (n+1)
     h = g * (n+2)
     x = h * (n+3)
-    i = index // f
-    j = i // (n+1)
-    k = j // (n+2)
-    l = k // (n+3)
-    ii = i * f
-    jj = j * g
-    kk = k * h
-    ll = l * x
-    return index + l * (h + x) + g + 2 * h - ii \
-        + i * g // h * (g + h) \
-        + j * h // x * (g - h) \
+    i = index // np.math.factorial(n)
+    j = i // g
+    k = i // h
+    l = i // x
+    return index + np.math.factorial(n) * (
+        l * (h + x) + g + 2 * h - i \
+        + i // (n+2) * (g + h) \
+        + j // (n+3) * (g - h) \
         + (i * g - j * h) * (n+2) \
-        + (i + (j // (n+3) - j) * (n+1)) // (n+2) * (h + f)
+        + (i + (j // (n+2 + 1) - j) * (n+1)) // (n+2) * (h + 1)
+    )
 
 # swap second and fourth = [14, 19,  6, 19,  6, 11,  6, 11, -6, 14, -6,  6, -6,  6,-14,  6,-11, -6,-11, -6,-19, -6,-19,-14]
 #                        = [12, 18,  6, 18,  6, 12,  6, 12, -6, 12, -6,  6, -6,  6,-12,  6,-12, -6,-12, -6,-18, -6,-18,-12]
