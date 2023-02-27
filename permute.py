@@ -102,9 +102,12 @@ def swap0(index, n):
     factorial = 1
     for i in range(n):
         factorial *= i + 1
-    
+
+    result, index = divmod(index, factorial * (n+1))
+    result *= factorial * (n+1)
+
     # start with minimum length-n permutation that ends with zero
-    result = factorial * n
+    result += factorial * n
 
     digit = 0
     for i in range(n, 1, -1):
@@ -223,6 +226,6 @@ if __name__ == '__main__':
         [3, 2, 1, 0],
     ]
 
-    for n in range(2, 6):
-        for i in range(np.math.factorial(n+1)):
+    for n in range(0, 6):
+        for i in range(min(n+1, 3) * np.math.factorial(n+1)):
             assert swap0real(i, n) == swap0(i, n)
