@@ -148,6 +148,8 @@ def swap0real(index, n):
     permutation[n] = 0
     return to_index(permutation)
 
+print([swap0real(i, 0) - (i + 1) // 3 % 2 * 2 - i // 6 * 6 - np.array([0]*18+[-6,-12,-6,-20,-12,-16])[i % 24] for i in range(120)])
+
 def find_zero(index):
     result = 0
     n = 1
