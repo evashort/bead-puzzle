@@ -1,5 +1,19 @@
 import numpy as np
 
+def get_value(index, position):
+    n = 0
+    result = position
+    while index > 0:
+        index, remainder = divmod(index, n + 1)
+        if (n == position):
+            result = n - remainder
+        elif n > position:
+            result += result >= n - remainder
+
+        n += 1
+
+    return result
+
 def from_index(index, out=None):
     if out is None:
         out = []
@@ -27,6 +41,9 @@ def from_index(index, out=None):
     return out
 
 def swap_in_index(index, start, end):
+    if end < start:
+        start, end = end, start
+
     stop = end + 1
 
     unit = 1
@@ -43,9 +60,7 @@ def swap_in_index(index, start, end):
         
         out[n - start] = value
 
-    tmp = out[0]
-    out[0] = out[-1]
-    out[-1] = tmp
+    out[0], out[-1] = out[-1], out[0]
 
     for n in range(stop - 1, start - 1, -1):
         index *= n + 1
@@ -223,6 +238,12 @@ def find_value(index, value):
 
 if __name__ == '__main__':
     import itertools
+    assert [
+        get_value(i, 3) for i in range(120)
+    ] == [
+        i[::-1][3] for i in itertools.permutations(range(4, -1, -1))
+    ]
+
     assert [
         tuple(from_index(i, out=[0]*4)) for i in range(24)
     ] == [

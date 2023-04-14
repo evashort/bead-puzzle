@@ -104,7 +104,7 @@ export default {
           rotationPuzzles[i] = {
             start: puzzle,
             won: false,
-            beads: this.permutationToBeads(puzzle, nodes),
+            beads: puzzle,
             history: [Permute.findZero(puzzle)],
             tail: null,
           }
@@ -352,15 +352,6 @@ ${comment}
     },
     tailChanged(tail) {
       this.puzzle.tail = tail
-    },
-    permutationToBeads(permutationIndex, nodes) {
-      let start = Permute.fromIndex(permutationIndex, nodes)
-      let beads = []
-      for (let i = 1; i < nodes; i++) {
-        beads.push((start.indexOf(i) + nodes) % nodes)
-      }
-
-      return beads
     },
   },
   watch: {

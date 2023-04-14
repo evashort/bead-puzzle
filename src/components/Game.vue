@@ -1,8 +1,12 @@
+<script setup>
+import Permute from '../Permute.js'
+</script>
+
 <script>
 export default {
   data() {
     return {
-      beads: [],
+      beads: 0,
       won: false,
       history: [],
       tail: null,
@@ -40,14 +44,19 @@ export default {
   },
   props: {
     edges: Array, 
-    state: { beads: Array, history: Array },
+    state: { beads: Number, history: Array },
     initialTail: Number,
     autofocus: Boolean,
   },
   emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
     size() {
-      return this.state.beads.length + 1
+      let end = 0
+      for (let [a, b] of this.edges) {
+        end = Math.max(end, a, b)
+      }
+
+      return end + 1
     },
     matrix() {
       let matrix = new Uint8Array(this.size * this.size)
@@ -271,10 +280,12 @@ export default {
       return this.beadRadius * Math.sqrt(3)
     },
     beadClasses() {
-      return this.beads.map(
-        function(node, id, beads) {
-          let historyIndex = this.extra.indexOf(node, this.activeStart)
-          return {
+      let result = []
+      for (let id = 0; id < this.size - 1; id++) {
+        let node = Permute.findValue(this.beads, id + 1)
+        let historyIndex = this.extra.indexOf(node, this.activeStart)
+        result.push(
+          {
             bead: true,
             tail: node == this.tail && this.showTail,
             onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
@@ -286,24 +297,26 @@ export default {
               this.oldBeads[id] == this.tail,
             ghost: this.clickTarget != null && !this.clicking,
           }
-        },
-        this,
-      )
+        )
+      }
+
+      return result
     },
     beadOffsetPaths() {
-      return this.beads.map(
-        function(node, id, beads) {
-          let edge =
-            node != this.extra[this.loopStart] &&
-            node == this.tail &&
-            this.showTail ?
-            [this.hole, this.tail] :
-            [this.oldBeads[id], node]
-          let path = this.edgePaths[edge.toString()]
-          return `path('${path}')`
-        },
-        this,
-      )
+      let result = []
+      for (let id = 0; id < this.size - 1; id++) {
+        let node = Permute.findValue(this.beads, id + 1)
+        let edge =
+          node != this.extra[this.loopStart] &&
+          node == this.tail &&
+          this.showTail ?
+          [this.hole, this.tail] :
+          [this.oldBeads[id], node]
+        let path = this.edgePaths[edge.toString()]
+        result.push(`path('${path}')`)
+      }
+
+      return result
     },
     trophyExitStart() {
       if (this.reversed) {
@@ -582,8 +595,8 @@ export default {
     },
     goForwardHelp() {
       this.trophyWasPushed = this.showTail
-      let id = this.beads.indexOf(this.tail)
-      this.beads[id] = this.hole
+      let id = Permute.getValue(this.beads, this.tail) - 1
+      this.beads = Permute.swap(this.beads, this.hole, this.tail)
       this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
@@ -673,8 +686,8 @@ export default {
         this.tail = this.hole
         this.history.pop()
 
-        let id = this.beads.indexOf(this.hole)
-        this.beads[id] = this.tail
+        let id = Permute.getValue(this.beads, this.hole) - 1
+        this.beads = Permute.swap(this.beads, this.hole, this.tail)
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         this.trophyAlternate = !this.trophyAlternate
@@ -861,9 +874,13 @@ export default {
         this.won = false
         this.hasWon = false
         this.showTail = false
-        this.beads = [...newState.beads]
-        this.oldBeads = [...newState.beads]
-        this.animations = new Uint8Array(this.beads.length)
+        this.beads = newState.beads
+        this.oldBeads = new Array(this.size - 1)
+        for (let i = 0; i < this.size - 1; i++) {
+          this.oldBeads[i] = Permute.findValue(this.beads, i + 1)
+        }
+
+        this.animations = new Uint8Array(this.oldBeads.length)
         this.history = [...newState.history]
         this.tail = this.getNextTail(this.history)
       },
@@ -886,11 +903,7 @@ export default {
       immediate: true,
     },
     stateChanges(newStateChanges, oldStateChanges) {
-      let newWon = true
-      for (let [id, node] of this.beads.entries()) {
-        if (node != id + 1) { newWon = false }
-      }
-
+      let newWon = this.beads == 0
       this.justWon = false
       if (newWon != this.won) {
         if (newWon) {
@@ -973,11 +986,11 @@ export default {
       </defs>
       <circle
         v-for="node in size"
-        :fill="node >= 2 && beads[node - 2] == node - 1 ? `url('#checked-${idColors[node - 2] + 1}')` : won ? `url('#checked-0')` : 'black'"
+        :fill="node >= 2 && Permute.getValue(beads, node - 1) == node - 1 ? `url('#checked-${idColors[node - 2] + 1}')` : won ? `url('#checked-0')` : 'black'"
         :r="clickRadius"
         :cx="nodeXs[node - 1]"
         :cy="nodeYs[node - 1]"
-        :class="{touchCircle: true, checked: node >= 2 ? beads[node - 2] == node - 1 : won}"
+        :class="{touchCircle: true, checked: node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won}"
       />
       <circle
         fill="black"
@@ -1105,27 +1118,27 @@ export default {
       </template>
       <image v-if="colorIds[0] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[0]]"
         href="../assets/heart.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${tail == beads[colorIds[0]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[0]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${Permute.getValue(beads, tail) - 1 == colorIds[0] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[0]] }"
       />
       <image v-if="colorIds[1] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[1]]"
         href="../assets/butterfly.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${tail == beads[colorIds[1]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[1]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${Permute.getValue(beads, tail) - 1 == colorIds[1] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[1]] }"
       />
       <image v-if="colorIds[2] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[2]]"
         href="../assets/saturn.svg"
-        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${tail == beads[colorIds[2]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[2]] }"
+        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${Permute.getValue(beads, tail) - 1 == colorIds[2] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[2]] }"
       />
       <image v-if="colorIds[3] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[3]]"
         href="../assets/leaf.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[3]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[3]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${Permute.getValue(beads, tail) - 1 == colorIds[3] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[3]] }"
       />
       <image v-if="colorIds[4] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[4]]"
         href="../assets/mushroom.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${tail == beads[colorIds[4]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[4]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${Permute.getValue(beads, tail) - 1 == colorIds[4] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[4]] }"
       />
       <image v-if="colorIds[5] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[5]]"
         href="../assets/flower.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${tail == beads[colorIds[5]] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[5]] }"
+        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${Permute.getValue(beads, tail) - 1 == colorIds[5] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[5]] }"
       />
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
