@@ -26,6 +26,39 @@ def from_index(index, out=None):
 
     return out
 
+def swap_in_index(index, start, end):
+    stop = end + 1
+
+    unit = 1
+    for n in range(start):
+        unit *= n + 1
+
+    index, fraction = divmod(index, unit)
+    out = [0] * (stop - start)
+    for n in range(start, stop):
+        index, remainder = divmod(index, n + 1)
+        value = n - remainder
+        for i in range(n - start):
+            out[i] += out[i] >= value
+        
+        out[n - start] = value
+
+    tmp = out[0]
+    out[0] = out[-1]
+    out[-1] = tmp
+
+    for n in range(stop - 1, start - 1, -1):
+        index *= n + 1
+        value = out[n - start]
+        index += n - value
+        for i in range(n - start):
+            out[i] -= out[i] >= value
+
+    index *= unit
+    index += fraction
+
+    return index
+
 def to_index(permutation):
     permutation = list(permutation)
     index = 0
@@ -190,7 +223,6 @@ def find_value(index, value):
 
 if __name__ == '__main__':
     import itertools
-    import random
     assert [
         tuple(from_index(i, out=[0]*4)) for i in range(24)
     ] == [
@@ -200,6 +232,9 @@ if __name__ == '__main__':
     assert all(
         to_index(from_index(i)) == i for i in range(24)
     )
+
+    assert from_index(swap_in_index(to_index([3, 2, 6, 5, 1, 0, 4, 8, 7]), 2, 7)) \
+        == [3, 2, 8, 5, 1, 0, 4, 6, 7]
 
     assert from_index(rotate_left(to_index((2, 1, 4, 0, 3)), 5), 5) \
         == [1, 4, 0, 3, 2]
