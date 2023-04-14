@@ -800,8 +800,8 @@ export default {
     getClickTarget(offsetX, offsetY) {
       let gameView = document.getElementById('game-view')
       let clientSize = Math.min(gameView.clientWidth, gameView.clientHeight)
-      let x = (offsetX - 0.5 * gameView.clientWidth) * 240 / clientSize
-      let y = (offsetY - 0.5 * gameView.clientHeight) * 240 / clientSize
+      let x = (offsetX - 0.5 * gameView.clientWidth) * 286 / clientSize
+      let y = (offsetY - 0.5 * gameView.clientHeight) * 286 / clientSize
       for (let i = 0; i < this.size; i++) {
         let dx = this.nodeXs[i] - x
         let dy = this.nodeYs[i] - y
