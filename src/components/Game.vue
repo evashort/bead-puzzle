@@ -29,9 +29,6 @@ export default {
       animations: new Uint8Array(0),
       oldBeads: [],
 
-      // change triggers
-      stateChanges: 0,
-
       // trophy state
       trophyAlternate: false,
       oldHole: 0,
@@ -618,7 +615,6 @@ export default {
             this.tail = this.oldHole
           }
 
-          this.stateChanges = (this.stateChanges + 1) % 1000
           return
         }
       } else {
@@ -633,7 +629,6 @@ export default {
       }
 
       this.tail = this.getNextTail(this.history)
-      this.stateChanges = (this.stateChanges + 1) % 1000
     },
     getNextTail(history) {
       // first choice: continue the loop
@@ -696,8 +691,6 @@ export default {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
         }
-
-        this.stateChanges = (this.stateChanges + 1) % 1000
       }
     },
     selectLeft() {
@@ -903,7 +896,7 @@ export default {
       },
       immediate: true,
     },
-    stateChanges(newStateChanges, oldStateChanges) {
+    beads(newBeads, oldBeads) {
       let newWon = this.beads == 0
       this.justWon = false
       if (newWon != this.won) {
