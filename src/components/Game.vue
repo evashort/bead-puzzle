@@ -669,7 +669,8 @@ export default {
     },
     goBack() {
       if (this.history.length >= 2) {
-        this.trophyWasPushed = this.showTail
+        this.trophyWasPushed = this.showTail &&
+          this.history[this.history.length - 2] == this.tail
         // always show tail when undoing win because winning hides tail.
         //
         // tutorial levels have dead ends which cause the tail to be hidden
