@@ -1,4 +1,4 @@
-"Number of moves without thinking ahead" is calculated by a computer solving the puzzle 1,000 times. The computer puts beads where they belong if possible and avoids trying the same thing twice, but otherwise it moves randomly.
+"Number of moves without thinking ahead" is calculated by a computer solving the puzzle 1,000 times. The computer tries not to repeat itself and puts beads where they belong when possible, but otherwise it moves randomly.
 
 In discrete math, a group of dots connected by lines is called a [graph](https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)). The dots are called vertices and the lines are called edges. Each puzzle in this game is based on a different graph.
 
