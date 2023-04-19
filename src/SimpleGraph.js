@@ -11,28 +11,29 @@ export function bytesToNodeCount(bytes) {
     return n + 1
 }
 
-export function bytesToEdges(bytes) {
-    let edges = []
-    let bitCount = 8 * bytes.length
-    let x = 1, y = 0
-    for (let bit = 0; bit < bitCount; bit++) {
-        if (bytes[bit >> 3] & (1 << (bit & 7))) {
-            edges.push([y, x])
-        }
+export function bytesToMatrix(bytes, layout) {
+    let length = layout.length
+    let matrix = new Uint8Array(length * length)
+    for (let b = 0; b < length; b++) {
+        for (let a = 0; a < b; a++) {
+            let [c, d] = [layout[a], layout[b]]
+            if (d < c) {
+                [c, d] = [d, c]
+            }
 
-        y++
-        if (y >= x) {
-            y = 0
-            x++
+            let bit = c + d * (d - 1) / 2
+            if (bytes[bit >> 3] & (1 << (bit & 7))) {
+                matrix[a + b * length] = matrix[b + a * length] = 1
+            }
         }
     }
 
-    return edges
+    return matrix
 }
 
 var SimpleGraph = {
     bytesToNodeCount: bytesToNodeCount,
-    bytesToEdges: bytesToEdges,
+    bytesToMatrix: bytesToMatrix,
 }
 
 export default SimpleGraph

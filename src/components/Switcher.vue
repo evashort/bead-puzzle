@@ -98,7 +98,6 @@ export default {
 
     let idGraphs = {}
     for (let graph of graphData.graphs) {
-      let nodes = SimpleGraph.bytesToNodeCount(base64js.toByteArray(graph.id))
       for (let rotationPuzzles of graph.puzzles) {
         for (let [i, puzzle] of rotationPuzzles.entries()) {
           rotationPuzzles[i] = {
@@ -183,19 +182,6 @@ export default {
     },
     puzzle() {
       return this.graph.puzzles[this.rotation][this.variation]
-    },
-    edges() {
-      let index = this.graph['layout']
-      let layout = Permute.fromIndex(index, this.nodes)
-      return SimpleGraph.bytesToEdges(this.idBytes).map(
-        function(edge, index, edges) {
-          return [
-            (layout.indexOf(edge[0]) + this.rotation) % this.nodes,
-            (layout.indexOf(edge[1]) + this.rotation) % this.nodes,
-          ]
-        },
-        this,
-      )
     },
     instructions() {
       // https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/term-collections/keys-keyboard-shortcuts
@@ -446,7 +432,8 @@ ${comment}
     <dialog id="play">
       <div class="gameHolder">
         <Game
-          :edges=edges
+          :graph=idBytes
+          :layout="Permute.rotateRight(graph.layout, rotation, nodes)"
           :state="initialState"
           :initialTail="initialTail"
           :autofocus="autofocus"

@@ -1,5 +1,6 @@
 <script setup>
 import Permute from '../Permute.js'
+import SimpleGraph from '../SimpleGraph.js'
 </script>
 
 <script>
@@ -40,7 +41,8 @@ export default {
     }
   },
   props: {
-    edges: Array, 
+    graph: Uint8Array,
+    layout: Number,
     state: { beads: Number, history: Array },
     initialTail: Number,
     autofocus: Boolean,
@@ -48,20 +50,24 @@ export default {
   emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
     size() {
-      let end = 0
-      for (let [a, b] of this.edges) {
-        end = Math.max(end, a, b)
-      }
-
-      return end + 1
+      return SimpleGraph.bytesToNodeCount(this.graph)
     },
     matrix() {
-      let matrix = new Uint8Array(this.size * this.size)
-      for (let [a, b] of this.edges) {
-        matrix[a * this.size + b] = matrix[b * this.size + a] = 1
+      let layout = Permute.fromIndex(this.layout, this.size)
+      return SimpleGraph.bytesToMatrix(this.graph, layout)
+    },
+    edges() {
+      let edges = []
+      for (let a = 0; a < this.size; a++) {
+        let rowStart = a * this.size
+        for (let b = a + 1; b < this.size; b++) {
+          if (this.matrix[rowStart + b]) {
+            edges.push([a, b])
+          }
+        }
       }
 
-      return matrix
+      return edges
     },
     idColors() {
       return [
@@ -880,13 +886,10 @@ export default {
       },
       immediate: true,
     },
-    edges: {
-      handler(newEdges, oldEdges) {
-        this.won = false
-        this.hasWon = false
-        this.showTail = false
-      },
-      immediate: true,
+    matrix(newMatrix, oldMatrix) {
+      this.won = false
+      this.hasWon = false
+      this.showTail = false
     },
     initialTail: {
       handler(newInitialTail, oldInitialTail) {
