@@ -26,7 +26,6 @@ export default {
           "3wA=",
           "+B0=",
           "3gw=",
-          "/ww=",
           "3ww=",
           "+J0B",
         ],
@@ -42,7 +41,7 @@ export default {
         ],
       },
       {
-        name: '🪆 recursion',
+        name: '🪆 Recursion',
         ids: [
           "Hg==",
           "3gA=",
@@ -52,7 +51,6 @@ export default {
           "/gw=",
           "/owB",
           "7ww=",
-          "b40B",
           "7Qw=",
           "7YwB",
           "7owB",
@@ -225,7 +223,7 @@ Each rotation of this puzzle has many variations.
 
 Each variation can be solved in 9 moves, but there's no reason to solve them all.
 
-If you can win in less than 44 moves, you must be thinking ahead.
+If you can win in less than 16 moves, you must be thinking ahead.
 `,
       }
       if (Object.hasOwn(fullInstructions, this.graph.id)) {
@@ -249,7 +247,7 @@ Every puzzle starts as far from the goal as possible, so restarting will never g
         '3gw=': `
 When you fold over one layer of an origami frog base, it becomes a diamond with no visible seams.
 
-A bird base has the same shape but a seam is always visible (see level 9).
+A bird base has the same shape but a seam is always visible (see level 8).
 `,
         '+A0=': `
 In this game, a *state* is an arrangement of beads.

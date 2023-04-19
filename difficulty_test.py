@@ -51,21 +51,27 @@ for i, src_path in enumerate(src_folder.iterdir()):
 
             seen = collections.Counter()
             moves = 0
-            while True:
+            while beads != goal:
                 seen[beads] += 1
                 choices = {
                     b: tuple(hole if bead == b else bead for bead in beads)
                     for b in edges[hole]
                 }
                 moves += 1
-                if goal in choices.values():
-                    break
-
-                min_seen = min(seen[choice] for choice in choices.values())
+                scores = {
+                    b: (
+                        seen[choice],
+                        sum(
+                            node != bead
+                            for bead, node in enumerate(choice, start=1)
+                        ),
+                    ) for b, choice in choices.items()
+                }
+                min_score = min(scores.values())
                 hole, beads = random.choice(
                     [
-                        item for item in choices.items()
-                        if seen[item[1]] <= min_seen
+                        (b, choices[b]) for b, score in scores.items()
+                        if score <= min_score
                     ],
                 )
 
