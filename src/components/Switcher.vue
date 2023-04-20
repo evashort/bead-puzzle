@@ -234,8 +234,8 @@ ${fullInstructions[this.graph.id]}
       }
 
       let comments = {
-        '/ww=': `
-This puzzle is harder than the last one even though it has more paths for the beads to move along.
+        '3ww=': `
+This puzzle is harder than frog base even though it has more paths for the beads to move along.
 
 That's because its [state space](https://en.wikipedia.org/wiki/State_space) is twice as big.
 
@@ -247,7 +247,7 @@ Every puzzle starts as far from the goal as possible, so restarting will never g
         '3gw=': `
 When you fold over one layer of an origami frog base, it becomes a diamond with no visible seams.
 
-A bird base has the same shape but a seam is always visible (see level 8).
+A bird base has the same shape but a seam is always visible.
 `,
         '+A0=': `
 In this game, a *state* is an arrangement of beads.

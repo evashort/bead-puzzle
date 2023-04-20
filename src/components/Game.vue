@@ -81,6 +81,17 @@ export default {
         [0, 1, 2, 3, 4, 5],
       ][this.size]
     },
+    colorHex() {
+      return [
+        "#cacaca",
+        "#b51d14",
+        "#ddb310",
+        "#00b25d",
+        "#00beff",
+        "#3e59f0", // 4053d3 -> color-mix(in lch, #4d64ff, #0750f4) = #3e59f0
+        "#fb49b0",
+      ]
+    },
     colorIds() {
       let colorIds = new Int8Array(6).fill(-1)
       for (let [id, color] of this.idColors.entries()) {
@@ -971,33 +982,43 @@ export default {
           stroke-linejoin="round"
         />
         <!-- http://tsitsul.in/blog/coloropt/ -->
-        <radialGradient r="0.55" id="checked-0"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#cacaca"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-1"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#b51d14"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-2"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#ddb310"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-3"> <stop offset="72%" stop-color="black"/> <stop offset="100%" stop-color="#00b25d"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-4"> <stop offset="75%" stop-color="black"/> <stop offset="100%" stop-color="#00beff"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-5"> <stop offset="70%" stop-color="black"/> <stop offset="100%" stop-color="#4053d3"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-6"> <stop offset="74%" stop-color="black"/> <stop offset="100%" stop-color="#fb49b0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-0"> <stop offset="77%" :stop-color="colorHex[0]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-1"> <stop offset="77%" :stop-color="colorHex[1]" stop-opacity="0.25"/> <stop offset="100%" stop-opacity="0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-2"> <stop offset="77%" :stop-color="colorHex[2]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-3"> <stop offset="77%" :stop-color="colorHex[3]" stop-opacity="0.25"/> <stop offset="98%" stop-opacity="0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-4"> <stop offset="77%" :stop-color="colorHex[4]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-5"> <stop offset="77%" :stop-color="colorHex[5]" stop-opacity="0.25"/> <stop offset="100%" stop-opacity="0"/> </radialGradient>
+        <radialGradient r="0.55" id="checked-6"> <stop offset="77%" :stop-color="colorHex[6]" stop-opacity="0.25"/> <stop offset="97%" stop-opacity="0"/> </radialGradient>
         <image id="star" x="-6" y="-6" width="12" height="12" href="../assets/star.svg"></image>
         <image id="star-small" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"></image>
       </defs>
+      <g v-for="node in size">
+        <circle
+          v-if="node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won"
+          :fill="node >= 2 ? `url('#checked-${idColors[node - 2] + 1}')` : `url('#checked-0')`"
+          :r="clickRadius * 1.3"
+          :cx="nodeXs[node - 1]"
+          :cy="nodeYs[node - 1]"
+        />
+      </g>
       <circle
         v-for="node in size"
-        :fill="node >= 2 && Permute.getValue(beads, node - 1) == node - 1 ? `url('#checked-${idColors[node - 2] + 1}')` : won ? `url('#checked-0')` : 'black'"
+        fill="var(--color-background)"
         :r="clickRadius"
         :cx="nodeXs[node - 1]"
         :cy="nodeYs[node - 1]"
         :class="{touchCircle: true, checked: node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won}"
+        :style="(node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won) ? {stroke: node >= 2 ? colorHex[idColors[node - 2] + 1] : colorHex[0]} : {}"
       />
       <circle
-        fill="black"
+        fill="var(--color-background)"
         :r="clickRadius"
         :cx="0"
         :cy="spinButtonY"
         :class="{touchCircle: true}"
       />
       <circle
-        fill="black"
+        fill="var(--color-background)"
         :r="smallClickRadius"
         :cx="0"
         :cy="smallSpinButtonY"
@@ -1190,11 +1211,13 @@ button {
   margin-top: calc(0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
   margin-left: calc(0.5 * (100% - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
   margin-bottom: min(0rem, 0.5 * (max(100vh, 15rem) - min(120%, 1.2 * max(100vh, 15rem), 42rem)));
+  border: 2px solid #444444;
+  border-radius: 2px;
+  background-color: black;
 }
 .touchCircle {
-  stroke: var(--color-text);
-  stroke-width: 0.5;
-  stroke-opacity: 0.25;
+  stroke: #444444;
+  stroke-width: 1px;
 }
 .touchCircle.checked {
   stroke-width: 0.75;
@@ -1217,7 +1240,7 @@ button {
   fill: none;
 }
 .spinIcon.shadow {
-  stroke: black;
+  stroke: var(--color-background);
   stroke-width: 9;
 }
 .spinIconGhost {
