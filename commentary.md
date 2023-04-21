@@ -87,7 +87,7 @@ Levels that reduce to other levels (old number of moves -> new number)
 - bird base -> bowtie (13 -> 9)
 - treasure chest -> bowtie (15 -> 9)
 - parachute -> bird base (15 -> 13)
-- sun -> treasure chest (18 -> 15)
+- sun -> treasure chest (17 -> 15)
 
 - fox -> square (8 -> 6)
 - cube -> fox (10 -> 8)

@@ -20,18 +20,32 @@ export default {
         ],
       },
       {
-        name: 'Part 1',
+        name: '🍪 Soft baked',
         ids: [
           "Hw==",
           "3wA=",
           "+B0=",
+          "+J0D",
           "3gw=",
           "3ww=",
-          "+J0B",
         ],
       },
       {
-        name: '🔄 Loops',
+        name: '🍫 Tempered',
+        ids: [
+          "+Z0D",
+          "3owB",
+          "7ww=",
+          "+J0B",
+          "34wB",
+          "74wB",
+          "/JUB",
+          "bY0B",
+          "7owB",
+        ],
+      },
+      {
+        name: '🥯 Loops',
         ids: [
           "7QA=",
           "fA0=",
@@ -41,33 +55,40 @@ export default {
         ],
       },
       {
-        name: '🪆 Recursion',
+        name: '🧅 Recursion',
         ids: [
           "Hg==",
           "3gA=",
           "+A0=",
           "+JUB",
+          "+I0B",
           "/gA=",
           "/gw=",
           "/owB",
-          "7ww=",
           "7Qw=",
           "7YwB",
-          "7owB",
-          "bY0B",
           "xrMB",
-          "eA0=",
-          "eI0B",
         ],
       },
       {
-        name: 'Part 4',
+        name: '🍭 Stick with it',
         ids: [
+          "eA0=",
+          "uJUB",
           "7Aw=",
           "VJYB",
-          "cI0B",
+          "VLcB",
+          "bI0B",
+        ],
+      },
+      {
+        name: '🌰 Tough nut to crack',
+        ids: [
           "VZYB",
+          "rJYB",
           "6JYB",
+          "4J4B",
+          "cI0B",
           "pJYB",
         ],
       },
@@ -86,13 +107,15 @@ export default {
       groupStart = groupStop
     }
 
-    groupBoundaries.push(
-      {
-        name: "Misc",
-        start: groupStart,
-        stop: graphData.graphs.length,
-      },
-    )
+    if (groupStart < graphData.graphs.length) {
+      groupBoundaries.push(
+        {
+          name: "Misc",
+          start: groupStart,
+          stop: graphData.graphs.length,
+        },
+      )
+    }
 
     let idGraphs = {}
     for (let graph of graphData.graphs) {
