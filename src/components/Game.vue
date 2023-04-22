@@ -771,7 +771,7 @@ export default {
 
       return false
     },
-    onMouseDown(event) {
+    onPointerDown(event) {
       if (event.button != 0) {
         return
       }
@@ -981,7 +981,7 @@ export default {
     @focus.native="onFocus"
     @blur.native="onBlur"
   >
-    <svg id="game-view" viewBox="-143 -143 286 286" @mousedown="onMouseDown" @click.stop.prevent="clicked">
+    <svg id="game-view" viewBox="-143 -143 286 286" @pointerdown="onPointerDown" @click.stop.prevent="clicked">
       <defs>
         <path
           id="head-path"
