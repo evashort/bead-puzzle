@@ -1076,8 +1076,8 @@ export default {
       </mask>
       <mask id="trophy-exit-mask">
         <circle
-          :cx="nodeXs[this.trophyExitStart]"
-          :cy="nodeYs[this.trophyExitStart]"
+          :cx="nodeXs[trophyExitStart]"
+          :cy="nodeYs[trophyExitStart]"
           :r="clickRadius"
           fill="white"
         >
@@ -1085,8 +1085,8 @@ export default {
       </mask>
       <mask id="trophy-enter-mask">
         <circle
-          :cx="nodeXs[this.trophyEnterEnd]"
-          :cy="nodeYs[this.trophyEnterEnd]"
+          :cx="nodeXs[trophyEnterEnd]"
+          :cy="nodeYs[trophyEnterEnd]"
           :r="clickRadius"
           fill="white"
         >

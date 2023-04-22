@@ -403,7 +403,7 @@ ${comment}
   <div :class="{switcher: true, playing: playing}">
     <button
       class="back"
-      @click="this.playing = false"
+      @click="playing = false"
     >
       <!-- https://github.com/FortAwesome/Font-Awesome/tree/6.x/svgs/solid -->
       <img src="../assets/arrow-left.svg"/>
@@ -419,7 +419,7 @@ ${comment}
           <img src="../assets/gear.svg"/>
           Settings
         </button>
-        <button class="close" @click="this.playing = true">
+        <button class="close" @click="playing = true">
           <img src="../assets/xmark.svg"/>
           <img src="../assets/play.svg"/>
         </button>
@@ -435,7 +435,8 @@ ${comment}
             <input
               type="radio"
               :value="group.start + j"
-              v-model="graphIndex"
+              @input="graphIndex = $event.target.value"
+              :checked="graphIndex == group.start + j"
               :id="`level-${group.start + j}`"
               name="level"
               @click="levelClicked"
@@ -484,7 +485,8 @@ ${comment}
               <input
                 type="radio"
                 :value="i"
-                v-model="rotationIndex"
+                @input="rotationIndex = $event.target.value"
+                :checked="rotationIndex == i"
                 :id="`rotation-${letter}`"
                 name="rotation"
               />
@@ -504,7 +506,8 @@ ${comment}
               <input
                 type="radio"
                 :value="i"
-                v-model="variation"
+                @input="variation = $event.target.value"
+                :checked="variation == i"
                 :id="`variation-${i}`"
                 name="variation"
               />
