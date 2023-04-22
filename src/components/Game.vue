@@ -57,14 +57,37 @@ export default {
       return SimpleGraph.bytesToMatrix(this.graph, layout)
     },
     edges() {
+      let [lastA, lastB] = this.arrowEdge
+      if (lastB < lastA) {
+        [lastB, lastA] = this.arrowEdge
+      }
+
+      let [firstA, firstB] = this.history
+      if (firstB < firstA) {
+        [firstB, firstA] = this.history
+      }
+
+      let arrowEdgeExists = false
       let edges = []
+      if (this.history.length >= 2 && (firstA != lastA || firstB != lastB)) {
+        edges.push([firstA, firstB])
+      }
+
       for (let a = 0; a < this.size; a++) {
         let rowStart = a * this.size
         for (let b = a + 1; b < this.size; b++) {
           if (this.matrix[rowStart + b]) {
-            edges.push([a, b])
+            if (a == lastA && b == lastB) {
+              arrowEdgeExists = true
+            } else if (a != firstA || b != firstB) {
+              edges.push([a, b])
+            }
           }
         }
+      }
+
+      if (arrowEdgeExists) {
+        edges.push([lastA, lastB])
       }
 
       return edges
@@ -142,8 +165,7 @@ export default {
     nodeXs() {
       let xs = new Float64Array(this.size)
       for (let i = 0; i < this.size; i++) {
-        // avoid vertical edges because of rendering bug for masked paths
-        xs[i] = 100 * Math.sin(2 * Math.PI * i / this.size + 0.02)
+        xs[i] = 100 * Math.sin(2 * Math.PI * i / this.size)
       }
 
       return xs
@@ -151,7 +173,7 @@ export default {
     nodeYs() {
       let ys = new Float64Array(this.size)
       for (let i = 0; i < this.size; i++) {
-        ys[i] = -100 * Math.cos(2 * Math.PI * i / this.size + 0.02)
+        ys[i] = -100 * Math.cos(2 * Math.PI * i / this.size)
       }
 
       return ys
@@ -965,21 +987,11 @@ export default {
           id="head-path"
           :d="headPath"
           :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-          fill="none"
-          stroke="black"
-          stroke-width="12"
-          stroke-linecap="round"
-          stroke-linejoin="round"
         />
         <path
           id="cross-path"
           :d="crossPath"
           :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
-          fill="none"
-          stroke="black"
-          stroke-width="12"
-          stroke-linecap="round"
-          stroke-linejoin="round"
         />
         <!-- http://tsitsul.in/blog/coloropt/ -->
         <radialGradient r="0.55" id="checked-0"> <stop offset="77%" :stop-color="colorHex[0]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
@@ -1024,56 +1036,6 @@ export default {
         :cy="smallSpinButtonY"
         :class="{touchCircle: true}"
       />
-      <path
-        :opacity="showTail ? 1 : 0"
-        class="head"
-        :d="headPath"
-        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        :class="{ghost: clickTarget != null && !clicking && !showTail}"
-        fill="none"
-      />
-      <mask id="cross-mask">
-        <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
-        <use
-          href="#cross-path"
-          :opacity="showCross && clicking ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking}"
-        />
-      </mask>
-      <mask id="head-mask">
-        <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
-        <use
-          href="#head-path"
-          :opacity="showTail ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking && !showTail}"
-        />
-        <!-- replace with black shape and make sure it covers the trophy -->
-        <use
-          href="#cross-path"
-          :opacity="showCross && clicking ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking}"
-        />
-      </mask>
-      <mask id="truncate-mask">
-        <rect x="-130" y="-130" width="260" height="260" fill="white"></rect>
-        <circle
-          :cx="nodeXs[history[0]]"
-          :cy="nodeYs[history[0]]"
-          :r="edgeTruncated ? 25 : 0"
-          fill="black"
-          :style="{'transition': 'r 0.5s'}">
-        </circle>
-        <use
-          href="#head-path"
-          :opacity="showTail ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking && !showTail}"
-        />
-        <use
-          href="#cross-path"
-          :opacity="showCross && clicking ? 1 : 0"
-          :class="{ghost: clickTarget != null && !clicking}"
-        />
-      </mask>
       <mask id="trophy-exit-mask">
         <circle
           :cx="nodeXs[trophyExitStart]"
@@ -1092,14 +1054,35 @@ export default {
         >
         </circle>
       </mask>
-      <path
-        v-for="edge of edges"
+      <g
+        v-for="(edge, i) in edges"
         :key="`${edge.toString()},${size}`"
-        :class="edgeClasses[edge.toString()]"
-        :d="edgePaths[edge.toString()]"
-        fill="none"
-        v-bind:mask="(edge[0] == arrowEdge[0] && edge[1] == arrowEdge[1]) || (edge[0] == arrowEdge[1] && edge[1] == arrowEdge[0]) ? 'url(#cross-mask)' : (edge[0] == history[0] && edge[1] == history[1]) || (edge[0] == history[1] && edge[1] == history[0]) ? 'url(#truncate-mask)' : 'url(#head-mask)'"
-      />
+      >
+        <use
+          v-if="i == edges.length - 1"
+          href="#head-path"
+          :class="{head: true, shadow: true, ghost: clickTarget != null && !clicking && !showTail}"
+          :opacity="showTail ? 1 : 0"
+        />
+        <use
+          v-if="i == edges.length - 1"
+          href="#head-path"
+          :class="{head: true, ghost: clickTarget != null && !clicking && !showTail}"
+          :opacity="showTail ? 1 : 0"
+        />
+        <path
+          :class="edgeClasses[edge.toString()]"
+          :d="edgePaths[edge.toString()]"
+        />
+        <circle
+          v-if="i == 0"
+          :cx="nodeXs[history[0]]"
+          :cy="nodeYs[history[0]]"
+          :r="edgeTruncated ? 25 : 0"
+          fill="var(--color-background)"
+          :style="{'transition': 'r 0.5s'}">
+        </circle>
+      </g>
       <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
         <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
@@ -1110,13 +1093,15 @@ export default {
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyExitPath : trophyEnterPath}"
         />
       </g>
-      <path
-        :opacity="showCross && clicking ? 1 : 0"
-        class="head"
-        :d="crossPath"
-        :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
-        :class="{ghost: clickTarget != null && !clicking}"
-        fill="none"
+      <use
+          href="#cross-path"
+          :class="{head: true, shadow: true, ghost: clickTarget != null && !clicking}"
+          :opacity="showCross && clicking ? 1 : 0"
+      />
+      <use
+          href="#cross-path"
+          :class="{head: true, ghost: clickTarget != null && !clicking}"
+          :opacity="showCross && clicking ? 1 : 0"
       />
       <template v-if="canSpin">
         <g
@@ -1228,6 +1213,11 @@ button {
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
+  fill: none;
+}
+.head.shadow {
+  stroke: var(--color-background);
+  stroke-width: 12;
 }
 .ghost {
   transition: opacity 0s 0.35s;
@@ -1247,6 +1237,7 @@ button {
   transition: transform 0s 0.05s;
 }
 .edge {
+  fill: none;
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
