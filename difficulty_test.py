@@ -160,11 +160,13 @@ for size, matrices in size_matrices.items():
         graph = graph_list[i]
         distance = graph['distance']
         states = graph['states']
-        graph['superior'] = [
+        superior_ids = [
             graph_list[j]['id'] for j in np.nonzero(superior)[0]
             if graph_list[j]['distance'] >= distance \
                 and graph_list[j]['states'] >= states
         ]
+        if superior_ids:
+            graph['superior'] = superior_ids
 
     # flag graphs with a loop containing all nodes and an edge between two
     # consecutive nodes because they can be solved with a boring algorithm
@@ -185,7 +187,16 @@ for size, matrices in size_matrices.items():
         ),
     )
     for graph, loop in zip(graph_list, has_loop):
-        graph['loop'] = bool(loop)
+        if bool(loop):
+            graph['loop'] = True
+
+# add second sandwich
+(sandwich_index, sandwich), = (
+    (i, dict(graph)) for i, graph in enumerate(graphs)
+    if graph['id'] == 'Hw=='
+)
+sandwich['id'] = 'Hw==.2'
+graphs.insert(sandwich_index + 1, sandwich)
 
 names_path = 'graph_names.json'
 id_names = None
@@ -357,9 +368,6 @@ graphs = [
     graph for graph in graphs
     if graph['name'] is not None and not graph['name'].startswith('#')
 ]
-
-# put tutorial in order
-graphs[0], graphs[1] = graphs[1], graphs[0]
 
 with open(final_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump({'graphs': graphs}, f)

@@ -62,6 +62,7 @@ export default {
           "+A0=",
           "+JUB",
           "+I0B",
+          "Hw==.2",
           "/gA=",
           "/gw=",
           "/owB",
@@ -168,7 +169,7 @@ export default {
       return this.graphs[this.graphIndex]
     },
     idBytes() {
-      return base64js.toByteArray(this.graph.id)
+      return base64js.toByteArray(this.graph.id.split(".", 1)[0])
     },
     nodes() {
       return SimpleGraph.bytesToNodeCount(this.idBytes)
@@ -296,6 +297,9 @@ See the two spaces that are next to each other but not connected?
 If one of those spaces was removed, the remaining spaces would form a pot shape.
 
 Instead of removing a space, you can fill it with the correct bead and then pretend it doesn't exist.
+`,
+        'VJYB': `
+You don't actually have to stick with it. You can stop playing if you're not having fun anymore.
 `,
       }
       let comment = Object.hasOwn(comments, this.graph.id) ?

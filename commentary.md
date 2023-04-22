@@ -57,27 +57,6 @@ Your progress will not be saved. You can change this in Settings.
 for each won level: 32+16+16 = 64 bits = 11 characters
 for each started level: 32+16+16+16+13+3 = 96 bits = 16 characters
 
-## graphs.json
-```json
-{
-    "graphs": [
-        {
-            "id": "DoA=",
-            "distance": 4,
-            "difficulty": 4.0,
-            "states": 5,
-            "layout": 58,
-            "puzzles": [
-                [21, 42, 79],
-                [],
-                [],
-                []
-            ]
-        }
-    ]
-}
-```
-
 ## Reductions
 
 Levels that reduce to other levels (old number of moves -> new number)

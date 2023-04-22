@@ -8,6 +8,10 @@
   "/38=": "#loop",
   "6wA=": "#split",
   "Hw==": "\ud83e\udd6a Sandwich",
+  "Hw==.2": {
+    "name": "\ud83e\udd6a Another sandwich",
+    "layout": "DBCA"
+  },
   "//8f": "#loop",
   "aw8=": "#split",
   "k5YB": "#split",
