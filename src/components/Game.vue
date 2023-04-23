@@ -57,37 +57,23 @@ export default {
       return SimpleGraph.bytesToMatrix(this.graph, layout)
     },
     edges() {
-      let [lastA, lastB] = this.arrowEdge
-      if (lastB < lastA) {
-        [lastB, lastA] = this.arrowEdge
-      }
-
       let [firstA, firstB] = this.history
       if (firstB < firstA) {
         [firstB, firstA] = this.history
       }
 
-      let arrowEdgeExists = false
       let edges = []
-      if (this.history.length >= 2 && (firstA != lastA || firstB != lastB)) {
+      if (this.history.length >= 2) {
         edges.push([firstA, firstB])
       }
 
       for (let a = 0; a < this.size; a++) {
         let rowStart = a * this.size
         for (let b = a + 1; b < this.size; b++) {
-          if (this.matrix[rowStart + b]) {
-            if (a == lastA && b == lastB) {
-              arrowEdgeExists = true
-            } else if (a != firstA || b != firstB) {
-              edges.push([a, b])
-            }
+          if (this.matrix[rowStart + b] && (a != firstA || b != firstB)) {
+            edges.push([a, b])
           }
         }
-      }
-
-      if (arrowEdgeExists) {
-        edges.push([lastA, lastB])
       }
 
       return edges
@@ -291,6 +277,36 @@ export default {
     headPath() {
       let r = this.headRadius, hr = 0.5 * this.headHeight
       return `M ${hr} ${-r} L ${-hr} ${0} L ${hr} ${r}`
+    },
+    headShadowWidth() {
+      return 12
+    },
+    edgeStrokeWidth() {
+      return 4
+    },
+    edgeConeRadius() {
+      // there is a notch in the back of the arrow head shadow to prevent it
+      // from covering the arrow edge. the notch is exactly as wide as the
+      // arrow edge where it intersects the arrow, but it gets wider further
+      // away from the intersection in case the arrow edge is slightly curved.
+      // this value controls the width of the widest part of the notch. it
+      // should be larger than 0.5 * edgeStrokeWidth
+      return 4
+    },
+    headShadowPath() {
+      let r = this.headRadius, hr = 0.5 * this.headHeight
+      let sr = 0.5 * this.headShadowWidth
+      let cos = this.headHeight
+      let sin = this.headRadius
+      let cot = cos / sin
+      let scale = sr / Math.sqrt(cos * cos + sin * sin)
+      cos *= scale
+      sin *= scale
+      let er = 0.5 * this.edgeStrokeWidth
+      let fr = er // fr is head stroke radius, which happens to be the same as edge stroke radius
+      let v = sr / sin // distance from center of arrow head to the concave corner, if the stroke had unit radius
+      let cr = this.edgeConeRadius
+      return `M ${hr + sin} ${-r + cos} A ${sr} ${sr} 0 0 0 ${hr - sin} ${-r - cos} L ${-hr - sin} ${-cos} A ${sr} ${sr} 0 0 0 ${-hr - sin} ${cos} L ${hr - sin} ${r + cos} A ${sr} ${sr} 0 0 0 ${hr + sin} ${r - cos} L ${-hr + sr * v + cr * cot} ${cr} L ${-hr + fr * v + er * cot} ${er} L ${-hr} ${0} L ${-hr + fr * v + er * cot} ${-er} L ${-hr + sr * v + cr * cot} ${-cr} Z`
     },
     crossRadius() {
       return 18
@@ -983,16 +999,6 @@ export default {
   >
     <svg id="game-view" viewBox="-143 -143 286 286" @pointerdown="onPointerDown" @click.stop.prevent="clicked">
       <defs>
-        <path
-          id="head-path"
-          :d="headPath"
-          :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        />
-        <path
-          id="cross-path"
-          :d="crossPath"
-          :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
-        />
         <!-- http://tsitsul.in/blog/coloropt/ -->
         <radialGradient r="0.55" id="checked-0"> <stop offset="77%" :stop-color="colorHex[0]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
         <radialGradient r="0.55" id="checked-1"> <stop offset="77%" :stop-color="colorHex[1]" stop-opacity="0.25"/> <stop offset="100%" stop-opacity="0"/> </radialGradient>
@@ -1058,18 +1064,6 @@ export default {
         v-for="(edge, i) in edges"
         :key="`${edge.toString()},${size}`"
       >
-        <use
-          v-if="i == edges.length - 1"
-          href="#head-path"
-          :class="{head: true, shadow: true, ghost: clickTarget != null && !clicking && !showTail}"
-          :opacity="showTail ? 1 : 0"
-        />
-        <use
-          v-if="i == edges.length - 1"
-          href="#head-path"
-          :class="{head: true, ghost: clickTarget != null && !clicking && !showTail}"
-          :opacity="showTail ? 1 : 0"
-        />
         <path
           :class="edgeClasses[edge.toString()]"
           :d="edgePaths[edge.toString()]"
@@ -1083,6 +1077,14 @@ export default {
           :style="{'transition': 'r 0.5s'}">
         </circle>
       </g>
+      <g
+        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
+        :class="{ghost: clickTarget != null && !clicking && !showTail}"
+        :opacity="showTail ? 1 : 0"
+      >
+        <path :d="headShadowPath" class="head shadow"/>
+        <path :d="headPath" class="head"/>
+      </g>
       <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
         <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
@@ -1093,16 +1095,14 @@ export default {
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyExitPath : trophyEnterPath}"
         />
       </g>
-      <use
-          href="#cross-path"
-          :class="{head: true, shadow: true, ghost: clickTarget != null && !clicking}"
-          :opacity="showCross && clicking ? 1 : 0"
-      />
-      <use
-          href="#cross-path"
-          :class="{head: true, ghost: clickTarget != null && !clicking}"
-          :opacity="showCross && clicking ? 1 : 0"
-      />
+      <g
+        :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
+        :class="{ghost: clickTarget != null && !clicking}"
+        :opacity="showCross && clicking ? 1 : 0"
+      >
+        <path :d="crossPath" class="cross shadow"/>
+        <path :d="crossPath" class="cross"/>
+      </g>
       <template v-if="canSpin">
         <g
           :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
@@ -1208,7 +1208,7 @@ button {
   stroke-width: 0.75;
   stroke-opacity: 1;
 }
-.head {
+.head, .cross {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
@@ -1216,6 +1216,10 @@ button {
   fill: none;
 }
 .head.shadow {
+  stroke: none;
+  fill: var(--color-background);
+}
+.cross.shadow {
   stroke: var(--color-background);
   stroke-width: 12;
 }
