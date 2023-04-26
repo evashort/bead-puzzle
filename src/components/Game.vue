@@ -57,13 +57,13 @@ export default {
       return SimpleGraph.bytesToMatrix(this.graph, layout)
     },
     edges() {
-      let [firstA, firstB] = this.history
-      if (firstB < firstA) {
-        [firstB, firstA] = this.history
-      }
-
       let edges = []
+      let [firstA, firstB] = this.history
       if (this.history.length >= 2) {
+        if (firstB < firstA) {
+          [firstB, firstA] = [firstA, firstB]
+        }
+
         edges.push([firstA, firstB])
       }
 
@@ -258,15 +258,6 @@ export default {
       }
 
       return edgeClasses
-    },
-    edgeTruncated() {
-      let startNode = this.extra[this.loopStart]
-      if (this.extra[this.loopEnd] == startNode) {
-        return false
-      }
-
-      let next = this.extra.indexOf(startNode, this.loopStart + 1)
-      return next >= 0 && next < this.loopEnd
     },
     headRadius() {
       return 12
@@ -1069,13 +1060,12 @@ export default {
           :d="edgePaths[edge.toString()]"
         />
         <circle
-          v-if="i == 0"
+          v-if="i == 0 && edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow']"
           :cx="nodeXs[history[0]]"
           :cy="nodeYs[history[0]]"
-          :r="edgeTruncated ? 25 : 0"
+          :r="25"
           fill="var(--color-background)"
-          :style="{'transition': 'r 0.5s'}">
-        </circle>
+        />
       </g>
       <g
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
