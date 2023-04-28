@@ -13,10 +13,11 @@ export default {
       tail: null,
       showTail: false,
       showCross: false,
-      // if clickTarget is null, clicking is treated as false no matter its
-      // actual value
-      clicking: false,
-      clickTarget: null,
+      clickingButton: false,
+      spinButtonClicked: false,
+      smallSpinButtonClicked: false,
+      oldArrowState: 0,
+
       /*
       animation legend:
       0 = static  forward primary
@@ -306,15 +307,11 @@ export default {
       let d = this.crossRadius * Math.sqrt(0.5)
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
     },
-    arrowEdge() {
-      if (this.showTail) {
-        return [this.hole, this.tail]
-      } else {
-        return [this.oldHole, this.hole]
-      }
-    },
     arrowPath() {
-      return this.edgePaths[this.arrowEdge.toString()]
+      return this.edgePaths[[this.hole, this.tail].toString()]
+    },
+    oldArrowPath() {
+      return this.edgePaths[[this.oldHole, this.hole].toString()]
     },
     beadRadius() {
       return 10
@@ -338,7 +335,6 @@ export default {
             undo: this.oldBeads[id] == this.hole,
             moving: this.oldBeads[id] == this.hole ||
               this.oldBeads[id] == this.tail,
-            ghost: this.clickTarget != null && !this.clicking,
           }
         )
       }
@@ -783,44 +779,26 @@ export default {
         return
       }
 
-      this.clickTarget = this.getClickTarget(event.offsetX, event.offsetY)
-      this.clicking = true
-      this.showCross = false
-      if (this.clickTarget == this.hole && this.history.length <= 1) {
-        this.clickTarget = -1
-        this.showTail = false
-        this.showCross = true
-      } else if (this.clickTarget != null && this.clickTarget >= 0) {
-        let newTail = this.clickTarget == this.hole ?
-          this.history[this.history.length - 2] : this.clickTarget
-        this.showTail = this.matrix[this.size * this.hole + newTail]
-        if (this.showTail) {
-          this.tail = newTail
+      let target = this.getClickTarget(event.offsetX, event.offsetY)
+      this.clickingButton = target != null
+      if (target != null && target >= 0) {
+        if (target == this.hole) {
+          if (this.history.length >= 2) {
+            this.goBack()
+            this.oldArrowState = 1 + this.oldArrowState % 2
+          } else {
+            this.showCross = true
+          }
+        } else if (this.matrix[target * this.size + this.hole]) {
+          this.tail = target
+          this.goForwardHelp()
+          this.oldArrowState = 1 + this.oldArrowState % 2
         } else {
-          this.clickTarget = -1
           this.showCross = true
         }
-      } else if (this.clickTarget == -2 || this.clickTarget == -3) {
-        this.showTail = false
-      }
-    },
-    clicked(event) {
-      if (event.button != 0) {
-        return
-      }
 
-      this.clicking = false
-      let newTarget = this.getClickTarget(event.offsetX, event.offsetY)
-      if (this.clickTarget == -1) {
-      } else if (newTarget != this.clickTarget) {
-        this.clicking = true
-      } else if (this.clickTarget == this.hole && this.reversing) {
-        this.goBack()
         this.showTail = false
-      } else if (this.clickTarget != null && this.clickTarget == this.tail) {
-        this.goForwardHelp()
-        this.showTail = false
-      } else if (this.clickTarget == -2 && this.canSpin) {
+      } else if (target == -2) {
         if (this.history[0] == this.hole) {
           this.tail = this.history[1]
         } else {
@@ -829,12 +807,19 @@ export default {
             this.hole,
           )
         }
+
         this.goForwardHelp()
-        this.clickTarget = -2
-      } else if (this.clickTarget == -3 && this.canSpin) {
+        this.showTail = false
+        this.spinButtonClicked = true
+      } else if (target == -3) {
         this.goBack()
         this.showTail = false
-        this.clickTarget = -3
+        this.smallSpinButtonClicked = true
+      }
+    },
+    clicked(event) {
+      if (event.button == 0) {
+        this.clickingButton = false
       }
     },
     getClickTarget(offsetX, offsetY) {
@@ -874,16 +859,12 @@ export default {
       }
     },
     onFocus() {
-      if (
-        this.clickTarget != -2 && this.clickTarget != -1 &&
-          this.clickTarget != -3
-      ) {
+      if (!this.clickingButton) {
         this.ensureTail()
       }
     },
     onBlur() {
-      this.clickTarget = null
-      this.showTail = false
+      this.clickingButton = false
     },
     getIngress(center, egress) {
       let result = egress
@@ -922,6 +903,7 @@ export default {
 
         this.animations = new Uint8Array(this.oldBeads.length)
         this.history = [...newState.history]
+        this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
       },
       immediate: true,
@@ -963,9 +945,13 @@ export default {
     showTail(newShowTail, oldShowTail) {
       if (newShowTail) {
         this.trophyPushed = true
-        if (!this.clicking) {
-          this.clickTarget = null
-        }
+      }
+    },
+    clickingButton(newClickingButton, oldClickingButton) {
+      if (!newClickingButton) {
+        this.showCross = false
+        this.spinButtonClicked = false
+        this.smallSpinButtonClicked = false
       }
     },
   },
@@ -988,7 +974,7 @@ export default {
     @focus.native="onFocus"
     @blur.native="onBlur"
   >
-    <svg id="game-view" viewBox="-143 -143 286 286" @pointerdown="onPointerDown" @click.stop.prevent="clicked">
+    <svg id="game-view" viewBox="-143 -143 286 286" @pointerdown="onPointerDown" @click.stop.prevent="clicked" @pointerup="clicked">
       <defs>
         <!-- http://tsitsul.in/blog/coloropt/ -->
         <radialGradient r="0.55" id="checked-0"> <stop offset="77%" :stop-color="colorHex[0]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
@@ -1068,9 +1054,15 @@ export default {
         />
       </g>
       <g
+        :style="{ 'offset-path': `path('${oldArrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
+        :class="{headGroup: true, animate: oldArrowState, alternate: oldArrowState == 2}"
+      >
+        <path :d="headShadowPath" class="head shadow"/>
+        <path :d="headPath" class="head"/>
+      </g>
+      <g
+        v-if=showTail
         :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        :class="{ghost: clickTarget != null && !clicking && !showTail}"
-        :opacity="showTail ? 1 : 0"
       >
         <path :d="headShadowPath" class="head shadow"/>
         <path :d="headPath" class="head"/>
@@ -1087,26 +1079,28 @@ export default {
       </g>
       <g
         :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
-        :class="{ghost: clickTarget != null && !clicking}"
-        :opacity="showCross && clicking ? 1 : 0"
+        :class="{crossGroup: true, ghost: !showCross}"
+        :opacity="showCross ? 1 : 0"
       >
         <path :d="crossPath" class="cross shadow"/>
         <path :d="crossPath" class="cross"/>
       </g>
       <template v-if="canSpin">
         <g
-          :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1) scale(${clicking && clickTarget == -2 ? activeBeadScale : normalBeadScale})`}"
-          :class="{spinIconGhost: clickTarget == -2 && !clicking}"
+          :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1)`}"
         >
-          <path :d="spinPath" class="spinIcon shadow"/>
-          <path :d="spinPath" class="spinIcon"/>
+          <g :class="{spinGroup: true, clicked: spinButtonClicked, ghost: !spinButtonClicked}">
+            <path :d="spinPath" class="spinIcon shadow"/>
+            <path :d="spinPath" class="spinIcon"/>
+          </g>
         </g>
         <g
-          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(${clockwise ? -1 : 1},1) scale(${clicking && clickTarget == -3 ? activeBeadScale : normalBeadScale})`}"
-          :class="{spinIconGhost: clickTarget == -3 && !clicking}"
+          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(${clockwise ? -1 : 1},1)`}"
         >
-          <path :d="smallSpinPath" class="spinIcon shadow"/>
-          <path :d="smallSpinPath" class="spinIcon"/>
+          <g :class="{spinGroup: true, clicked: smallSpinButtonClicked, ghost: !smallSpinButtonClicked}">
+            <path :d="smallSpinPath" class="spinIcon shadow"/>
+            <path :d="smallSpinPath" class="spinIcon"/>
+          </g>
         </g>
       </template>
       <image v-if="colorIds[0] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[0]]"
@@ -1209,11 +1203,28 @@ button {
   stroke: none;
   fill: var(--color-background);
 }
+.headGroup {
+  opacity: 0;
+}
+.headGroup.animate {
+  animation: oldArrow 0.45s;
+}
+.headGroup.animate.alternate {
+  animation: oldArrow2 0.45s;
+}
+@keyframes oldArrow {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+@keyframes oldArrow2 {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
 .cross.shadow {
   stroke: var(--color-background);
   stroke-width: 12;
 }
-.ghost {
+.crossGroup.ghost {
   transition: opacity 0s 0.35s;
 }
 .spinIcon {
@@ -1227,7 +1238,15 @@ button {
   stroke: var(--color-background);
   stroke-width: 9;
 }
-.spinIconGhost {
+.spinGroup.clicked {
+  transform: scale(calc(5/3));
+  animation: revert 1s 0.35s forwards;
+}
+@keyframes revert {
+  from { transform: scale(1); }
+  to { transform: scale(1); }
+}
+.spinGroup.ghost {
   transition: transform 0s 0.05s;
 }
 .edge {
@@ -1294,15 +1313,6 @@ tail onPath undo reverse offset-rotate
 }
 .bead.tail.undo.reverse {
   offset-rotate: reverse;
-}
-.bead.ghost {
-  transition: transform 0s 0.35s;
-}
-.bead.ghost.moving {
-  /* this timing function approximates a delay, since actual delay caused
-   * beads to stay BIG sometimes due to browser bug
-   */
-  transition: transform 0.06s cubic-bezier(1,0,1,0);
 }
 .trophy {
   offset-rotate: auto;
