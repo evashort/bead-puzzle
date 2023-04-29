@@ -1046,11 +1046,11 @@ export default {
           :d="edgePaths[edge.toString()]"
         />
         <circle
-          v-if="i == 0 && edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow']"
+          v-if="i == 0"
           :cx="nodeXs[history[0]]"
           :cy="nodeYs[history[0]]"
           :r="25"
-          fill="var(--color-background)"
+          :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow'], delay: oldHole == history[0] }"
         />
       </g>
       <g
@@ -1191,6 +1191,20 @@ button {
 .touchCircle.checked {
   stroke-width: 0.75;
   stroke-opacity: 1;
+}
+.terminator {
+  opacity: 0;
+  fill: var(--color-background);
+}
+.terminator.shown {
+  opacity: 1;
+}
+.terminator.delay {
+  animation: delay 0.45s
+}
+@keyframes delay {
+  from { opacity: 0; }
+  to { opacity: 0; }
 }
 .head, .cross {
   stroke: var(--color-text);
