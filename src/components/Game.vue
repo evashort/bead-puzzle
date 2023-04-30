@@ -17,6 +17,7 @@ export default {
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
       oldArrowState: 0,
+      backwardsInLoop: 0,
 
       /*
       animation legend:
@@ -59,19 +60,39 @@ export default {
     },
     edges() {
       let edges = []
-      let [firstA, firstB] = this.history
-      if (this.history.length >= 2) {
+      let [firstA, firstB] = []
+      if (this.backwardsInLoop) {
+        if (this.oldHole == this.history[1]) {
+          firstA = this.history[1]
+          firstB = this.history[2]
+        } else {
+          firstA = this.history[this.history.length - 2]
+          firstB = this.history[this.history.length - 3]
+        }
         if (firstB < firstA) {
           [firstB, firstA] = [firstA, firstB]
         }
-
+        
         edges.push([firstA, firstB])
+      }
+
+      let [secondA, secondB] = this.history
+      if (this.history.length >= 2) {
+        if (secondB < secondA) {
+          [secondB, secondA] = [secondA, secondB]
+        }
+
+        edges.push([secondA, secondB])
       }
 
       for (let a = 0; a < this.size; a++) {
         let rowStart = a * this.size
         for (let b = a + 1; b < this.size; b++) {
-          if (this.matrix[rowStart + b] && (a != firstA || b != firstB)) {
+          if (
+            this.matrix[rowStart + b] &&
+              (a != firstA || b != firstB) &&
+              (a != secondA || b != secondB)
+          ) {
             edges.push([a, b])
           }
         }
@@ -647,6 +668,7 @@ export default {
           // reverse the loop
           this.history.reverse()
           this.history.push(this.history[0])
+          this.backwardsInLoop = 1 + this.backwardsInLoop % 2
         } else {
           // not a loop
           this.reversed = true
@@ -657,10 +679,12 @@ export default {
             this.tail = this.oldHole
           }
 
+          this.backwardsInLoop = 0
           return
         }
       } else {
         this.history.push(this.tail)
+        this.backwardsInLoop = 0
       }
 
       // remove before loop
@@ -732,6 +756,9 @@ export default {
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
+          this.backwardsInLoop = 1 + this.backwardsInLoop % 2
+        } else {
+          this.backwardsInLoop = 0
         }
       }
     },
@@ -905,6 +932,7 @@ export default {
         this.history = [...newState.history]
         this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
+        this.backwardsInLoop = 0
       },
       immediate: true,
     },
@@ -1046,11 +1074,18 @@ export default {
           :d="edgePaths[edge.toString()]"
         />
         <circle
-          v-if="i == 0"
+          v-if="backwardsInLoop ? i == 1 : i == 0"
           :cx="nodeXs[history[0]]"
           :cy="nodeYs[history[0]]"
           :r="25"
           :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow'], delay: oldHole == history[0] }"
+        />
+        <circle
+          v-if="i == 0"
+          :cx="nodeXs[oldHole]"
+          :cy="nodeYs[oldHole]"
+          :r="25"
+          :class="{ terminator: true, reverseDelay: backwardsInLoop, alternate: backwardsInLoop == 2 }"
         />
       </g>
       <g
@@ -1199,12 +1234,26 @@ button {
 .terminator.shown {
   opacity: 1;
 }
-.terminator.delay {
+.terminator.shown.delay {
   animation: delay 0.45s
 }
 @keyframes delay {
   from { opacity: 0; }
   to { opacity: 0; }
+}
+.terminator.reverseDelay {
+  animation: reverseDelay 0.45s ease-in
+}
+@keyframes reverseDelay {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+.terminator.reverseDelay.alternate {
+  animation: reverseDelay2 0.45s ease-in
+}
+@keyframes reverseDelay2 {
+  from { opacity: 1; }
+  to { opacity: 1; }
 }
 .head, .cross {
   stroke: var(--color-text);
