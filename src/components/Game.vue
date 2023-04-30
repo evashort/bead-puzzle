@@ -1085,7 +1085,7 @@ export default {
           :cx="nodeXs[oldHole]"
           :cy="nodeYs[oldHole]"
           :r="25"
-          :class="{ terminator: true, reverseDelay: backwardsInLoop, alternate: backwardsInLoop == 2 }"
+          :class="{ oldTerminator: true, delay: backwardsInLoop, alternate: backwardsInLoop == 2 }"
         />
       </g>
       <g
@@ -1241,19 +1241,24 @@ button {
   from { opacity: 0; }
   to { opacity: 0; }
 }
-.terminator.reverseDelay {
-  animation: reverseDelay 0.45s ease-in
+.oldTerminator {
+  stroke: var(--color-background);
+  stroke-width: 0;
+  fill: none;
+}
+.oldTerminator.delay {
+  animation: reverseDelay 0.45s ease 0.3s backwards
 }
 @keyframes reverseDelay {
-  from { opacity: 1; }
-  to { opacity: 1; }
+  from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
+  to { r: calc(100% * 25 / 286); stroke-width: 0; }
 }
-.terminator.reverseDelay.alternate {
-  animation: reverseDelay2 0.45s ease-in
+.oldTerminator.delay.alternate {
+  animation: reverseDelay2 0.45s ease 0.3s backwards
 }
 @keyframes reverseDelay2 {
-  from { opacity: 1; }
-  to { opacity: 1; }
+  from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
+  to { r: calc(100% * 25 / 286); stroke-width: 0; }
 }
 .head, .cross {
   stroke: var(--color-text);
