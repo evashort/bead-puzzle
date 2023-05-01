@@ -16,8 +16,9 @@ export default {
       clickingButton: false,
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
-      oldArrowState: 0,
-      backwardsInLoop: 0,
+      showOldArrow: false,
+      backwardsInLoop: false,
+      continuingLoop: false,
 
       /*
       animation legend:
@@ -83,6 +84,16 @@ export default {
         }
 
         edges.push([secondA, secondB])
+      }
+
+      if (this.continuingLoop) {
+        firstA = this.history[this.history.length - 1]
+        firstB = this.history[this.history.length - 2]
+        if (firstB < firstA) {
+          [firstB, firstA] = [firstA, firstB]
+        }
+        
+        edges.push([firstA, firstB])
       }
 
       for (let a = 0; a < this.size; a++) {
@@ -662,13 +673,16 @@ export default {
       this.trophyAlternate = !this.trophyAlternate
       this.oldHole = this.hole
       this.reversed = false
+      this.showOldArrow = false
+      this.backwardsInLoop = false
+      this.continuingLoop = false
       if (this.reversing) {
         this.history.pop()
         if (this.history[0] == this.oldHole) {
           // reverse the loop
           this.history.reverse()
           this.history.push(this.history[0])
-          this.backwardsInLoop = 1 + this.backwardsInLoop % 2
+          this.backwardsInLoop = true
         } else {
           // not a loop
           this.reversed = true
@@ -679,12 +693,13 @@ export default {
             this.tail = this.oldHole
           }
 
-          this.backwardsInLoop = 0
           return
         }
       } else {
+        this.continuingLoop = this.history.length >= 3 &&
+          this.oldHole == this.history[0] &&
+          this.tail == this.history[1]
         this.history.push(this.tail)
-        this.backwardsInLoop = 0
       }
 
       // remove before loop
@@ -753,12 +768,13 @@ export default {
         this.animations[id] = 3 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         this.trophyAlternate = !this.trophyAlternate
+        this.showOldArrow = false
+        this.backwardsInLoop = false
+        this.continuingLoop = false
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
-          this.backwardsInLoop = 1 + this.backwardsInLoop % 2
-        } else {
-          this.backwardsInLoop = 0
+          this.backwardsInLoop = true
         }
       }
     },
@@ -812,14 +828,14 @@ export default {
         if (target == this.hole) {
           if (this.history.length >= 2) {
             this.goBack()
-            this.oldArrowState = 1 + this.oldArrowState % 2
+            this.showOldArrow = true
           } else {
             this.showCross = true
           }
         } else if (this.matrix[target * this.size + this.hole]) {
           this.tail = target
           this.goForwardHelp()
-          this.oldArrowState = 1 + this.oldArrowState % 2
+          this.showOldArrow = true
         } else {
           this.showCross = true
         }
@@ -932,7 +948,9 @@ export default {
         this.history = [...newState.history]
         this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
-        this.backwardsInLoop = 0
+        this.showOldArrow = false
+        this.backwardsInLoop = false
+        this.continuingLoop = false
       },
       immediate: true,
     },
@@ -1081,16 +1099,16 @@ export default {
           :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow'], delay: oldHole == history[0] }"
         />
         <circle
-          v-if="i == 0"
+          v-if="backwardsInLoop ? i == 0 : i == 1"
           :cx="nodeXs[oldHole]"
           :cy="nodeYs[oldHole]"
-          :r="25"
-          :class="{ oldTerminator: true, delay: backwardsInLoop, alternate: backwardsInLoop == 2 }"
+          :r="12.5"
+          :class="{ oldTerminator: true, close: backwardsInLoop, delay: continuingLoop && !showOldArrow, alternate: trophyAlternate }"
         />
       </g>
       <g
         :style="{ 'offset-path': `path('${oldArrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-        :class="{headGroup: true, animate: oldArrowState, alternate: oldArrowState == 2}"
+        :class="{headGroup: true, animate: showOldArrow, alternate: trophyAlternate}"
       >
         <path :d="headShadowPath" class="head shadow"/>
         <path :d="headPath" class="head"/>
@@ -1246,19 +1264,33 @@ button {
   stroke-width: 0;
   fill: none;
 }
-.oldTerminator.delay {
-  animation: reverseDelay 0.45s ease 0.3s backwards
+.oldTerminator.close {
+  animation: close 0.45s ease 0.3s backwards
 }
-@keyframes reverseDelay {
+@keyframes close {
   from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
   to { r: calc(100% * 25 / 286); stroke-width: 0; }
+}
+.oldTerminator.close.alternate {
+  animation: close2 0.45s ease 0.3s backwards
+}
+@keyframes close2 {
+  from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
+  to { r: calc(100% * 25 / 286); stroke-width: 0; }
+}
+.oldTerminator.delay {
+  animation: oldDelay 0.45s
+}
+@keyframes oldDelay {
+  from { stroke-width: 25; }
+  to { stroke-width: 25; }
 }
 .oldTerminator.delay.alternate {
-  animation: reverseDelay2 0.45s ease 0.3s backwards
+  animation: oldDelay2 0.45s
 }
-@keyframes reverseDelay2 {
-  from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
-  to { r: calc(100% * 25 / 286); stroke-width: 0; }
+@keyframes oldDelay2 {
+  from { stroke-width: 25; }
+  to { stroke-width: 25; }
 }
 .head, .cross {
   stroke: var(--color-text);
