@@ -463,6 +463,7 @@ ${comment}
           :state="initialState"
           :initialTail="initialTail"
           :autofocus="autofocus"
+          :curvedPaths="true"
           @update:won="wonChanged"
           @update:state="stateChanged"
           @update:tail="tailChanged"

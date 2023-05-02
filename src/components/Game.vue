@@ -22,13 +22,9 @@ export default {
 
       /*
       animation legend:
-      0 = static  forward primary
-      1 = animate forward alternate
-      2 = animate forward primary
-      3 = animate reverse alternate
-      4 = animate reverse primary
-
-      6 = static  reverse primary
+      0 = static
+      1 = animate
+      2 = animate alternate
       */
       animations: new Uint8Array(0),
       oldBeads: [],
@@ -49,6 +45,7 @@ export default {
     state: { beads: Number, history: Array },
     initialTail: Number,
     autofocus: Boolean,
+    curvedPaths: Boolean,
   },
   emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
@@ -244,6 +241,28 @@ export default {
         }
       }
 
+      if (!this.curvedPaths) {
+        if (this.showTail && this.tail == this.extra[this.loopStart]) {
+          let id = Permute.getValue(this.beads, this.tail) - 1
+          let a = this.oldBeads[id]
+          if (a != this.hole) {
+            let b = this.tail
+            let name = [a, b].toString()
+            let c = this.hole
+            let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
+            let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
+            let dx3 = this.nodeXs[c] - x2, dy3 = this.nodeYs[c] - y2
+            let scale = 0.1 / Math.sqrt(dx3 * dx3 + dy3 * dy3)
+            dx3 *= scale
+            dy3 *= scale
+            edgePaths[name] = 
+                `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2} l ${dx3} ${dy3}`
+          }
+        }
+
+        return edgePaths
+      }
+
       let endTangent = [0, 0]
       if (this.extra[this.loopStart] == this.extra[this.loopEnd]) {
         let a = this.extra[this.loopEnd - 1], b = this.extra[this.loopEnd]
@@ -359,14 +378,12 @@ export default {
         result.push(
           {
             bead: true,
-            tail: node == this.tail && this.showTail,
+            tail: node == this.tail && this.showTail &&
+              (node != this.extra[this.loopStart] || this.oldBeads[id] == this.hole),
             onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
-            animate: this.animations[id] % 6,
-            alternate: this.animations[id] % 2,
-            reverse: this.animations[id] >= 3,
-            undo: this.oldBeads[id] == this.hole,
-            moving: this.oldBeads[id] == this.hole ||
-              this.oldBeads[id] == this.tail,
+            animate: this.animations[id],
+            alternate: this.animations[id] == 2,
+            reverse: historyIndex > 0 && this.oldBeads[id] == this.extra[historyIndex - 1],
           }
         )
       }
@@ -378,9 +395,8 @@ export default {
       for (let id = 0; id < this.size - 1; id++) {
         let node = Permute.findValue(this.beads, id + 1)
         let edge =
-          node != this.extra[this.loopStart] &&
-          node == this.tail &&
-          this.showTail ?
+          node == this.tail && this.showTail &&
+            node != this.extra[this.loopStart] ?
           [this.hole, this.tail] :
           [this.oldBeads[id], node]
         let path = this.edgePaths[edge.toString()]
@@ -686,7 +702,6 @@ export default {
         } else {
           // not a loop
           this.reversed = true
-          this.animations[id] += 2
           if (this.history.length >= 2) {
             this.tail = this.history[this.history.length - 2] // keep going back
           } else {
@@ -706,6 +721,7 @@ export default {
       for (let offset = this.history.length - 4; offset >= 0; offset--) {
         if (this.history[offset] == this.hole) {
           this.history = this.history.slice(offset)
+          break
         }
       }
 
@@ -765,7 +781,7 @@ export default {
 
         let id = Permute.getValue(this.beads, this.hole) - 1
         this.beads = Permute.swap(this.beads, this.hole, this.tail)
-        this.animations[id] = 3 + this.animations[id] % 2
+        this.animations[id] = 1 + this.animations[id] % 2
         this.oldBeads[id] = this.hole
         this.trophyAlternate = !this.trophyAlternate
         this.showOldArrow = false
@@ -1096,7 +1112,7 @@ export default {
           :cx="nodeXs[history[0]]"
           :cy="nodeYs[history[0]]"
           :r="25"
-          :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow'], delay: oldHole == history[0] }"
+          :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow'], delay: this.history.length == 2 }"
         />
         <circle
           v-if="backwardsInLoop ? i == 0 : i == 1"
@@ -1373,10 +1389,7 @@ tail onPath undo reverse offset-rotate
 0    0                   -90deg
 0    1           0       auto
 0    1           1       reverse
-1    0      0            reverse
-1           1    0       auto
-1           1    1       reverse
-1    1      0            auto
+1                        reverse
 */
 .bead {
   offset-distance: 100%;
@@ -1385,7 +1398,7 @@ tail onPath undo reverse offset-rotate
 .bead.onPath {
   offset-rotate: auto;
 }
-.bead.onPath.reverse {
+.bead.onPath.reverse, .bead.tail {
   offset-rotate: reverse;
 }
 .bead.animate {
@@ -1401,18 +1414,6 @@ tail onPath undo reverse offset-rotate
 @keyframes slide2 {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
-}
-.bead.tail {
-  offset-rotate: reverse;
-}
-.bead.tail.onPath {
-  offset-rotate: auto;
-}
-.bead.tail.undo {
-  offset-rotate: auto;
-}
-.bead.tail.undo.reverse {
-  offset-rotate: reverse;
 }
 .trophy {
   offset-rotate: auto;
