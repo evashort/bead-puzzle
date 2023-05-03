@@ -162,6 +162,9 @@ export default {
       initialTail: null,
       autofocus: false,
       playing: false,
+      showSettings: false,
+      canAnimate: true,
+      curvedPaths: true,
     }
   },
   computed: {
@@ -415,11 +418,11 @@ ${comment}
     </button>
     <div class="sidebar">
       <div class="navigation">
-        <button disabled class="tab">
+        <button :disabled="!showSettings" class="tab" @click="showSettings = false">
           <img src="../assets/list.svg"/>
           Levels
         </button>
-        <button class="tab">
+        <button :disabled="showSettings" class="tab" @click="showSettings = true">
           <img src="../assets/gear.svg"/>
           Settings
         </button>
@@ -428,7 +431,7 @@ ${comment}
           <img src="../assets/play.svg"/>
         </button>
       </div>
-      <div class="levels">
+      <div class="levels" v-if="!showSettings">
         <fieldset v-for="group in groups">
           <legend>{{group.name}}</legend>
           <div
@@ -454,6 +457,16 @@ ${comment}
           </div>
         </fieldset>
       </div>
+      <div class="settings" v-if="showSettings">
+        <input type="checkbox" id="setting-0" name="settings" v-model="canAnimate">
+        &nbsp;
+        <label for="setting-0">Animation</label>
+        <br/>
+        <input type="checkbox" id="setting-1" name="settings" v-model="curvedPaths">
+        &nbsp;
+        <label for="setting-1">Curved paths</label>
+        <br/>
+      </div>
     </div>
     <dialog id="play">
       <div class="gameHolder">
@@ -463,8 +476,8 @@ ${comment}
           :state="initialState"
           :initialTail="initialTail"
           :autofocus="autofocus"
-          :curvedPaths="true"
-          :canAnimate="true"
+          :curvedPaths="curvedPaths"
+          :canAnimate="canAnimate"
           @update:won="wonChanged"
           @update:state="stateChanged"
           @update:tail="tailChanged"
@@ -616,6 +629,10 @@ button img {
 }
 .levels:focus {
   z-index: 1; /* make scroll focus border visible in firefox */
+}
+.settings {
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
 }
 .close::after {
   content: " Play";
