@@ -13,6 +13,7 @@ export default {
       tail: null,
       showTail: false,
       showCross: false,
+      focusIsClick: false,
       clickingButton: false,
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
@@ -834,6 +835,7 @@ export default {
       return false
     },
     onPointerDown(event) {
+      this.focusIsClick = true
       if (event.button != 0) {
         return
       }
@@ -877,6 +879,7 @@ export default {
       }
     },
     clicked(event) {
+      this.focusIsClick = false
       if (event.button == 0) {
         this.clickingButton = false
       }
@@ -917,12 +920,18 @@ export default {
         this.showTail = false
       }
     },
-    onFocus() {
+    onFocus(event) {
+      if (!this.focusIsClick) {
+        event.target.scrollIntoView(false)
+      }
+
+      this.focusIsClick = false
       if (!this.clickingButton) {
         this.ensureTail()
       }
     },
     onBlur() {
+      this.focusIsClick = false
       this.clickingButton = false
     },
     getIngress(center, egress) {
