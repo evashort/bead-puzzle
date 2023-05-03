@@ -464,6 +464,7 @@ ${comment}
           :initialTail="initialTail"
           :autofocus="autofocus"
           :curvedPaths="true"
+          :canAnimate="true"
           @update:won="wonChanged"
           @update:state="stateChanged"
           @update:tail="tailChanged"

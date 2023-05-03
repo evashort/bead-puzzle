@@ -47,6 +47,7 @@ export default {
     initialTail: Number,
     autofocus: Boolean,
     curvedPaths: Boolean,
+    canAnimate: Boolean,
   },
   emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
@@ -1031,7 +1032,7 @@ export default {
 
 <template>
   <button
-    class="game"
+    :class="{game: true, canAnimate: canAnimate}"
     :autofocus="autofocus"
     @keydown.up.stop.prevent="goForward()"
     @keydown.down.stop.prevent="goBack()"
@@ -1277,7 +1278,7 @@ button {
 .terminator.shown {
   opacity: 1;
 }
-.terminator.shown.delay {
+.canAnimate .terminator.shown.delay {
   animation: delay 0.45s
 }
 @keyframes delay {
@@ -1289,28 +1290,28 @@ button {
   stroke-width: 0;
   fill: none;
 }
-.oldTerminator.close {
+.canAnimate .oldTerminator.close {
   animation: close 0.45s ease 0.3s backwards
 }
 @keyframes close {
   from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
   to { r: calc(100% * 25 / 286); stroke-width: 0; }
 }
-.oldTerminator.close.alternate {
+.canAnimate .oldTerminator.close.alternate {
   animation: close2 0.45s ease 0.3s backwards
 }
 @keyframes close2 {
   from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
   to { r: calc(100% * 25 / 286); stroke-width: 0; }
 }
-.oldTerminator.delay {
+.canAnimate .oldTerminator.delay {
   animation: oldDelay 0.45s
 }
 @keyframes oldDelay {
   from { stroke-width: 25; }
   to { stroke-width: 25; }
 }
-.oldTerminator.delay.alternate {
+.canAnimate .oldTerminator.delay.alternate {
   animation: oldDelay2 0.45s
 }
 @keyframes oldDelay2 {
@@ -1331,10 +1332,10 @@ button {
 .headGroup {
   opacity: 0;
 }
-.headGroup.animate {
+.canAnimate .headGroup.animate {
   animation: oldArrow 0.45s;
 }
-.headGroup.animate.alternate {
+.canAnimate .headGroup.animate.alternate {
   animation: oldArrow2 0.45s;
 }
 @keyframes oldArrow {
@@ -1379,8 +1380,10 @@ button {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
-  transition: d 0.5s;
   stroke-dasharray: 4 12;
+}
+.canAnimate .edge {
+  transition: d 0.5s;
 }
 .edge.arrow {
   stroke-dasharray: 8 8;
@@ -1410,14 +1413,14 @@ tail onPath undo reverse offset-rotate
 .bead.onPath.reverse, .bead.tail {
   offset-rotate: reverse;
 }
-.bead.animate {
+.canAnimate .bead.animate {
   animation: slide 0.75s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.bead.alternate {
+.canAnimate .bead.alternate {
   animation-name: slide2;
 }
 @keyframes slide2 {
@@ -1426,19 +1429,25 @@ tail onPath undo reverse offset-rotate
 }
 .trophy {
   offset-rotate: auto;
+  offset-distance: 100%;
+}
+.canAnimate .trophy {
   animation: slide 0.75s ease forwards;
 }
-.trophy.wasPushed {
+.canAnimate .trophy.wasPushed {
   animation: wasPushed 0.75s ease forwards;
 }
 @keyframes wasPushed {
   from { offset-distance: calc(100% * 0.2); }
   to { offset-distance: 100%; }
 }
-.trophy.enter {
+.canAnimate .trophy.enter {
   animation: slide2 0.75s ease forwards;
 }
 .trophy.enter.wasPushed {
+  offset-distance: 0%;
+}
+.canAnimate .trophy.enter.wasPushed {
   animation: unpushed 0.5s ease forwards;
 }
 @keyframes unpushed {
@@ -1453,6 +1462,9 @@ tail onPath undo reverse offset-rotate
   to { offset-distance: calc(100% * 0.2); }
 }
 .trophy.enter.pushed {
+  offset-distance: calc(100% * 0.2);
+}
+.canAnimate .trophy.enter.pushed {
   animation: pushed calc(0.75s * (1 - 0.2)) ease forwards;
 }
 </style>
