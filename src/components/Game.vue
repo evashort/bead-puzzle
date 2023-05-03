@@ -38,6 +38,8 @@ export default {
       trophyWasPushed: false,
       justWon: false,
       hasWon: false,
+      trophyEnterPaused: false,
+      trophyExitPaused: false,
     }
   },
   props: {
@@ -494,6 +496,7 @@ export default {
         trophy: true,
         reverse: this.reversed,
         wasPushed: this.trophyWasPushed,
+        unpaused: !this.trophyExitPaused,
       }
     },
     trophyEnterClasses() {
@@ -503,6 +506,7 @@ export default {
         reverse: this.trophyPushed ? this.reversing : this.reversed,
         pushed: this.showTail,
         wasPushed: this.trophyPushed,
+        unpaused: !this.trophyEnterPaused,
       }
     },
     normalBeadScale() {
@@ -1007,6 +1011,16 @@ export default {
       },
       immediate: true,
     },
+    canAnimate(newCanAnimate, oldCanAnimate) {
+      if (newCanAnimate) {
+        this.animations = new Uint8Array(this.oldBeads.length)
+        this.showOldArrow = false
+        this.backwardsInLoop = false
+        this.continuingLoop = false
+        this.trophyEnterPaused = true
+        this.trophyExitPaused = true
+      }
+    },
     beads(newBeads, oldBeads) {
       let newWon = this.beads == 0
       this.justWon = false
@@ -1023,12 +1037,15 @@ export default {
       }
 
       this.trophyPushed = this.showTail
+      this.trophyEnterPaused = false
+      this.trophyExitPaused = false
       this.$emit('update:state', { beads: this.beads, history: this.history })
     },
     tail(newTail, oldTail) {
       this.$emit('update:tail', newTail)
     },
     showTail(newShowTail, oldShowTail) {
+      this.trophyEnterPaused = false
       if (newShowTail) {
         this.trophyPushed = true
       }
@@ -1467,23 +1484,23 @@ tail onPath undo reverse offset-rotate
   offset-rotate: auto;
   offset-distance: 100%;
 }
-.canAnimate .trophy {
+.canAnimate .trophy.unpaused {
   animation: slide 0.75s ease forwards;
 }
-.canAnimate .trophy.wasPushed {
+.canAnimate .trophy.wasPushed.unpaused {
   animation: wasPushed 0.75s ease forwards;
 }
 @keyframes wasPushed {
   from { offset-distance: calc(100% * 0.2); }
   to { offset-distance: 100%; }
 }
-.canAnimate .trophy.enter {
+.canAnimate .trophy.enter.unpaused {
   animation: slide2 0.75s ease forwards;
 }
 .trophy.enter.wasPushed {
   offset-distance: 0%;
 }
-.canAnimate .trophy.enter.wasPushed {
+.canAnimate .trophy.enter.wasPushed.unpaused {
   animation: unpushed 0.5s ease forwards;
 }
 @keyframes unpushed {
@@ -1500,7 +1517,7 @@ tail onPath undo reverse offset-rotate
 .trophy.enter.pushed {
   offset-distance: calc(100% * 0.2);
 }
-.canAnimate .trophy.enter.pushed {
+.canAnimate .trophy.enter.pushed.unpaused {
   animation: pushed calc(0.75s * (1 - 0.2)) ease forwards;
 }
 </style>
