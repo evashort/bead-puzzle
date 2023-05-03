@@ -353,6 +353,9 @@ export default {
       let cr = this.edgeConeRadius
       return `M ${hr + sin} ${-r + cos} A ${sr} ${sr} 0 0 0 ${hr - sin} ${-r - cos} L ${-hr - sin} ${-cos} A ${sr} ${sr} 0 0 0 ${-hr - sin} ${cos} L ${hr - sin} ${r + cos} A ${sr} ${sr} 0 0 0 ${hr + sin} ${r - cos} L ${-hr + sr * v + cr * cot} ${cr} L ${-hr + fr * v + er * cot} ${er} L ${-hr} ${0} L ${-hr + fr * v + er * cot} ${-er} L ${-hr + sr * v + cr * cot} ${-cr} Z`
     },
+    terminatorRadius() {
+      return this.curvedPaths ? 28 : 36
+    },
     crossRadius() {
       return 18
     },
@@ -1125,14 +1128,14 @@ export default {
           v-if="backwardsInLoop ? i == 1 : i == 0"
           :cx="nodeXs[history[0]]"
           :cy="nodeYs[history[0]]"
-          :r="25"
-          :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'] && !edgeClasses[edge.toString()]['arrow'], delay: this.history.length == 2 }"
+          :r="terminatorRadius"
+          :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'], hidden: edgeClasses[edge.toString()]['arrow'], delay: this.history.length == 2 }"
         />
         <circle
           v-if="backwardsInLoop ? i == 0 : i == 1"
           :cx="nodeXs[oldHole]"
           :cy="nodeYs[oldHole]"
-          :r="12.5"
+          :r="terminatorRadius * 0.5"
           :class="{ oldTerminator: true, close: backwardsInLoop, delay: continuingLoop && !showOldArrow, alternate: trophyAlternate }"
         />
       </g>
@@ -1282,6 +1285,9 @@ button {
 .terminator.shown {
   opacity: 1;
 }
+.terminator.shown.hidden {
+  opacity: 0;
+}
 .canAnimate .terminator.shown.delay {
   animation: delay 0.45s
 }
@@ -1298,29 +1304,53 @@ button {
   animation: close 0.45s ease 0.3s backwards
 }
 @keyframes close {
-  from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
-  to { r: calc(100% * 25 / 286); stroke-width: 0; }
+  from {
+    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
+    stroke-width: v-bind(terminatorRadius);
+  }
+  to {
+    r: calc(100% * v-bind(terminatorRadius) / 286);
+    stroke-width: 0;
+  }
 }
 .canAnimate .oldTerminator.close.alternate {
   animation: close2 0.45s ease 0.3s backwards
 }
 @keyframes close2 {
-  from { r: calc(100% * 12.5 / 286); stroke-width: 25; }
-  to { r: calc(100% * 25 / 286); stroke-width: 0; }
+  from {
+    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
+    stroke-width: v-bind(terminatorRadius);
+  }
+  to {
+    r: calc(100% * v-bind(terminatorRadius) / 286);
+    stroke-width: 0;
+  }
 }
 .canAnimate .oldTerminator.delay {
-  animation: oldDelay 0.45s
+  animation: oldDelay 0.45s ease 0.3s backwards
 }
 @keyframes oldDelay {
-  from { stroke-width: 25; }
-  to { stroke-width: 25; }
+  from {
+    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
+    stroke-width: v-bind(terminatorRadius);
+  }
+  to {
+    r: 0%;
+    stroke-width: 0;
+  }
 }
 .canAnimate .oldTerminator.delay.alternate {
-  animation: oldDelay2 0.45s
+  animation: oldDelay2 0.45s ease 0.3s backwards
 }
 @keyframes oldDelay2 {
-  from { stroke-width: 25; }
-  to { stroke-width: 25; }
+  from {
+    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
+    stroke-width: v-bind(terminatorRadius);
+  }
+  to {
+    r: 0%;
+    stroke-width: 0;
+  }
 }
 .head, .cross {
   stroke: var(--color-text);
