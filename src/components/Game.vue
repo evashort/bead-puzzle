@@ -830,6 +830,7 @@ export default {
           this.showTail = true
         }
 
+        this.resetButtons()
         return true
       }
 
@@ -842,6 +843,7 @@ export default {
       }
 
       let target = this.getClickTarget(event.offsetX, event.offsetY)
+      this.resetButtons()
       this.clickingButton = target != null
       if (target != null && target >= 0) {
         if (target == this.hole) {
@@ -883,6 +885,9 @@ export default {
       this.focusIsClick = false
       if (event.button == 0) {
         this.clickingButton = false
+        if (this.canAnimate) {
+          this.resetButtons()
+        }
       }
     },
     getClickTarget(offsetX, offsetY) {
@@ -933,7 +938,13 @@ export default {
     },
     onBlur() {
       this.focusIsClick = false
+      this.resetButtons()
+    },
+    resetButtons() {
       this.clickingButton = false
+      this.showCross = false
+      this.spinButtonClicked = false
+      this.smallSpinButtonClicked = false
     },
     getIngress(center, egress) {
       let result = egress
@@ -1017,13 +1028,6 @@ export default {
     showTail(newShowTail, oldShowTail) {
       if (newShowTail) {
         this.trophyPushed = true
-      }
-    },
-    clickingButton(newClickingButton, oldClickingButton) {
-      if (!newClickingButton) {
-        this.showCross = false
-        this.spinButtonClicked = false
-        this.smallSpinButtonClicked = false
       }
     },
   },
@@ -1350,7 +1354,7 @@ button {
   stroke: var(--color-background);
   stroke-width: 12;
 }
-.crossGroup.ghost {
+.canAnimate .crossGroup.ghost {
   transition: opacity 0s 0.35s;
 }
 .spinIcon {
@@ -1366,13 +1370,15 @@ button {
 }
 .spinGroup.clicked {
   transform: scale(calc(5/3));
+}
+.canAnimate .spinGroup.clicked {
   animation: revert 1s 0.35s forwards;
 }
 @keyframes revert {
   from { transform: scale(1); }
   to { transform: scale(1); }
 }
-.spinGroup.ghost {
+.canAnimate .spinGroup.ghost {
   transition: transform 0s 0.05s;
 }
 .edge {
