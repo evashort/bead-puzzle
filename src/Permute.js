@@ -36,6 +36,20 @@ export function fromIndex(index, length) {
     return out
 }
 
+export function toIndexDestructive(permutation) {
+    let index = 0
+    for (let i = permutation.length - 1; i >= 0; i--) {
+        index *= i + 1
+        let value = permutation[i]
+        index += i - value
+        for (let j = 0; j < i; j++) {
+            permutation[j] -= permutation[j] >= value
+        }
+    }
+
+    return index
+}
+
 export function swap(index, a, b) {
     if (b < a) {
         [a, b] = [b, a]
@@ -145,6 +159,7 @@ function rotateLeftOnce(index, length) {
 var Permute = {
     getValue: getValue,
     fromIndex: fromIndex,
+    toIndexDestructive: toIndexDestructive,
     findZero: findZero,
     findValue: findValue,
     swap: swap,

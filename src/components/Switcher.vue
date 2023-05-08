@@ -5,6 +5,7 @@ import Markdown from 'vue3-markdown-it'
 import base64js from 'base64-js'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
+import pako from 'pako'
 </script>
 
 <script>
@@ -321,6 +322,118 @@ State space: ${this.graph.states} states
 ${comment}
 `
     },
+    saveFile() {
+      let startedVariations = 0
+      let wonVariations = 0
+      let eitherVariations = 0
+      for (let graph of this.graphs) {
+        for (let rotationPuzzles of graph.puzzles) {
+          for (let puzzle of rotationPuzzles) {
+            startedVariations += puzzle.history.length > 1
+            wonVariations += puzzle.won
+            eitherVariations += puzzle.won || puzzle.history.length > 1
+          }
+        }
+      }
+
+      let buffer = new ArrayBuffer(17 + 8 * eitherVariations + 4 * startedVariations)
+      let view = new DataView(buffer)
+      let offset = 0
+      view.setUint16(offset, 0, true) // version = 0
+      view.setUint16(offset += 2, 3, true) // total settings length
+      view.setUint8(offset += 2, 0) // first setting type = flags
+      view.setUint8(offset += 1, 1) // first setting length = 1
+      view.setUint8(offset += 1, this.canAnimate + (this.curvedPaths << 1))
+      let lastPlayedId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
+      let array = new Uint8Array(buffer)
+      array.set(lastPlayedId, offset += 1)
+      view.setUint16(offset += 4, startedVariations, true)
+      offset += 2
+      let count = 0
+      for (let graph of this.graphs) {
+        let graphId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
+        for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
+          let layout = Permute.rotateRight(graph.layout, rotation, this.nodes)
+          for (let puzzle of rotationPuzzles) {
+            if (puzzle.history.length > 1 && !puzzle.won) {
+              array.set(graphId, offset + 8 * count)
+              view.setUint16(offset + 4 + 8 * count, layout, true)
+              view.setUint16(offset + 6 + 8 * count, puzzle.start, true)
+              count++
+            }
+          }
+        }
+      }
+
+      console.assert(count == eitherVariations - wonVariations)
+      for (let graph of this.graphs) {
+        let graphId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
+        for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
+          let layout = Permute.rotateRight(graph.layout, rotation, this.nodes)
+          for (let puzzle of rotationPuzzles) {
+            if (puzzle.won && puzzle.history.length > 1) {
+              array.set(graphId, offset + 8 * count)
+              view.setUint16(offset + 4 + 8 * count, layout, true)
+              view.setUint16(offset + 6 + 8 * count, puzzle.start, true)
+              count++
+            }
+          }
+        }
+      }
+
+      console.assert(count == startedVariations)
+      for (let graph of this.graphs) {
+        let graphId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
+        for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
+          let layout = Permute.rotateRight(graph.layout, rotation, this.nodes)
+          for (let puzzle of rotationPuzzles) {
+            if (puzzle.won && puzzle.history.length <= 1) {
+              array.set(graphId, offset + 8 * count)
+              view.setUint16(offset + 4 + 8 * count, layout, true)
+              view.setUint16(offset + 6 + 8 * count, puzzle.start, true)
+              count++
+            }
+          }
+        }
+      }
+
+      console.assert(count == eitherVariations)
+      offset += 8 * eitherVariations
+      view.setUint16(offset, startedVariations, true)
+      offset += 2
+      count = 0
+      for (let graph of this.graphs) {
+        for (let rotationPuzzles of graph.puzzles) {
+          for (let puzzle of rotationPuzzles) {
+            if (puzzle.history.length > 1) {
+              view.setUint16(offset + 4 * count, puzzle.beads, true)
+              let historyLength = puzzle.history.length - 1
+              let history = puzzle.history.slice(0, historyLength)
+              let historyNum = Permute.toIndexDestructive(history)
+              historyNum *= 8
+              historyNum += historyLength
+              view.setUint16(offset + 2 + 4 * count, historyNum, true)
+              count++
+            }
+          }
+        }
+      }
+
+      console.assert(count == startedVariations)
+      offset += 4 * startedVariations
+      view.setUint16(offset, wonVariations, true)
+      offset += 2
+      console.assert(offset == buffer.byteLength)
+      return buffer
+    },
+    uncompressedSaveFile() {
+      let zipped = new Uint8Array(this.saveFile)
+      return base64js.fromByteArray(zipped).replaceAll('+', '-').replaceAll('/', '_')
+    },
+    compressedSaveFile() {
+      let zipped = pako.deflate(this.saveFile)
+      return base64js.fromByteArray(zipped).replaceAll('+', '-').replaceAll('/', '_')
+    },
   },
   methods: {
     focusGame() {
@@ -465,7 +578,12 @@ ${comment}
         <input type="checkbox" id="setting-1" name="settings" v-model="curvedPaths">
         &nbsp;
         <label for="setting-1">Curved paths</label>
-        <br/>
+        <pre style="white-space: pre-wrap; overflow-wrap: break-word;">
+
+{{uncompressedSaveFile.replaceAll('-', '\u2011')}}
+
+{{compressedSaveFile.replaceAll('-', '\u2011')}}
+</pre>
       </div>
     </div>
     <dialog id="play">

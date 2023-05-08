@@ -39,9 +39,9 @@ Your progress will not be saved. You can change this in Settings.
 
 1. 16-bit version
 1. 16-bit settings length
-1. 8-bit number of settings
     1. 8-bit setting type
-1. settings
+    1. 8-bit setting length
+    1. setting
 1. 32-bit last-played level ID
 1. 16-bit number of variations
     1. 32-bit level ID
@@ -49,10 +49,9 @@ Your progress will not be saved. You can change this in Settings.
     1. 16-bit original bead locations
 1. 16-bit number of started variations
     1. 16-bit current bead locations
-    1. 13-bit history not including hole or tail
     1. 3-bit history length
+    1. 13-bit history not including hole or tail
 1. 16-bit number of won variations
-1. 32-bit CRC checksum
 
 for each won level: 32+16+16 = 64 bits = 11 characters
 for each started level: 32+16+16+16+13+3 = 96 bits = 16 characters

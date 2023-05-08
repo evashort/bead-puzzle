@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "base64-js": "^1.5.1",
+    "pako": "^2.1.0",
     "vue": "^3.2.31",
     "vue3-markdown-it": "^1.0.10"
   },
