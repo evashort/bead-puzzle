@@ -362,7 +362,17 @@ for graph in graphs:
             )
 
     graph['name'] = name
-    graph['layout'] = permute.matrix_pair_to_index(id_matrix, matrix)
+    layouts = list(permute.matrix_pair_to_indices(id_matrix, matrix))
+    rotation_layouts = [0] * nodes
+    rotation_layouts[0] = layouts[0]
+    for i in range(nodes - 1, 0, -1):
+        for j, layout in enumerate(layouts):
+            layouts[j] = permute.rotate_left(layout, nodes)
+
+        rotation_layouts[i] = min(layouts)
+
+    graph['layouts'] = rotation_layouts
+    assert graph['layouts']
 
 graphs = [
     graph for graph in graphs

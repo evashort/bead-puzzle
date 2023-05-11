@@ -168,6 +168,10 @@ export default {
       curvedPaths: true,
     }
   },
+  mounted() {
+    window.addEventListener('storage', this.storageChanged)
+    this.loadSaveFile(localStorage.getItem('save'))
+  },
   computed: {
     graph() {
       return this.graphs[this.graphIndex]
@@ -336,7 +340,7 @@ ${comment}
         }
       }
 
-      let buffer = new ArrayBuffer(17 + 8 * eitherVariations + 4 * startedVariations)
+      let buffer = new ArrayBuffer(21 + 8 * eitherVariations + 4 * startedVariations)
       let view = new DataView(buffer)
       let offset = 0
       view.setUint16(offset, 0, true) // version = 0
@@ -347,13 +351,15 @@ ${comment}
       let lastPlayedId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
       let array = new Uint8Array(buffer)
       array.set(lastPlayedId, offset += 1)
-      view.setUint16(offset += 4, startedVariations, true)
+      view.setUint16(offset += 4, this.graph.layouts[this.rotation], true)
+      view.setUint16(offset += 2, this.puzzle.start, true)
+      view.setUint16(offset += 2, startedVariations, true)
       offset += 2
       let count = 0
       for (let graph of this.graphs) {
         let graphId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
         for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
-          let layout = Permute.rotateRight(graph.layout, rotation, this.nodes)
+          let layout = this.graph.layouts[rotation]
           for (let puzzle of rotationPuzzles) {
             if (puzzle.history.length > 1 && !puzzle.won) {
               array.set(graphId, offset + 8 * count)
@@ -369,7 +375,7 @@ ${comment}
       for (let graph of this.graphs) {
         let graphId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
         for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
-          let layout = Permute.rotateRight(graph.layout, rotation, this.nodes)
+          let layout = this.graph.layouts[rotation]
           for (let puzzle of rotationPuzzles) {
             if (puzzle.won && puzzle.history.length > 1) {
               array.set(graphId, offset + 8 * count)
@@ -385,7 +391,7 @@ ${comment}
       for (let graph of this.graphs) {
         let graphId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
         for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
-          let layout = Permute.rotateRight(graph.layout, rotation, this.nodes)
+          let layout = this.graph.layouts[rotation]
           for (let puzzle of rotationPuzzles) {
             if (puzzle.won && puzzle.history.length <= 1) {
               array.set(graphId, offset + 8 * count)
@@ -480,6 +486,84 @@ ${comment}
     tailChanged(tail) {
       this.puzzle.tail = tail
     },
+    storageChanged(event) {
+      if (event.key === null) {
+        console.log('cleared')
+      } else if (event.key == 'save') {
+        this.loadSaveFile(event.newValue)
+      }
+    },
+    loadSaveFile(saveFile) {
+      let zipped = base64js.toByteArray(saveFile)
+      let array = pako.inflate(zipped)
+      let buffer = array.buffer
+      let view = new DataView(buffer)
+      let offset = 0
+      if (buffer.byteLength < 4) { return false }
+      let version = view.getUint16(offset, true)
+      if (version > 0) { return false }
+      let settingsLength = view.getUint16(offset += 2, true)
+      let settingsStop = (offset += 2) + settingsLength
+      if (buffer.byteLength < settingsStop) { return false }
+      while (offset < settingsStop) {
+        let settingType = view.getUint8(offset)
+        if (offset + 1 >= settingsStop) { return false }
+        let settingLength = view.getUint8(offset += 1)
+        offset += 1
+        if (offset + settingLength > settingsStop) { return false }
+        if (settingType == 0) {
+          if (settingLength != 1) { return false }
+          let flags = view.getUint8(offset)
+          this.canAnimate = Boolean(flags & 0x1)
+          this.curvedPaths = Boolean(flags & 0x2)
+        }
+
+        offset += settingLength
+      }
+
+      console.assert(offset == settingsStop)
+      if (offset + 8 > buffer.byteLength) { return false }
+      let idLength = 4
+      for (; idLength > 0; idLength--) {
+        if (array[offset + idLength - 1]) { break }
+      }
+      let lastPlayedBytes = array.slice(offset, offset + 4)
+      let lastPlayedSize = SimpleGraph.bytesToNodeCount(lastPlayedBytes)
+      let lastPlayedByteCount = Math.ceil(lastPlayedSize * (lastPlayedSize - 1) * 0.5 * 0.125)
+      let lastPlayedId = base64js.fromByteArray(lastPlayedBytes.slice(0, lastPlayedByteCount))
+      let lastPlayedLayout = view.getUint16(offset += 4, true)
+      let lastPlayedStart = view.getUint16(offset += 2, true)
+      offset += 2
+      for (let [i, graph] of this.graphs.entries()) {
+        if (graph.id.split(".", 1)[0] != lastPlayedId) {
+          continue
+        }
+
+        let rotation = graph.layouts.indexOf(lastPlayedLayout)
+        if (rotation < 0) {
+          continue
+        }
+
+        let variation = -1
+        for (let [j, puzzle] of graph.puzzles[rotation].entries()) {
+          if (puzzle.start == lastPlayedStart) {
+            variation = j
+            break
+          }
+        }
+
+        if (variation < 0) {
+          continue
+        }
+
+        this.graphIndex = i
+        this.rotationIndex = this.rotations.indexOf(rotation)
+        this.variation = variation
+        break
+      }
+
+      return true
+    },
   },
   watch: {
     graphIndex(newGraphIndex, oldGraphIndex) {
@@ -514,6 +598,9 @@ ${comment}
       } else {
         play.close()
       }
+    },
+    compressedSaveFile(newCompressedSaveFile, oldCompressedSaveFile) {
+      localStorage.setItem('save', newCompressedSaveFile)
     },
   },
 }
@@ -590,7 +677,7 @@ ${comment}
       <div class="gameHolder">
         <Game
           :graph=idBytes
-          :layout="Permute.rotateRight(graph.layout, rotation, nodes)"
+          :layout="graph.layouts[rotationIndex]"
           :state="initialState"
           :initialTail="initialTail"
           :autofocus="autofocus"

@@ -91,15 +91,13 @@ def invert(permutation):
     inverse[permutation] = np.arange(len(permutation))
     return inverse
 
-def matrix_pair_to_index(src, dst):
+def matrix_pair_to_indices(src, dst):
     permutation = np.zeros(len(src), dtype=int)
     for i in range(np.math.factorial(len(src))):
         from_index(i, out=permutation)
         result = src[:, permutation][permutation, :]
         if np.all(result == dst):
-            return i
-    
-    raise ValueError('the matricies are not permutations of each other')
+            yield i
 
 def rotate_index(index, distance, length):
     iterations = (length - distance) % length

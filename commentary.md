@@ -43,6 +43,8 @@ Your progress will not be saved. You can change this in Settings.
     1. 8-bit setting length
     1. setting
 1. 32-bit last-played level ID
+1. 16-bit last-played permutation
+1. 16-bit last-played original bead locations
 1. 16-bit number of variations
     1. 32-bit level ID
     1. 16-bit permutation

@@ -134,28 +134,6 @@ export function findValue(index, value) {
     return value
 }
 
-export function rotateRight(index, distance, length) {
-    let iterations = ((-distance % length) + length) % length
-    for (; iterations > 0; iterations--) {
-        index = rotateLeftOnce(index, length)
-    }
-
-    return index
-}
-
-function rotateLeftOnce(index, length) {
-    let factorial = 1 // factorial of n - 1
-    for (let n = 1; n < length; n++) {
-        let remainder = index % factorial
-        let j = (index - remainder) / factorial % ((n + 1) * n)
-        let offset = n + j * n - j % (n + 1) - (j - j % n) * (n + 1)
-        index += offset * factorial
-        factorial *= n
-    }
-
-    return index
-}
-
 var Permute = {
     getValue: getValue,
     fromIndex: fromIndex,
@@ -163,7 +141,6 @@ var Permute = {
     findZero: findZero,
     findValue: findValue,
     swap: swap,
-    rotateRight: rotateRight,
 }
 
 export default Permute
