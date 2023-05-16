@@ -786,7 +786,13 @@ export default {
         }
 
         this.tail = this.hole
-        this.history.pop()
+        if (this.history[0] == this.tail) {
+          // ensure the entire loop is represented
+          this.history = [this.history[this.history.length - 2]].concat(this.history.slice(0, this.history.length - 1))
+          this.backwardsInLoop = true
+        } else {
+          this.history = this.history.slice(0, this.history.length - 1)
+        }
 
         let id = Permute.getValue(this.beads, this.hole) - 1
         this.beads = Permute.swap(this.beads, this.hole, this.tail)
@@ -796,11 +802,6 @@ export default {
         this.showOldArrow = false
         this.backwardsInLoop = false
         this.continuingLoop = false
-        if (this.history[0] == this.tail) {
-          // ensure the entire loop is represented
-          this.history.unshift(this.hole)
-          this.backwardsInLoop = true
-        }
       }
     },
     selectLeft() {
@@ -1040,6 +1041,7 @@ export default {
       this.trophyEnterPaused = false
       this.trophyExitPaused = false
       this.$emit('update:state', { beads: this.beads, history: this.history })
+      // console.log(Permute.fromIndex(this.beads, this.size).toString(), this.history.toString())
     },
     tail(newTail, oldTail) {
       this.$emit('update:tail', newTail)

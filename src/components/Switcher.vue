@@ -3,6 +3,7 @@ import Game from './Game.vue'
 import graphData from '../assets/graphs.json'
 import Markdown from 'vue3-markdown-it'
 import base64js from 'base64-js'
+import HistoryNum from '../HistoryNum.js'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
 import pako from 'pako'
@@ -409,15 +410,14 @@ ${comment}
       offset += 2
       count = 0
       for (let graph of this.graphs) {
+        let graphId = base64js.toByteArray(graph.id.split(".", 1)[0])
+        let graphNodes = SimpleGraph.bytesToNodeCount(graphId)
         for (let rotationPuzzles of graph.puzzles) {
           for (let puzzle of rotationPuzzles) {
             if (puzzle.history.length > 1) {
-              view.setUint16(offset + 4 * count, puzzle.beads, true)
               let historyLength = puzzle.history.length - 1
-              let history = puzzle.history.slice(0, historyLength)
-              let historyNum = Permute.toIndexDestructive(history)
-              historyNum *= 8
-              historyNum += historyLength
+              view.setUint16(offset + 4 * count, puzzle.beads * 8 + historyLength, true)
+              let historyNum = HistoryNum.historyToNumber(puzzle.history, graphNodes)
               view.setUint16(offset + 2 + 4 * count, historyNum, true)
               count++
             }
@@ -593,18 +593,33 @@ ${comment}
       let wonVariations = view.getUint16(offset, true)
       for (let graph of this.graphs) {
         let id = graph.id.split('.', 1)[0]
+        let nodes = SimpleGraph.bytesToNodeCount(base64js.toByteArray(id))
         for (let [i, layout] of graph.layouts.entries()) {
           for (let puzzle of graph.puzzles[i]) {
             let key = [id, layout, puzzle.start].toString()
             let index = variationIndices[key]
-            if (index === undefined) { continue }
-            if (index >= eitherVariations - wonVariations) {
-              puzzle.won = true
+            puzzle.won = index >= eitherVariations - wonVariations
+            if (index < states.length) {
+              let historyLength = states[index] % 8
+              puzzle.beads = (states[index] - historyLength) / 8
+              puzzle.history = HistoryNum.numberToHistory(
+                histories[index],
+                historyLength,
+                nodes,
+                Permute.findZero(puzzle.beads),
+              )
+            } else {
+              puzzle.beads = puzzle.start
+              puzzle.history = [Permute.findZero(puzzle.beads)]
             }
           }
         }
       }
 
+      this.initialState = {
+        beads: this.puzzle.beads,
+        history: this.puzzle.history,
+      }
       return (offset += 2) == buffer.byteLength
     },
   },
