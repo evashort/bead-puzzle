@@ -31,6 +31,10 @@ export function applyLayout(bytes, layout) {
 }
 
 export function hasEdge(bytes, a, b) {
+    if (a == b) {
+        return false
+    }
+
     if (b < a) {
         [a, b] = [b, a]
     }
