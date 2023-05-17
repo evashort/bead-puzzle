@@ -763,6 +763,7 @@ export default {
     },
     goBack() {
       if (this.history.length >= 2) {
+        let newHole = this.history[this.history.length - 2]
         this.trophyWasPushed = this.showTail &&
           this.history[this.history.length - 2] == this.tail
         // always show tail when undoing win because winning hides tail.
@@ -779,22 +780,20 @@ export default {
         }
 
         this.tail = this.hole
-        if (this.history[0] == this.tail) {
-          // ensure the entire loop is represented
-          this.history = [this.history[this.history.length - 2]].concat(this.history.slice(0, this.history.length - 1))
-          this.backwardsInLoop = true
-        } else {
-          this.history = this.history.slice(0, this.history.length - 1)
-        }
-
-        let id = Permute.getValue(this.beads, this.hole) - 1
-        this.beads = Permute.swap(this.beads, this.hole, this.tail)
+        let id = Permute.getValue(this.beads, newHole) - 1
+        this.beads = Permute.swap(this.beads, newHole, this.tail)
         this.animations[id] = 1 + this.animations[id] % 2
-        this.oldBeads[id] = this.hole
+        this.oldBeads[id] = newHole
         this.trophyAlternate = !this.trophyAlternate
         this.showOldArrow = false
         this.backwardsInLoop = false
         this.continuingLoop = false
+        this.history.pop()
+        if (this.history[0] == this.tail) {
+          // ensure the entire loop is represented
+          this.history.unshift(this.hole)
+          this.backwardsInLoop = true
+        }
       }
     },
     selectLeft() {
@@ -1034,7 +1033,7 @@ export default {
       this.trophyEnterPaused = false
       this.trophyExitPaused = false
       this.$emit('update:state', { beads: this.beads, history: this.history })
-      // console.log(Permute.fromIndex(this.beads, this.size).toString(), this.history.toString())
+      console.log(Permute.fromIndex(this.beads, this.size).toString(), this.history.toString())
     },
     tail(newTail, oldTail) {
       this.$emit('update:tail', newTail)
