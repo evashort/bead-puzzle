@@ -1033,7 +1033,6 @@ export default {
       this.trophyEnterPaused = false
       this.trophyExitPaused = false
       this.$emit('update:state', { beads: this.beads, history: this.history })
-      console.log(Permute.fromIndex(this.beads, this.size).toString(), this.history.toString())
     },
     tail(newTail, oldTail) {
       this.$emit('update:tail', newTail)
