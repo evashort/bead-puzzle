@@ -44,7 +44,6 @@ export default {
   },
   props: {
     graph: Uint8Array,
-    layout: Number,
     state: { beads: Number, history: Array },
     initialTail: Number,
     autofocus: Boolean,
@@ -55,10 +54,6 @@ export default {
   computed: {
     size() {
       return SimpleGraph.bytesToNodeCount(this.graph)
-    },
-    matrix() {
-      let layout = Permute.fromIndex(this.layout, this.size)
-      return SimpleGraph.bytesToMatrix(this.graph, layout)
     },
     edges() {
       let edges = []
@@ -98,10 +93,9 @@ export default {
       }
 
       for (let a = 0; a < this.size; a++) {
-        let rowStart = a * this.size
         for (let b = a + 1; b < this.size; b++) {
           if (
-            this.matrix[rowStart + b] &&
+            SimpleGraph.hasEdge(this.graph, a, b) &&
               (a != firstA || b != firstB) &&
               (a != secondA || b != secondB)
           ) {
@@ -170,7 +164,7 @@ export default {
     deadEnd() {
       let edges = 0
       for (let i = 0; i < this.size; i++) {
-        edges += this.matrix[this.hole * this.size + i]
+        edges += SimpleGraph.hasEdge(this.graph, this.hole, i)
         if (edges > 1) {
           return false
         }
@@ -659,10 +653,9 @@ export default {
       return Math.abs((node + this.size/2) % this.size - this.size/2)
     },
     getForcedTail(prev, hole) {
-      let start = hole * this.size
       let tail = -1
       for (let i = 0; i < this.size; i++) {
-        if (i != prev && this.matrix[start + i]) {
+        if (i != prev && SimpleGraph.hasEdge(this.graph, hole, i)) {
           if (tail != -1) { return -1 }
           tail = i
         }
@@ -752,7 +745,7 @@ export default {
         if (
           tail != oldHole && // going back shouldn't be the default.
                              // happens when old hole is start of loop.
-          this.matrix[hole * this.size + tail]
+          SimpleGraph.hasEdge(this.graph, hole, tail)
         ) { return tail }
       }
 
@@ -761,7 +754,7 @@ export default {
         let tail = (hole + i) % this.size
         if (
           tail != oldHole && // going back shouldn't be the default
-          this.matrix[hole * this.size + tail]
+          SimpleGraph.hasEdge(this.graph, hole, tail)
         ) { return tail }
       }
 
@@ -812,7 +805,7 @@ export default {
       // iterate counterclockwise and choose the first edge
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
-        if (this.matrix[this.hole * this.size + newTail]) {
+        if (SimpleGraph.hasEdge(this.graph, this.hole, newTail)) {
           this.tail = newTail
           return
         }
@@ -826,7 +819,7 @@ export default {
       // iterate counterclockwise and choose the first edge
       for (let i = 1; i <= this.size; i++) {
         let newTail = (this.tail + i) % this.size
-        if (this.matrix[this.hole * this.size + newTail]) {
+        if (SimpleGraph.hasEdge(this.graph, this.hole, newTail)) {
           this.tail = newTail
           return
         }
@@ -861,7 +854,7 @@ export default {
           } else {
             this.showCross = true
           }
-        } else if (this.matrix[target * this.size + this.hole]) {
+        } else if (SimpleGraph.hasEdge(this.graph, target, this.hole)) {
           this.tail = target
           this.goForwardHelp()
           this.showOldArrow = true
@@ -965,9 +958,9 @@ export default {
         for (let side = nearSide; Math.abs(side) == 1; side -= 2 * nearSide) {
           let ingress = egress + distance * side
           if (ingress > 0 && ingress < this.size) {
-            // use real center for matrix check
+            // use real center for graph check
             let id = (ingress + center) % this.size
-            if (this.matrix[center * this.size + id]) {
+            if (SimpleGraph.hasEdge(this.graph, center, id)) {
               result = id
             }
           }
@@ -999,7 +992,7 @@ export default {
       },
       immediate: true,
     },
-    matrix(newMatrix, oldMatrix) {
+    graph(newGraph, oldGraph) {
       this.won = false
       this.hasWon = false
       this.showTail = false

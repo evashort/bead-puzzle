@@ -734,8 +734,7 @@ ${comment}
     <dialog id="play">
       <div class="gameHolder">
         <Game
-          :graph=idBytes
-          :layout="graph.layouts[rotationIndex]"
+          :graph="SimpleGraph.applyLayout(idBytes, graph.layouts[rotationIndex])"
           :state="initialState"
           :initialTail="initialTail"
           :autofocus="autofocus"
