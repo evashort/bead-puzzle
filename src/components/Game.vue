@@ -938,6 +938,7 @@ export default {
     },
     onBlur() {
       this.focusIsClick = false
+      this.showTail = false
       this.resetButtons()
     },
     resetButtons() {
