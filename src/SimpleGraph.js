@@ -43,7 +43,7 @@ export function hasEdge(bytes, a, b) {
     let byteIndex = bit >> 3
     return byteIndex < bytes.length && (
         bytes[byteIndex] & (1 << (bit & 7))
-    )
+    ) != 0
 }
 
 var SimpleGraph = {
