@@ -58,7 +58,8 @@ export default {
     edges() {
       let edges = []
       let [firstA, firstB] = []
-      if (this.backwardsInLoop) {
+      // TODO
+      /*if (this.backwardsInLoop) {
         if (this.oldHole == this.history[1]) {
           firstA = this.history[1]
           firstB = this.history[2]
@@ -90,14 +91,15 @@ export default {
         }
         
         edges.push([firstA, firstB])
-      }
+      }*/
 
       for (let a = 0; a < this.size; a++) {
         for (let b = a + 1; b < this.size; b++) {
           if (
-            SimpleGraph.hasEdge(this.graph, a, b) &&
+            // TODO
+            SimpleGraph.hasEdge(this.graph, a, b)/* &&
               (a != firstA || b != firstB) &&
-              (a != secondA || b != secondB)
+              (a != secondA || b != secondB)*/
           ) {
             edges.push([a, b])
           }
@@ -239,6 +241,7 @@ export default {
         }
       }
 
+      return edgePaths // TODO
       if (!this.curvedPaths) {
         if (this.showTail && this.tail == this.extra[this.loopStart]) {
           let id = Permute.getValue(this.beads, this.tail) - 1
@@ -296,11 +299,12 @@ export default {
         edgeClasses[[b, a].toString()] = {edge: true}
       }
 
-      for (let i = this.activeStart; i < this.activeEnd; i++) {
-        let a = this.history[i], b = this.history[i + 1]
-        edgeClasses[[a, b].toString()]['active'] = true
-        edgeClasses[[b, a].toString()]['active'] = true
-      }
+      // TODO
+      // for (let i = this.activeStart; i < this.activeEnd; i++) {
+      //   let a = this.history[i], b = this.history[i + 1]
+      //   edgeClasses[[a, b].toString()]['active'] = true
+      //   edgeClasses[[b, a].toString()]['active'] = true
+      // }
 
       if (this.showTail) {
         edgeClasses[[this.hole, this.tail].toString()]['arrow'] = true
@@ -375,16 +379,18 @@ export default {
       let result = []
       for (let id = 0; id < this.size - 1; id++) {
         let node = Permute.findValue(this.beads, id + 1)
-        let historyIndex = this.extra.indexOf(node, this.activeStart)
+        // TODO
+        // let historyIndex = this.extra.indexOf(node, this.activeStart)
         result.push(
           {
             bead: true,
             tail: node == this.tail && this.showTail &&
-              (node != this.extra[this.loopStart] || this.oldBeads[id] == this.hole),
-            onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
+              // TODO
+              (/*node != this.extra[this.loopStart] || */this.oldBeads[id] == this.hole),
+            // onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
             animate: this.animations[id],
             alternate: this.animations[id] == 2,
-            reverse: historyIndex > 0 && this.oldBeads[id] == this.extra[historyIndex - 1],
+            // reverse: historyIndex > 0 && this.oldBeads[id] == this.extra[historyIndex - 1],
           }
         )
       }
@@ -396,8 +402,9 @@ export default {
       for (let id = 0; id < this.size - 1; id++) {
         let node = Permute.findValue(this.beads, id + 1)
         let edge =
-          node == this.tail && this.showTail &&
-            node != this.extra[this.loopStart] ?
+          // TODO
+          node == this.tail && this.showTail /*&&
+            node != this.extra[this.loopStart]*/ ?
           [this.hole, this.tail] :
           [this.oldBeads[id], node]
         let path = this.edgePaths[edge.toString()]
@@ -798,6 +805,7 @@ export default {
     },
     selectLeft() {
       if (this.ensureTail()) {
+        console.log('showed tail: ' + this.showTail + ', dead end: ' + this.deadEnd)
         return
       }
 
@@ -812,6 +820,7 @@ export default {
     },
     selectRight() {
       if (this.ensureTail()) {
+        console.log('showed tail: ' + this.showTail + ', dead end: ' + this.deadEnd)
         return
       }
 
@@ -1109,6 +1118,7 @@ export default {
         :cy="smallSpinButtonY"
         :class="{touchCircle: true}"
       />
+      <!-- TODO
       <mask id="trophy-exit-mask">
         <circle
           :cx="nodeXs[trophyExitStart]"
@@ -1127,6 +1137,7 @@ export default {
         >
         </circle>
       </mask>
+      -->
       <g
         v-for="(edge, i) in edges"
         :key="`${edge.toString()},${size}`"
@@ -1134,7 +1145,7 @@ export default {
         <path
           :class="edgeClasses[edge.toString()]"
           :d="edgePaths[edge.toString()]"
-        />
+        /><!-- TODO
         <circle
           v-if="backwardsInLoop ? i == 1 : i == 0"
           :cx="nodeXs[history[0]]"
@@ -1148,7 +1159,7 @@ export default {
           :cy="nodeYs[oldHole]"
           :r="terminatorRadius * 0.5"
           :class="{ oldTerminator: true, close: backwardsInLoop, delay: continuingLoop && !showOldArrow, alternate: trophyAlternate }"
-        />
+        />-->
       </g>
       <g
         :style="{ 'offset-path': `path('${oldArrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
@@ -1164,6 +1175,7 @@ export default {
         <path :d="headShadowPath" class="head shadow"/>
         <path :d="headPath" class="head"/>
       </g>
+      <!-- TODO
       <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
         <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
@@ -1174,6 +1186,7 @@ export default {
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyExitPath : trophyEnterPath}"
         />
       </g>
+      -->
       <g
         :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
         :class="{crossGroup: true, ghost: !showCross}"
@@ -1183,16 +1196,18 @@ export default {
         <path :d="crossPath" class="cross"/>
       </g>
       <template v-if="canSpin">
+        <!--TODO-->
         <g
-          :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1)`}"
+          :style="{transform: `translate(0,${spinButtonY}px) scale(${/*clockwise*/true ? 1 : -1},1)`}"
         >
           <g :class="{spinGroup: true, clicked: spinButtonClicked, ghost: !spinButtonClicked}">
             <path :d="spinPath" class="spinIcon shadow"/>
             <path :d="spinPath" class="spinIcon"/>
           </g>
         </g>
+        <!--TODO-->
         <g
-          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(${clockwise ? -1 : 1},1)`}"
+          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(${/*clockwise*/true ? -1 : 1},1)`}"
         >
           <g :class="{spinGroup: true, clicked: smallSpinButtonClicked, ghost: !smallSpinButtonClicked}">
             <path :d="smallSpinPath" class="spinIcon shadow"/>
