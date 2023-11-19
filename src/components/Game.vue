@@ -509,6 +509,16 @@ export default {
     activeBeadScale() {
       return 5/3
     },
+    beadScales() {
+      return {
+        heart: 2.7,
+        butterfly: 2.8,
+        saturn: 3.35,
+        leaf: 2.5,
+        mushroom: 2.6,
+        flower: 2.5,
+      }
+    },
     clickRadius() {
       return 42
     },
@@ -1074,8 +1084,14 @@ export default {
         <radialGradient r="0.55" id="checked-4"> <stop offset="77%" :stop-color="colorHex[4]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
         <radialGradient r="0.55" id="checked-5"> <stop offset="77%" :stop-color="colorHex[5]" stop-opacity="0.25"/> <stop offset="100%" stop-opacity="0"/> </radialGradient>
         <radialGradient r="0.55" id="checked-6"> <stop offset="77%" :stop-color="colorHex[6]" stop-opacity="0.25"/> <stop offset="97%" stop-opacity="0"/> </radialGradient>
-        <image id="star" x="-6" y="-6" width="12" height="12" href="../assets/star.svg"></image>
-        <image id="star-small" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"></image>
+        <image id="star" x="-6" y="-6" width="12" height="12" href="../assets/star.svg"/>
+        <image id="star-small" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"/>
+        <image id="heart-bead" x="-6" y="-6" width="12" height="12" data-scale="2.7" href="../assets/heart.svg"/>
+        <image id="butterfly-bead" x="-6" y="-6" width="12" height="12" data-scale="2.8" href="../assets/butterfly.svg"/>
+        <image id="saturn-bead" x="-6" y="-6" width="12" height="12" data-scale="3.35" href="../assets/saturn.svg"/>
+        <image id="leaf-bead" x="-6" y="-6" width="12" height="12" data-scale="2.5" href="../assets/leaf.svg"/>
+        <image id="mushroom-bead" x="-6" y="-6" width="12" height="12" data-scale="2.6" href="../assets/mushroom.svg"/>
+        <image id="flower-bead" x="-6" y="-6" width="12" height="12" data-scale="2.5" href="../assets/flower.svg"/>
       </defs>
       <g v-for="node in size">
         <circle
@@ -1200,30 +1216,14 @@ export default {
           </g>
         </g>
       </template>
-      <image v-if="colorIds[0] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[0]]"
-        href="../assets/heart.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.7) scale(${Permute.getValue(beads, tail) - 1 == colorIds[0] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[0]] }"
-      />
-      <image v-if="colorIds[1] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[1]]"
-        href="../assets/butterfly.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.8) scale(${Permute.getValue(beads, tail) - 1 == colorIds[1] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[1]] }"
-      />
-      <image v-if="colorIds[2] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[2]]"
-        href="../assets/saturn.svg"
-        :style="{ 'transform': `rotate(90deg) scale(3.35) scale(${Permute.getValue(beads, tail) - 1 == colorIds[2] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[2]] }"
-      />
-      <image v-if="colorIds[3] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[3]]"
-        href="../assets/leaf.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${Permute.getValue(beads, tail) - 1 == colorIds[3] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[3]] }"
-      />
-      <image v-if="colorIds[4] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[4]]"
-        href="../assets/mushroom.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.6) scale(${Permute.getValue(beads, tail) - 1 == colorIds[4] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[4]] }"
-      />
-      <image v-if="colorIds[5] >= 0" x="-6" y="-6" width="12" height="12" :class="beadClasses[colorIds[5]]"
-        href="../assets/flower.svg"
-        :style="{ 'transform': `rotate(90deg) scale(2.5) scale(${Permute.getValue(beads, tail) - 1 == colorIds[5] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[5]] }"
-      />
+      <template
+        v-for="(scale, name, i) in beadScales"
+        :key="i"
+      >
+        <use v-if="colorIds[i] >= 0" :href="`#${name}-bead`" :class="beadClasses[colorIds[i]]"
+          :style="{ 'transform': `rotate(90deg) scale(${scale}) scale(${Permute.getValue(beads, tail) - 1 == colorIds[i] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[i]] }"
+        />
+      </template>
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/heart_outline.svg"
