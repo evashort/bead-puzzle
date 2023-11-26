@@ -43,7 +43,7 @@ export default {
     }
   },
   props: {
-    graph: Uint8Array,
+    graphId: String,
     state: { beads: Number, history: Array },
     initialTail: Number,
     autofocus: Boolean,
@@ -52,6 +52,9 @@ export default {
   },
   emits: ['update:won', 'update:state', 'update:tail'],
   computed: {
+    graph() {
+      return SimpleGraph.fromString(this.graphId)
+    },
     size() {
       return SimpleGraph.bytesToNodeCount(this.graph)
     },
@@ -1002,7 +1005,7 @@ export default {
       },
       immediate: true,
     },
-    graph(newGraph, oldGraph) {
+    graphId(newGraphId, oldGraphId) {
       this.won = false
       this.hasWon = false
       this.showTail = false

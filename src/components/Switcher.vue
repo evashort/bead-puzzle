@@ -178,7 +178,7 @@ export default {
       return this.graphs[this.graphIndex]
     },
     idBytes() {
-      return base64js.toByteArray(this.graph.id.split(".", 1)[0])
+      return SimpleGraph.fromString(this.graph.id)
     },
     nodes() {
       return SimpleGraph.bytesToNodeCount(this.idBytes)
@@ -349,7 +349,7 @@ ${comment}
       view.setUint8(offset += 2, 0) // first setting type = flags
       view.setUint8(offset += 1, 1) // first setting length = 1
       view.setUint8(offset += 1, this.canAnimate + (this.curvedPaths << 1))
-      let lastPlayedId = base64js.toByteArray(this.graph.id.split(".", 1)[0])
+      let lastPlayedId = SimpleGraph.fromString(this.graph.id)
       let array = new Uint8Array(buffer)
       array.set(lastPlayedId, offset += 1)
       view.setUint16(offset += 4, this.graph.layouts[this.rotation], true)
@@ -358,7 +358,7 @@ ${comment}
       offset += 2
       let count = 0
       for (let graph of this.graphs) {
-        let graphId = base64js.toByteArray(graph.id.split(".", 1)[0])
+        let graphId = SimpleGraph.fromString(graph.id)
         for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
           let layout = graph.layouts[rotation]
           for (let puzzle of rotationPuzzles) {
@@ -374,7 +374,7 @@ ${comment}
 
       console.assert(count == eitherVariations - wonVariations)
       for (let graph of this.graphs) {
-        let graphId = base64js.toByteArray(graph.id.split(".", 1)[0])
+        let graphId = SimpleGraph.fromString(graph.id)
         for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
           let layout = graph.layouts[rotation]
           for (let puzzle of rotationPuzzles) {
@@ -390,7 +390,7 @@ ${comment}
 
       console.assert(count == startedVariations)
       for (let graph of this.graphs) {
-        let graphId = base64js.toByteArray(graph.id.split(".", 1)[0])
+        let graphId = SimpleGraph.fromString(graph.id)
         for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
           let layout = graph.layouts[rotation]
           for (let puzzle of rotationPuzzles) {
@@ -410,7 +410,7 @@ ${comment}
       offset += 2
       count = 0
       for (let graph of this.graphs) {
-        let graphId = base64js.toByteArray(graph.id.split(".", 1)[0])
+        let graphId = SimpleGraph.fromString(graph.id)
         let graphNodes = SimpleGraph.bytesToNodeCount(graphId)
         for (let rotationPuzzles of graph.puzzles) {
           for (let puzzle of rotationPuzzles) {
@@ -530,7 +530,7 @@ ${comment}
       let lastPlayedBytes = array.slice(offset, offset + 4)
       let lastPlayedSize = SimpleGraph.bytesToNodeCount(lastPlayedBytes)
       let lastPlayedByteCount = Math.ceil(lastPlayedSize * (lastPlayedSize - 1) * 0.5 * 0.125)
-      let lastPlayedId = base64js.fromByteArray(lastPlayedBytes.slice(0, lastPlayedByteCount))
+      let lastPlayedId = SimpleGraph.toString(lastPlayedBytes.slice(0, lastPlayedByteCount))
       let lastPlayedLayout = view.getUint16(offset += 4, true)
       let lastPlayedStart = view.getUint16(offset += 2, true)
       for (let [i, graph] of this.graphs.entries()) {
@@ -569,7 +569,7 @@ ${comment}
         let idBytes = array.slice(offset, offset + 4)
         let idSize = SimpleGraph.bytesToNodeCount(idBytes)
         let idByteCount = Math.ceil(idSize * (idSize - 1) * 0.5 * 0.125)
-        let id = base64js.fromByteArray(idBytes.slice(0, idByteCount))
+        let id = SimpleGraph.toString(idBytes.slice(0, idByteCount))
         let layout = view.getUint16(offset + 4, true)
         let start = view.getUint16(offset + 6, true)
         variationIndices[[id, layout, start].toString()] = i
@@ -593,7 +593,7 @@ ${comment}
       let wonVariations = view.getUint16(offset, true)
       for (let graph of this.graphs) {
         let id = graph.id.split('.', 1)[0]
-        let nodes = SimpleGraph.bytesToNodeCount(base64js.toByteArray(id))
+        let nodes = SimpleGraph.bytesToNodeCount(SimpleGraph.fromString(id))
         for (let [i, layout] of graph.layouts.entries()) {
           for (let puzzle of graph.puzzles[i]) {
             let key = [id, layout, puzzle.start].toString()
@@ -734,7 +734,7 @@ ${comment}
     <dialog id="play">
       <div class="gameHolder">
         <Game
-          :graph="SimpleGraph.applyLayout(idBytes, graph.layouts[rotationIndex])"
+          :graphId="SimpleGraph.toString(SimpleGraph.applyLayout(idBytes, graph.layouts[rotationIndex]))"
           :state="initialState"
           :initialTail="initialTail"
           :autofocus="autofocus"

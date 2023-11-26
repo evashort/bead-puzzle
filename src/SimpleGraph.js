@@ -1,4 +1,5 @@
 import Permute from './Permute.js'
+import base64js from 'base64-js'
 
 export function bytesToNodeCount(bytes) {
     let lastIndex = bytes.length - 1
@@ -46,10 +47,20 @@ export function hasEdge(bytes, a, b) {
     ) != 0
 }
 
+export function fromString(string) {
+    return base64js.toByteArray(string.split(".", 1)[0])
+}
+
+export function toString(bytes) {
+    return base64js.fromByteArray(bytes)
+}
+
 var SimpleGraph = {
     bytesToNodeCount: bytesToNodeCount,
     applyLayout: applyLayout,
     hasEdge: hasEdge,
+    fromString: fromString,
+    toString: toString,
 }
 
 export default SimpleGraph
