@@ -15,20 +15,17 @@ export default {
   },
   computed: {
     name() {
-      if (this.bead > 0) {
-        return [
-          [],
-          [],
-          ['mushroom'],
-          ['butterfly', 'mushroom'],
-          ['heart', 'butterfly', 'mushroom'],
-          ['heart', 'butterfly', 'leaf', 'mushroom'],
-          ['heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
-          ['heart', 'butterfly', 'mushroom', 'leaf', 'mushroom', 'flower'],
-        ][this.size][this.bead]
-      }
-
-      return null
+      return [
+        [null],
+        [null],
+        [null, 'mushroom'],
+        [null, 'butterfly', 'mushroom'],
+        [null, 'heart', 'butterfly', 'mushroom'],
+        [null, 'heart', 'butterfly', 'leaf', 'mushroom'],
+        [null, 'heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
+        [null, 'heart', 'butterfly', 'mushroom', 'leaf', 'mushroom', 'flower'],
+      ][this.size][this.bead]
+    }
     },
     scale() {
       if (this.name) {
