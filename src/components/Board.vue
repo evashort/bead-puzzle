@@ -87,7 +87,7 @@ export default {
     :moveToA="false"
     :onPath="false"
     :moving="false"
-    :id="edgeBeads[key] ?? 0"
+    :bead="edgeBeads[key] ?? 0"
     :selected="false"
   />
 </template>

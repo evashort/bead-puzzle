@@ -10,12 +10,12 @@ export default {
     moveToA: Boolean,
     onPath: Boolean,
     moving: Boolean,
-    id: Number,
+    bead: Number,
     selected: Boolean,
   },
   computed: {
     name() {
-      if (this.id > 0) {
+      if (this.bead > 0) {
         return [
           [],
           [],
@@ -25,7 +25,7 @@ export default {
           ['heart', 'butterfly', 'leaf', 'mushroom'],
           ['heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
           ['heart', 'butterfly', 'mushroom', 'leaf', 'mushroom', 'flower'],
-        ][this.size][this.id]
+        ][this.size][this.bead]
       }
 
       return null
@@ -57,7 +57,10 @@ export default {
 </script>
 
 <template>
+  <!-- using :key causes the element to be deleted and recreated when the bead
+    changes, allowing the slide animation to play again. -->
   <use
+    v-if="name"
     :href="`#${name}-bead`"
     :key="name"
     :class="beadClasses"
@@ -67,32 +70,44 @@ export default {
 
 <style scoped>
 /*
-tail onPath undo reverse offset-rotate
-0    0                   -90deg
-0    1           0       auto
-0    1           1       reverse
-1                        reverse
+facingA onPath offset-rotate
+        0      -90deg
+0       1      auto
+1       1      reverse
+moveToA moving offset-distance
+0       0      100%
+0       1      0% -> 100%
+1       0      0%
+1       1      100% -> 0%
 */
 .bead {
   offset-distance: 100%;
-  offset-rotate: auto;
+  offset-rotate: -90deg;
   transform: rotate(90deg) scale(var(--scale));
 }
-.bead.tail {
+.bead.onPath {
+  offset-rotate: auto;
+}
+.bead.onPath.facingA {
   offset-rotate: reverse;
 }
-.canAnimate .bead.animate {
+.bead.moveToA {
+  offset-distance: 0%;
+}
+.bead.moving {
   animation: slide 0.75s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.canAnimate .bead.alternate {
-  animation-name: slide2;
+.bead.moving.moveToA {
+  /* use a different animation instead of "animation-direction: reverse" so
+     that the animation plays again when changing direction */
+  animation-name: slide-back;
 }
-@keyframes slide2 {
-  from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
+@keyframes slide-back {
+  from { offset-distance: 100%; }
+  to { offset-distance: 0%; }
 }
 </style>
