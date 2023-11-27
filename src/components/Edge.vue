@@ -25,7 +25,6 @@ export default {
         [null, 'heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
         [null, 'heart', 'butterfly', 'mushroom', 'leaf', 'mushroom', 'flower'],
       ][this.size][this.bead]
-    }
     },
     scale() {
       if (this.name) {
