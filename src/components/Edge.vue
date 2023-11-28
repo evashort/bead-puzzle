@@ -42,29 +42,66 @@ export default {
     },
     beadClasses() {
       return {
-        facingA: facingA,
-        moveToA: moveToA,
-        onPath: onPath,
-        moving: moving,
+        bead: true,
+        facingA: this.facingA,
+        moveToA: this.moveToA,
+        onPath: this.onPath,
+        moving: this.moving,
       }
+    },
+    x1() {
+      return this.getX(this.a)
+    },
+    y1() {
+      return this.getY(this.a)
+    },
+    x2() {
+      return this.getX(this.b)
+    },
+    y2() {
+      return this.getY(this.b)
+    },
+    path() {
+      let x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2
+      return `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
+    },
+  },
+  methods: {
+    getX(i) {
+      return 100 * Math.sin(2 * Math.PI * i / this.size)
+    },
+    getY(i) {
+      return -100 * Math.cos(2 * Math.PI * i / this.size)
     },
   },
 }
 </script>
 
 <template>
+  <path
+    :class="['edge']"
+    :d="path"
+  />
   <!-- using :key causes the element to be deleted and recreated when the bead
-    changes, allowing the slide animation to play again. -->
+       changes, allowing the slide animation to play again. -->
   <use
     v-if="name"
     :href="`#${name}-bead`"
     :key="name"
     :class="beadClasses"
-    :style="{ '--scale': scale }"
+    :style="{ '--scale': scale, 'offset-path': `path('${path}')` }"
   />
 </template>
 
 <style scoped>
+.edge {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 4 12;
+}
+
 /*
 facingA onPath offset-rotate
         0      -90deg

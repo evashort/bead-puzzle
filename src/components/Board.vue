@@ -47,13 +47,38 @@ export default {
       for (let bead = 1; bead < this.size; bead++) {
         let a = this.beadStarts[bead - 1]
         let b = Permute.findValue(this.beads, bead)
-        if (b < a) {
+        let moveToA = b < a
+        if (moveToA) {
           [a, b] = [b, a]
         }
 
-        result[[a, b].toString()] = bead
+        let moving = a != b
+        if (a == b) {
+          for (a = 0; a < b; a++) {
+            if (SimpleGraph.hasEdge(this.graph, a, b) && !Object.hasOwn(result, [a, b].toString())) {
+              break
+            }
+          }
+        }
+
+        if (a == b) {
+          moveToA = true
+          for (b = a + 1; b < this.size; b++) {
+            if (SimpleGraph.hasEdge(this.graph, a, b) && !Object.hasOwn(result, [a, b].toString())) {
+              break
+            }
+          }
+        }
+
+        result[[a, b].toString()] = {
+          bead: bead,
+          moveToA: moveToA,
+          moving: moving,
+        }
       }
-    }
+
+      return result
+    },
   },
   watch: {
     beads(newBeads, oldBeads) {
@@ -76,18 +101,18 @@ export default {
 
 <template>
   <Edge
-    v-for="([a, b], key) in this.edges"
+    v-for="([a, b], key) in edges"
     :key="key"
     :size="size"
     :a="a"
     :b="b"
     :aPrime="a"
     :bPrime="b"
-    :facingA="false"
-    :moveToA="false"
+    :facingA="edgeBeads[key]?.moveToA ?? false"
+    :moveToA="edgeBeads[key]?.moveToA ?? false"
     :onPath="false"
-    :moving="false"
-    :bead="edgeBeads[key] ?? 0"
+    :moving="edgeBeads[key]?.moving ?? false"
+    :bead="edgeBeads[key]?.bead ?? 0"
     :selected="false"
   />
 </template>

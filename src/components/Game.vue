@@ -1,4 +1,5 @@
 <script setup>
+import Board from './Board.vue'
 import Permute from '../Permute.js'
 import SimpleGraph from '../SimpleGraph.js'
 </script>
@@ -1089,12 +1090,12 @@ export default {
         <radialGradient r="0.55" id="checked-6"> <stop offset="77%" :stop-color="colorHex[6]" stop-opacity="0.25"/> <stop offset="97%" stop-opacity="0"/> </radialGradient>
         <image id="star" x="-6" y="-6" width="12" height="12" href="../assets/star.svg"/>
         <image id="star-small" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"/>
-        <image id="heart-bead" x="-6" y="-6" width="12" height="12" data-scale="2.7" href="../assets/heart.svg"/>
-        <image id="butterfly-bead" x="-6" y="-6" width="12" height="12" data-scale="2.8" href="../assets/butterfly.svg"/>
-        <image id="saturn-bead" x="-6" y="-6" width="12" height="12" data-scale="3.35" href="../assets/saturn.svg"/>
-        <image id="leaf-bead" x="-6" y="-6" width="12" height="12" data-scale="2.5" href="../assets/leaf.svg"/>
-        <image id="mushroom-bead" x="-6" y="-6" width="12" height="12" data-scale="2.6" href="../assets/mushroom.svg"/>
-        <image id="flower-bead" x="-6" y="-6" width="12" height="12" data-scale="2.5" href="../assets/flower.svg"/>
+        <image id="heart-bead" x="-6" y="-6" width="12" height="12" href="../assets/heart.svg"/>
+        <image id="butterfly-bead" x="-6" y="-6" width="12" height="12" href="../assets/butterfly.svg"/>
+        <image id="saturn-bead" x="-6" y="-6" width="12" height="12" href="../assets/saturn.svg"/>
+        <image id="leaf-bead" x="-6" y="-6" width="12" height="12" href="../assets/leaf.svg"/>
+        <image id="mushroom-bead" x="-6" y="-6" width="12" height="12" href="../assets/mushroom.svg"/>
+        <image id="flower-bead" x="-6" y="-6" width="12" height="12" href="../assets/flower.svg"/>
       </defs>
       <g v-for="node in size">
         <circle
@@ -1150,10 +1151,6 @@ export default {
         v-for="(edge, i) in edges"
         :key="`${edge.toString()},${size}`"
       >
-        <path
-          :class="edgeClasses[edge.toString()]"
-          :d="edgePaths[edge.toString()]"
-        />
         <circle
           v-if="backwardsInLoop ? i == 1 : i == 0"
           :cx="nodeXs[history[0]]"
@@ -1219,14 +1216,12 @@ export default {
           </g>
         </g>
       </template>
-      <template
-        v-for="(scale, name, i) in beadScales"
-        :key="i"
-      >
-        <use v-if="colorIds[i] >= 0" :href="`#${name}-bead`" :class="beadClasses[colorIds[i]]"
-          :style="{ 'transform': `rotate(90deg) scale(${scale}) scale(${Permute.getValue(beads, tail) - 1 == colorIds[i] && showTail ? activeBeadScale : normalBeadScale})`, 'offset-path': beadOffsetPaths[colorIds[i]] }"
-        />
-      </template>
+      <Board
+        :key="graphId"
+        :graphId="graphId"
+        :beads="beads"
+        :history="history"
+      />
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"
           href="../assets/heart_outline.svg"
