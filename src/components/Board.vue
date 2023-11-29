@@ -1,5 +1,6 @@
 <script setup>
 import Edge from './Edge.vue'
+import Bead from './Bead.vue'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
 </script>
@@ -149,6 +150,12 @@ export default {
   <Edge
     v-for="(path, key) in edgePaths"
     :key="key"
+    :path="path"
+    :onPath="false"
+  />
+  <Bead
+    v-for="(path, key) in edgePaths"
+    :key="key"
     :size="size"
     :path="path"
     :facingA="edgeBeads[key]?.moveToA ?? false"
@@ -157,6 +164,5 @@ export default {
     :moving="edgeBeads[key]?.moving ?? false"
     :bead="edgeBeads[key]?.bead ?? 0"
     :selected="false"
-    :controlLength="controlLength"
   />
 </template>
