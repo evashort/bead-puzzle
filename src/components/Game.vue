@@ -1222,6 +1222,7 @@ export default {
         :beads="beads"
         :history="history"
         :controlLength="30"
+        :radius="100"
       />
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
         <image x="-4" y="-4" width="8" height="8"

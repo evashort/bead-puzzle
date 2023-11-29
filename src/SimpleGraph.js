@@ -47,6 +47,23 @@ export function hasEdge(bytes, a, b) {
     ) != 0
 }
 
+export function* edges(bytes) {
+    let a = 0, b = 1
+    for (let byte of bytes) {
+        for (let i = 1; i < 256; i *= 2) {
+            if (byte & i) {
+                yield [a, b]
+            }
+
+            a++
+            if (a >= b) {
+                a = 0
+                b++
+            }
+        }
+    }
+}
+
 export function fromString(string) {
     return base64js.toByteArray(string.split(".", 1)[0])
 }
@@ -59,6 +76,7 @@ var SimpleGraph = {
     bytesToNodeCount: bytesToNodeCount,
     applyLayout: applyLayout,
     hasEdge: hasEdge,
+    edges: edges,
     fromString: fromString,
     toString: toString,
 }
