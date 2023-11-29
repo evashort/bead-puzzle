@@ -12,6 +12,7 @@ export default {
     moving: Boolean,
     bead: Number,
     selected: Boolean,
+    controlLength: Number,
   },
   computed: {
     name() {
@@ -49,21 +50,22 @@ export default {
         moving: this.moving,
       }
     },
-    x1() {
-      return this.getX(this.a)
-    },
-    y1() {
-      return this.getY(this.a)
-    },
-    x2() {
-      return this.getX(this.b)
-    },
-    y2() {
-      return this.getY(this.b)
-    },
+    x0() { return this.getX(this.aPrime) },
+    y0() { return this.getY(this.aPrime) },
+    x1() { return this.getX(this.a) },
+    y1() { return this.getY(this.a) },
+    x2() { return this.getX(this.b) },
+    y2() { return this.getY(this.b) },
+    x3() { return this.getX(this.bPrime) },
+    y3() { return this.getY(this.bPrime) },
     path() {
       let x1 = this.x1, y1 = this.y1, x2 = this.x2, y2 = this.y2
-      return `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
+      let x0 = this.x0, y0 = this.y0, x3 = this.x3, y3 = this.y3
+      let l = this.controlLength
+      let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
+      let [tx2, ty2] = this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
+      let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
+      return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`
     },
   },
   methods: {
@@ -72,6 +74,17 @@ export default {
     },
     getY(i) {
       return -100 * Math.cos(2 * Math.PI * i / this.size)
+    },
+    getTangent(dx1, dy1, dx2, dy2, length) {
+      // returns a vector with the given length, pointing in the average
+      // direction of the two input vectors
+      let len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1)
+      let len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
+      let dx3 = dx1 * len2 + dx2 * len1
+      let dy3 = dy1 * len2 + dy2 * len1
+      let len3 = Math.sqrt(dx3 * dx3 + dy3 * dy3)
+      let factor = len3 > 0 ? length / len3 : 0
+      return [dx3 * factor, dy3 * factor]
     },
   },
 }
@@ -102,6 +115,10 @@ export default {
   stroke-dasharray: 4 12;
 }
 
+.canAnimate .edge {
+  transition: d 0.5s;
+}
+
 /*
 facingA onPath offset-rotate
         0      -90deg
@@ -127,14 +144,14 @@ moveToA moving offset-distance
 .bead.moveToA {
   offset-distance: 0%;
 }
-.bead.moving {
+.canAnimate .bead.moving {
   animation: slide 0.75s ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.bead.moving.moveToA {
+.canAnimate .bead.moving.moveToA {
   /* use a different animation instead of "animation-direction: reverse" so
      that the animation plays again when changing direction */
   animation-name: slide-back;

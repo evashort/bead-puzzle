@@ -22,6 +22,7 @@ export default {
     graphId: String,
     beads: Number,
     history: Array,
+    controlLength: Number,
   },
   computed: {
     graph() {
@@ -38,6 +39,25 @@ export default {
             result[[a, b].toString()] = [a, b]
           }
         }
+      }
+
+      return result
+    },
+    edgePrimes() {
+      let result = {}
+      for (let i = 0; i < this.history.length - 1; i++) {
+        let a = this.history[i], b = this.history[i + 1]
+        let aPrime = i > 0 ? this.history[i - 1] : a
+        let bPrime = i < this.history.length - 2 ? this.history[i + 2] : b
+        if (b < a) {
+          // destructuring gives the wrong result for some reason
+          // [a, b] = [b, a]
+          // [aPrime, bPrime] = [bPrime, aPrime]
+          let temp = a; a = b; b = temp
+          temp = aPrime; aPrime = bPrime; bPrime = temp
+        }
+
+        result[[a, b].toString()] = [aPrime, bPrime]
       }
 
       return result
@@ -106,13 +126,14 @@ export default {
     :size="size"
     :a="a"
     :b="b"
-    :aPrime="a"
-    :bPrime="b"
+    :aPrime="(edgePrimes[key] ?? [a, b])[0]"
+    :bPrime="(edgePrimes[key] ?? [a, b])[1]"
     :facingA="edgeBeads[key]?.moveToA ?? false"
     :moveToA="edgeBeads[key]?.moveToA ?? false"
     :onPath="false"
     :moving="edgeBeads[key]?.moving ?? false"
     :bead="edgeBeads[key]?.bead ?? 0"
     :selected="false"
+    :controlLength="controlLength"
   />
 </template>
