@@ -74,21 +74,17 @@ export default {
 
       return result
     },
-    edgeBeads() {
-      let result = {}
+    beadEdges() {
+      let result = []
       for (let bead = 1; bead < this.size; bead++) {
         let a = this.beadStarts[bead - 1]
         let b = Permute.findValue(this.beads, bead)
         let moveToA = b < a
-        if (moveToA) {
-          [a, b] = [b, a]
-        }
-
-        result[[a, b]] = {
-          bead: bead,
+        result.push({
+          edge: moveToA ? [b, a] : [a, b],
           moveToA: moveToA,
           moving: a != b,
-        }
+        })
       }
 
       return result
@@ -139,16 +135,19 @@ export default {
     :path="edgePaths[edge]"
     :onPath="false"
   />
+  <!-- including edge in the key allows the slide animation to play again when
+    the bead moves to a different edge. including i in the key allows the slide
+    animation to play again when a different bead moves onto the edge. -->
   <Bead
-    v-for="(path, key) in edgePaths"
-    :key="key"
+    v-for="(bead, i) in beadEdges"
+    :key="`${i}:${bead.edge}`"
     :size="size"
-    :path="path"
-    :facingA="edgeBeads[key]?.moveToA ?? false"
-    :moveToA="edgeBeads[key]?.moveToA ?? false"
+    :path="edgePaths[bead.edge]"
+    :facingA="bead.moveToA"
+    :moveToA="bead.moveToA"
     :onPath="false"
-    :moving="edgeBeads[key]?.moving ?? false"
-    :bead="edgeBeads[key]?.bead ?? 0"
+    :moving="bead.moving"
+    :bead="i"
     :selected="false"
   />
 </template>

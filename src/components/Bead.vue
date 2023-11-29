@@ -13,14 +13,14 @@ export default {
   computed: {
     name() {
       return [
-        [null],
-        [null],
-        [null, 'mushroom'],
-        [null, 'butterfly', 'mushroom'],
-        [null, 'heart', 'butterfly', 'mushroom'],
-        [null, 'heart', 'butterfly', 'leaf', 'mushroom'],
-        [null, 'heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
-        [null, 'heart', 'butterfly', 'saturn', 'leaf', 'mushroom', 'flower'],
+        [],
+        [],
+        ['mushroom'],
+        ['butterfly', 'mushroom'],
+        ['heart', 'butterfly', 'mushroom'],
+        ['heart', 'butterfly', 'leaf', 'mushroom'],
+        ['heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
+        ['heart', 'butterfly', 'saturn', 'leaf', 'mushroom', 'flower'],
       ][this.size][this.bead]
     },
     scale() {
@@ -51,13 +51,9 @@ export default {
 </script>
 
 <template>
-  <!-- using :key causes the element to be deleted and recreated when the bead
-       changes, allowing the slide animation to play again.
-       TODO: replace with "a,b" if outer key becomes name or something -->
   <use
     v-if="name"
     :href="`#${name}-bead`"
-    :key="name"
     :class="beadClasses"
     :style="{ '--scale': scale, 'offset-path': `path('${path}')` }"
   />
