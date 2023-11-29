@@ -47,25 +47,29 @@ export default {
           temp = aPrime; aPrime = bPrime; bPrime = temp
         }
 
-        result[[a, b].toString()] = [aPrime, bPrime]
+        result[[a, b]] = [aPrime, bPrime]
       }
 
       return result
     },
     edgePaths() {
       let result = {}
-      for (let [a, b] of SimpleGraph.edges(this.graph)) {
-        let key = [a, b].toString()
-        let [aPrime, bPrime] = this.edgePrimes[key] ?? [a, b]
+      for (let edge of SimpleGraph.edges(this.graph)) {
+        let [aPrime, bPrime] = this.edgePrimes[edge] ?? edge
         let x0 = this.getX(aPrime), y0 = this.getY(aPrime)
-        let x1 = this.getX(a), y1 = this.getY(a)
-        let x2 = this.getX(b), y2 = this.getY(b)
+        let x1 = this.getX(edge[0]), y1 = this.getY(edge[0])
+        let x2 = this.getX(edge[1]), y2 = this.getY(edge[1])
         let x3 = this.getX(bPrime), y3 = this.getY(bPrime)
         let l = this.controlLength
         let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
         let [tx2, ty2] = this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
         let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
-        result[key] = `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`
+        result[edge] = `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`
+      }
+
+      for (let a = 0; a < this.size; a++) {
+        let x = this.getX(a), y = this.getY(a)
+        result[[a, a]] = `M${x} ${y}`
       }
 
       return result
@@ -80,28 +84,10 @@ export default {
           [a, b] = [b, a]
         }
 
-        let moving = a != b
-        if (a == b) {
-          for (a = 0; a < b; a++) {
-            if (SimpleGraph.hasEdge(this.graph, a, b) && !Object.hasOwn(result, [a, b].toString())) {
-              break
-            }
-          }
-        }
-
-        if (a == b) {
-          moveToA = true
-          for (b = a + 1; b < this.size; b++) {
-            if (SimpleGraph.hasEdge(this.graph, a, b) && !Object.hasOwn(result, [a, b].toString())) {
-              break
-            }
-          }
-        }
-
-        result[[a, b].toString()] = {
+        result[[a, b]] = {
           bead: bead,
           moveToA: moveToA,
-          moving: moving,
+          moving: a != b,
         }
       }
 
@@ -148,9 +134,9 @@ export default {
 
 <template>
   <Edge
-    v-for="(path, key) in edgePaths"
-    :key="key"
-    :path="path"
+    v-for="edge of SimpleGraph.edges(this.graph)"
+    :key="edge.toString()"
+    :path="edgePaths[edge]"
     :onPath="false"
   />
   <Bead
