@@ -23,6 +23,7 @@ export default {
     graphId: String,
     beads: Number,
     history: Array,
+    tail: Number,
     controlLength: Number,
     radius: Number,
   },
@@ -35,7 +36,7 @@ export default {
     },
     edgePrimes() {
       let result = {}
-      for (let i = 0; i < this.history.length - 1; i++) {
+      for (let i = 0; i < this.altHistory.length - 1; i++) {
         let a = this.loopHistory(i)
         let b = this.loopHistory(i + 1)
         let aPrime = this.loopHistory(i - 1)
@@ -82,6 +83,32 @@ export default {
 
       return result
     },
+    altHistory() {
+      let historySet = new Set(this.history)
+      let extra = []
+      let next = this.tail
+      let last = this.history[this.history.length - 1]
+      if (!(next >= 0) && this.history.length >= 2) {
+        next = this.getOnlyPath(this.history[this.history.length - 2], last)
+      }
+
+      while (next >= 0) {
+        extra.push(next)
+        if (historySet.has(next)) {
+          break
+        }
+
+        next = this.getOnlyPath(last, next)
+        last = extra[extra.length - 1]
+      }
+
+      let original = this.history
+      if (next >= 0) {
+        original = original.slice(this.history.indexOf(next))
+      }
+
+      return original.concat(extra)
+    },
   },
   methods: {
     getX(i) {
@@ -101,15 +128,25 @@ export default {
       let factor = len3 > 0 ? length / len3 : 0
       return [dx3 * factor, dy3 * factor]
     },
+    getOnlyPath(a, b) {
+      let result = -1
+      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
+        if (c == a) { continue }
+        if (result >= 0) { return -1 }
+        result = c
+      }
+
+      return result
+    },
     loopHistory(i) {
-      let n = this.history.length - 1
-      if (this.history[0] == this.history[n]) {
+      let n = this.altHistory.length - 1
+      if (this.altHistory[0] == this.altHistory[n]) {
         i = ((i % n) + n) % n // account for negative i
       } else {
         i = Math.min(Math.max(0, i), n)
       }
 
-      return this.history[i]
+      return this.altHistory[i]
     },
     sortedPair(a, b) {
       return b < a ? [b, a] : [a, b]

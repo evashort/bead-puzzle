@@ -1221,6 +1221,7 @@ export default {
         :graphId="graphId"
         :beads="beads"
         :history="history"
+        :tail="showTail ? tail : -1"
         :controlLength="30"
         :radius="100"
       />
