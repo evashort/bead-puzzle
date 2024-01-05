@@ -36,18 +36,11 @@ export default {
     edgePrimes() {
       let result = {}
       for (let i = 0; i < this.history.length - 1; i++) {
-        let a = this.history[i], b = this.history[i + 1]
-        let aPrime = i > 0 ? this.history[i - 1] : a
-        let bPrime = i < this.history.length - 2 ? this.history[i + 2] : b
-        if (b < a) {
-          // destructuring gives the wrong result for some reason
-          // [a, b] = [b, a]
-          // [aPrime, bPrime] = [bPrime, aPrime]
-          let temp = a; a = b; b = temp
-          temp = aPrime; aPrime = bPrime; bPrime = temp
-        }
-
-        result[[a, b]] = [aPrime, bPrime]
+        let a = this.loopHistory(i)
+        let b = this.loopHistory(i + 1)
+        let aPrime = this.loopHistory(i - 1)
+        let bPrime = this.loopHistory(i + 2)
+        result[this.sortedPair(a, b)] = this.swapIf(b < a, aPrime, bPrime)
       }
 
       return result
@@ -107,6 +100,22 @@ export default {
       let len3 = Math.sqrt(dx3 * dx3 + dy3 * dy3)
       let factor = len3 > 0 ? length / len3 : 0
       return [dx3 * factor, dy3 * factor]
+    },
+    loopHistory(i) {
+      let n = this.history.length - 1
+      if (this.history[0] == this.history[n]) {
+        i = ((i % n) + n) % n // account for negative i
+      } else {
+        i = Math.min(Math.max(0, i), n)
+      }
+
+      return this.history[i]
+    },
+    sortedPair(a, b) {
+      return b < a ? [b, a] : [a, b]
+    },
+    swapIf(condition, a, b) {
+      return condition ? [b, a] : [a, b]
     },
   },
   watch: {
