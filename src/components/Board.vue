@@ -84,11 +84,26 @@ export default {
       return result
     },
     altHistory() {
+      if (this.history.length <= 1) {
+        if (this.tail >= 0) {
+          return this.history.concat(this.tail)
+        } else {
+          return this.history
+        }
+      }
+
+      if (
+        this.history[this.history.length - 1] == this.history[0] &&
+        this.tail == this.history[1]
+      ) {
+        return this.history
+      }
+
       let historySet = new Set(this.history)
       let extra = []
       let next = this.tail
       let last = this.history[this.history.length - 1]
-      if (!(next >= 0) && this.history.length >= 2) {
+      if (!(next >= 0) || next == this.history[this.history.length - 2]) {
         next = this.getOnlyPath(this.history[this.history.length - 2], last)
       }
 
@@ -102,12 +117,11 @@ export default {
         last = extra[extra.length - 1]
       }
 
-      let original = this.history
-      if (next >= 0) {
-        original = original.slice(this.history.indexOf(next))
+      if (next == this.history[0]) {
+        extra.pop()
       }
 
-      return original.concat(extra)
+      return this.history.concat(extra)
     },
   },
   methods: {
@@ -179,9 +193,9 @@ export default {
     v-for="edge of SimpleGraph.edges(this.graph)"
     :key="edge.toString()"
     :path="edgePaths[edge]"
-    :onPath="false"
+    :onPath="Object.hasOwn(edgePrimes, edge)"
   />
-  <!-- including edge in the key allows the slide animation to play again when
+  <!-- inclusding edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
     animation to play again when a different bead moves onto the edge. -->
   <Bead

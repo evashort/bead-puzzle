@@ -8,7 +8,7 @@ export default {
 </script>
 
 <template>
-  <path class="edge" :d="path"/>
+  <path :class="{edge: true, onPath: onPath}" :d="path"/>
 </template>
 
 <style scoped>
@@ -22,5 +22,9 @@ export default {
 
 .canAnimate .edge {
   transition: d 0.5s;
+}
+
+.edge.onPath {
+  stroke-dasharray: none;
 }
 </style>
