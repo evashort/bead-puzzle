@@ -17,6 +17,7 @@ export default {
     }
     return {
       beadStarts: beadStarts,
+      moving: new Uint8Array(size - 1)
     }
   },
   props: {
@@ -70,13 +71,16 @@ export default {
     beadEdges() {
       let result = []
       for (let bead = 1; bead < this.size; bead++) {
-        let a = this.beadStarts[bead - 1]
         let b = Permute.findValue(this.beads, bead)
+        let isTail = b == this.tail
+        let a = isTail ? this.history[this.history.length - 1] :
+          this.beadStarts[bead - 1]
         let moveToA = b < a
         result.push({
           edge: moveToA ? [b, a] : [a, b],
+          facingA: moveToA != isTail,
           moveToA: moveToA,
-          moving: a != b,
+          moving: this.moving[bead - 1] != 0,
         })
       }
 
@@ -212,14 +216,20 @@ export default {
         let end = Permute.findValue(newBeads, bead)
         if (end != start) {
           newBeadStarts.push(start)
+          this.moving[bead - 1] = true
         } else {
           newBeadStarts.push(this.beadStarts[bead - 1])
         }
       }
 
       this.beadStarts = newBeadStarts
-    }
-  }
+    },
+    tail(newTail, oldTail) {
+      if (newTail >= 0) {
+        this.moving[Permute.getValue(this.beads, newTail) - 1] = false
+      }
+    },
+  },
 }
 </script>
 
@@ -232,15 +242,16 @@ export default {
   />
   <!-- inclusding edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
-    animation to play again when a different bead moves onto the edge. -->
+    animation to play again when a different bead moves onto the edge. 
+    TODO: can onPath expression apply to bead on forced path? -->
   <Bead
     v-for="(bead, i) in beadEdges"
     :key="`${i}:${bead.edge}`"
     :size="size"
     :path="edgePaths[bead.edge]"
-    :facingA="bead.moveToA"
+    :facingA="bead.facingA"
     :moveToA="bead.moveToA"
-    :onPath="false"
+    :onPath="(edgePrimes[bead.edge] ?? bead.edge).toString() != bead.edge.toString()"
     :moving="bead.moving"
     :bead="i"
     :selected="false"
