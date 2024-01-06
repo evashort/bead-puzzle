@@ -117,10 +117,6 @@ export default {
         last = extra[extra.length - 1]
       }
 
-      if (next == this.history[0]) {
-        extra.pop()
-      }
-
       return this.history.concat(extra)
     },
   },
@@ -153,14 +149,26 @@ export default {
       return result
     },
     loopHistory(i) {
-      let n = this.altHistory.length - 1
-      if (this.altHistory[0] == this.altHistory[n]) {
-        i = ((i % n) + n) % n // account for negative i
+      if (i < 0) {
+        let loopEnd = this.altHistory.indexOf(this.altHistory[0], 1)
+        if (loopEnd >= 0) {
+          return this.altHistory[(i + 1) % loopEnd + loopEnd - 1]
+        } else {
+          return this.altHistory[0]
+        }
+      } else if (i >= this.altHistory.length) {
+        let loopEnd = this.altHistory.length - 1
+        let loopStart = this.altHistory.indexOf(this.altHistory[loopEnd])
+        if (loopStart < loopEnd) {
+          return this.altHistory[
+            (i - loopStart) % (loopEnd - loopStart) + loopStart
+          ]
+        } else {
+          return this.altHistory[loopEnd]
+        }
       } else {
-        i = Math.min(Math.max(0, i), n)
+        return this.altHistory[i]
       }
-
-      return this.altHistory[i]
     },
     sortedPair(a, b) {
       return b < a ? [b, a] : [a, b]
