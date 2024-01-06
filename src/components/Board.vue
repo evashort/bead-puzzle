@@ -37,8 +37,7 @@ export default {
     edgePrimes() {
       let result = {}
       for (let i = 0; i < this.altHistory.length - 1; i++) {
-        let a = this.loopHistory(i)
-        let b = this.loopHistory(i + 1)
+        let a = this.loopHistory(i), b = this.loopHistory(i + 1)
         let aPrime = this.loopHistory(i - 1)
         let bPrime = this.loopHistory(i + 2)
         result[this.sortedPair(a, b)] = this.swapIf(b < a, aPrime, bPrime)
@@ -83,19 +82,19 @@ export default {
 
       return result
     },
-    altHistory() {
+    extra() {
       if (this.history.length <= 1) {
         if (this.tail >= 0) {
-          return this.history.concat(this.tail)
+          return [this.tail]
         } else {
-          return this.history
+          return []
         }
       }
 
       let last = this.history[this.history.length - 1]
       let next = this.tail
       if (last == this.history[0] && next == this.history[1]) {
-        return this.history
+        return []
       }
 
       if (!(next >= 0) || next == this.history[this.history.length - 2]) {
@@ -114,7 +113,38 @@ export default {
         last = extra[extra.length - 1]
       }
 
-      return this.history.concat(extra)
+      return extra
+    },
+    altHistory() {
+      if (this.extra) {
+        return this.history.concat(this.extra)
+      } else {
+        return this.history
+      }
+    },
+    activeEdges() {
+      let start = this.history.indexOf(
+        this.altHistory[this.altHistory.length - 1]
+      )
+      if (!(start >= 0) || start >= this.history.length - 1) {
+        start = 0
+      }
+
+      let stop = this.history.length + (
+        this.history[0] == this.history[this.history.length - 1] || (
+          this.tail >= 0 && (
+            this.history.length <= 1 ||
+            this.tail != this.history[this.history.length - 2]
+          )
+        )
+      )
+      let result = new Set()
+      for (let i = start; i < stop - 1; i++) {
+        let a = this.altHistory[i], b = this.altHistory[i + 1]
+        result.add(this.sortedPair(a, b).toString())
+      }
+
+      return result
     },
   },
   methods: {
@@ -198,7 +228,7 @@ export default {
     v-for="edge of SimpleGraph.edges(this.graph)"
     :key="edge.toString()"
     :path="edgePaths[edge]"
-    :onPath="Object.hasOwn(edgePrimes, edge)"
+    :onPath="activeEdges.has(edge.toString())"
   />
   <!-- inclusding edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
