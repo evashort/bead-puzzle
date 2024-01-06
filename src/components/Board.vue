@@ -92,21 +92,18 @@ export default {
         }
       }
 
-      if (
-        this.history[this.history.length - 1] == this.history[0] &&
-        this.tail == this.history[1]
-      ) {
+      let last = this.history[this.history.length - 1]
+      let next = this.tail
+      if (last == this.history[0] && next == this.history[1]) {
         return this.history
       }
 
-      let historySet = new Set(this.history)
-      let extra = []
-      let next = this.tail
-      let last = this.history[this.history.length - 1]
       if (!(next >= 0) || next == this.history[this.history.length - 2]) {
         next = this.getOnlyPath(this.history[this.history.length - 2], last)
       }
 
+      let historySet = new Set(this.history)
+      let extra = []
       while (next >= 0) {
         extra.push(next)
         if (historySet.has(next)) {
