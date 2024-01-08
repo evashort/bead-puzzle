@@ -142,10 +142,10 @@ export default {
           )
         )
       )
-      let result = new Set()
-      for (let i = start; i < stop - 1; i++) {
+      let result = {}
+      for (let i = 0; i < stop - 1; i++) {
         let a = this.altHistory[i], b = this.altHistory[i + 1]
-        result.add(this.sortedPair(a, b).toString())
+        result[this.sortedPair(a, b)] = i >= start
       }
 
       return result
@@ -238,12 +238,11 @@ export default {
     v-for="edge of SimpleGraph.edges(this.graph)"
     :key="edge.toString()"
     :path="edgePaths[edge]"
-    :onPath="activeEdges.has(edge.toString())"
+    :onPath="activeEdges[edge.toString()] ?? false"
   />
   <!-- inclusding edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
-    animation to play again when a different bead moves onto the edge. 
-    TODO: can onPath expression apply to bead on forced path? -->
+    animation to play again when a different bead moves onto the edge. -->
   <Bead
     v-for="(bead, i) in beadEdges"
     :key="`${i}:${bead.edge}`"
@@ -251,7 +250,7 @@ export default {
     :path="edgePaths[bead.edge]"
     :facingA="bead.facingA"
     :moveToA="bead.moveToA"
-    :onPath="(edgePrimes[bead.edge] ?? bead.edge).toString() != bead.edge.toString()"
+    :onPath="Object.hasOwn(activeEdges, bead.edge)"
     :moving="bead.moving"
     :bead="i"
     :selected="false"
