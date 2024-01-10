@@ -226,7 +226,18 @@ export default {
     },
     tail(newTail, oldTail) {
       if (newTail >= 0) {
-        this.moving[Permute.getValue(this.beads, newTail) - 1] = false
+        let bead = Permute.getValue(this.beads, newTail)
+        if (
+          // this condition determines whether the bead's edge will change from
+          // becoming the tail, see beadEdges()
+          this.history[this.history.length - 1] != this.beadStarts[bead - 1]
+        ) {
+          // if so, prevent the slide animation from being replayed
+          this.moving[bead - 1] = false
+          // TODO: when possible, beadEdges() should prevent the bead's edge
+          // from changing from becoming the tail even if its beadStart isn't
+          // the hole
+        }
       }
     },
   },
