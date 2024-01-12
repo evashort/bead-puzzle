@@ -68,13 +68,21 @@ export default {
 
       return result
     },
+    slideStarts() {
+      let result = {}
+      for (let i = 1; i < this.history.length; i++) {
+        result[this.history[i - 1]] = this.history[i]
+      }
+
+      return result
+    },
     beadEdges() {
       let result = []
       for (let bead = 1; bead < this.size; bead++) {
         let b = Permute.findValue(this.beads, bead)
         let isTail = b == this.tail
         let a = isTail ? this.history[this.history.length - 1] :
-          this.beadStarts[bead - 1]
+          this.slideStarts[b] ?? b
         let moveToA = b < a
         result.push({
           edge: moveToA ? [b, a] : [a, b],
