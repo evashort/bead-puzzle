@@ -76,7 +76,18 @@ export default {
         ]
       }
 
-      if (this.tail >= 0 && !this.hasForwardTail) {
+      if (
+        this.altHistory.length >= 2 &&
+        this.altHistory[this.altHistory.length - 1] == this.history[0] &&
+        this.history.indexOf(this.history[0], 1) < 0
+      ) {
+        // altHistory forms a simple loop (rather than a figure-8)
+        result[this.history[0]] =
+          [this.altHistory[1], this.altHistory[this.altHistory.length - 2]]
+      }
+
+      if (this.hasLoop && this.tail >= 0 && !this.hasForwardTail) {
+        // indicate that going forward would reverse the loop
         result[this.tail].reverse()
       }
 
