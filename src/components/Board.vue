@@ -101,7 +101,7 @@ export default {
           a: a,
           b: b,
           reverse: reverse,
-          moving: moving,
+          moving: moving && a != b,
         })
       }
 
