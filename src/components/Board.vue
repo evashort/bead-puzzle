@@ -83,11 +83,10 @@ export default {
         let isTail = b == this.tail
         let a = isTail ? this.history[this.history.length - 1] :
           this.slideStarts[b] ?? b
-        let moveToA = b < a
         result.push({
-          edge: moveToA ? [b, a] : [a, b],
-          facingA: moveToA != isTail,
-          moveToA: moveToA,
+          a: a,
+          b: b,
+          reverse: isTail,
           moving: this.moving[bead - 1] != 0,
         })
       }
@@ -264,12 +263,12 @@ export default {
     animation to play again when a different bead moves onto the edge. -->
   <Bead
     v-for="(bead, i) in beadEdges"
-    :key="`${i}:${bead.edge}`"
+    :key="`${i}:${sortedPair(bead.a, bead.b)}`"
     :size="size"
-    :path="edgePaths[bead.edge]"
-    :facingA="bead.facingA"
-    :moveToA="bead.moveToA"
-    :onPath="Object.hasOwn(activeEdges, bead.edge)"
+    :path="edgePaths[sortedPair(bead.a, bead.b)]"
+    :facingA="(bead.b < bead.a) != bead.reverse"
+    :moveToA="bead.b < bead.a"
+    :onPath="Object.hasOwn(activeEdges, sortedPair(bead.a, bead.b))"
     :moving="bead.moving"
     :bead="i"
     :selected="false"
