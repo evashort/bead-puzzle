@@ -100,7 +100,7 @@ export default {
         result.push({
           a: a,
           b: b,
-          reverse: reverse,
+          reverse: reverse && a != b,
           moving: moving && a != b,
         })
       }
