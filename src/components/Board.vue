@@ -17,7 +17,6 @@ export default {
     }
     return {
       beadStarts: beadStarts,
-      moving: new Uint8Array(size - 1)
     }
   },
   props: {
@@ -68,10 +67,17 @@ export default {
 
       return result
     },
-    slideStarts() {
+    beadOrientations() {
       let result = {}
-      for (let i = 1; i < this.history.length; i++) {
-        result[this.history[i - 1]] = this.history[i]
+      for (let i = 0; i < this.altHistory.length; i++) {
+        result[this.altHistory[i]] = [
+          this.altHistory[Math.min(i + 1, this.altHistory.length - 1)],
+          this.altHistory[Math.max(i - 1, 0)],
+        ]
+      }
+
+      if (this.tail >= 0 && !this.hasForwardTail) {
+        result[this.tail].reverse()
       }
 
       return result
@@ -80,14 +86,22 @@ export default {
       let result = []
       for (let bead = 1; bead < this.size; bead++) {
         let b = Permute.findValue(this.beads, bead)
-        let isTail = b == this.tail
-        let a = isTail ? this.history[this.history.length - 1] :
-          this.slideStarts[b] ?? b
+        let [a, c] = this.beadOrientations[b] ?? [b, b]
+        let start = this.beadStarts[bead - 1]
+        let reverse = start == c || a == b
+        if (reverse) {
+          a = c
+        }
+
+        let moving = start == a || a == b
+        if (moving) {
+          a = start
+        }
         result.push({
           a: a,
           b: b,
-          reverse: isTail,
-          moving: this.moving[bead - 1] != 0,
+          reverse: reverse,
+          moving: moving,
         })
       }
 
@@ -95,23 +109,16 @@ export default {
     },
     extra() {
       if (this.history.length <= 1) {
-        if (this.tail >= 0) {
-          return [this.tail]
-        } else {
-          return []
-        }
-      }
-
-      let last = this.history[this.history.length - 1]
-      let next = this.tail
-      if (last == this.history[0] && next == this.history[1]) {
+        return this.hasForwardTail ? [this.tail] : []
+      } else if (
+        this.hasLoop && (this.tail == this.history[1] || !this.hasForwardTail)
+      ) {
         return []
       }
 
-      if (!(next >= 0) || next == this.history[this.history.length - 2]) {
-        next = this.getOnlyPath(this.history[this.history.length - 2], last)
-      }
-
+      let last = this.history[this.history.length - 1]
+      let next = this.hasForwardTail ? this.tail :
+        this.getOnlyPath(this.history[this.history.length - 2], last)
       let historySet = new Set(this.history)
       let extra = []
       while (next >= 0) {
@@ -134,28 +141,28 @@ export default {
       }
     },
     activeEdges() {
-      let start = this.history.indexOf(
-        this.altHistory[this.altHistory.length - 1]
+      let start = this.history.lastIndexOf(
+        this.altHistory[this.altHistory.length - 1],
+        -2,
       )
-      if (!(start >= 0) || start >= this.history.length - 1) {
-        start = 0
-      }
-
-      let stop = this.history.length + (
-        this.history[0] == this.history[this.history.length - 1] || (
-          this.tail >= 0 && (
-            this.history.length <= 1 ||
-            this.tail != this.history[this.history.length - 2]
-          )
-        )
-      )
+      let stop = this.history.length + (this.hasLoop || this.hasForwardTail)
       let result = {}
-      for (let i = 0; i < stop - 1; i++) {
-        let a = this.altHistory[i], b = this.altHistory[i + 1]
-        result[this.sortedPair(a, b)] = i >= start
+      for (let i = 1; i < this.altHistory.length; i++) {
+        let a = this.altHistory[i - 1], b = this.altHistory[i]
+        result[this.sortedPair(a, b)] = i > start && i < stop
       }
 
       return result
+    },
+    hasLoop() {
+      return this.history.length >= 2 &&
+        this.history[0] == this.history[this.history.length - 1]
+    },
+    hasForwardTail() {
+      return this.tail >= 0 && (
+        this.history.length <= 1 ||
+        this.tail != this.history[this.history.length - 2]
+      )
     },
   },
   methods: {
@@ -196,8 +203,9 @@ export default {
         }
       } else if (i >= this.altHistory.length) {
         let loopEnd = this.altHistory.length - 1
-        let loopStart = this.altHistory.indexOf(this.altHistory[loopEnd])
-        if (loopStart < loopEnd) {
+        let loopStart =
+          this.altHistory.lastIndexOf(this.altHistory[loopEnd], -2)
+        if (loopStart >= 0) {
           return this.altHistory[
             (i - loopStart) % (loopEnd - loopStart) + loopStart
           ]
@@ -223,7 +231,6 @@ export default {
         let end = Permute.findValue(newBeads, bead)
         if (end != start) {
           newBeadStarts.push(start)
-          this.moving[bead - 1] = true
         } else {
           newBeadStarts.push(this.beadStarts[bead - 1])
         }
@@ -231,19 +238,21 @@ export default {
 
       this.beadStarts = newBeadStarts
     },
-    tail(newTail, oldTail) {
-      if (newTail >= 0) {
-        let bead = Permute.getValue(this.beads, newTail)
-        if (
-          // this condition determines whether the bead's edge will change from
-          // becoming the tail, see beadEdges()
-          this.history[this.history.length - 1] != this.beadStarts[bead - 1]
-        ) {
+    extra(newExtra, oldExtra) {
+      if (newExtra.toString() == oldExtra.toString()) {
+        // this watcher gets triggered too much because two Javascript arrays
+        // are never equal
+        return
+      }
+
+      for (let a of newExtra) {
+        let bead = Permute.getValue(this.beads, a)
+        let orientation = this.beadOrientations[a] ?? [a, a]
+        // this condition determines whether the bead's edge will change due to
+        // extra changing, see beadEdges()
+        if (!orientation.includes(this.beadStarts[bead - 1])) {
           // if so, prevent the slide animation from being replayed
-          this.moving[bead - 1] = false
-          // TODO: when possible, beadEdges() should prevent the bead's edge
-          // from changing from becoming the tail even if its beadStart isn't
-          // the hole
+          this.beadStarts[bead - 1] = a
         }
       }
     },
