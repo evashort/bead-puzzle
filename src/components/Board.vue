@@ -134,11 +134,7 @@ export default {
       return extra
     },
     altHistory() {
-      if (this.extra) {
-        return this.history.concat(this.extra)
-      } else {
-        return this.history
-      }
+      return this.extra.length ? this.history.concat(this.extra) : this.history
     },
     activeEdges() {
       let start = this.history.lastIndexOf(
@@ -245,6 +241,7 @@ export default {
         return
       }
 
+      let newBeadStarts = false
       for (let a of newExtra) {
         let bead = Permute.getValue(this.beads, a)
         let orientation = this.beadOrientations[a] ?? [a, a]
@@ -252,9 +249,12 @@ export default {
         // extra changing, see beadEdges()
         if (!orientation.includes(this.beadStarts[bead - 1])) {
           // if so, prevent the slide animation from being replayed
-          this.beadStarts[bead - 1] = a
+          newBeadStarts = newBeadStarts || this.beadStarts.slice()
+          newBeadStarts[bead - 1] = a
         }
       }
+
+      this.beadStarts = newBeadStarts || this.beadStarts
     },
   },
 }
