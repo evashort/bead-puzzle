@@ -2,8 +2,7 @@
 export default {
   props: {
     size: Number,
-    index: Number,
-    won: Boolean,
+    bead: Number,
     radius: Number,
   },
   computed: {
@@ -17,7 +16,20 @@ export default {
         ['heart', 'butterfly', 'leaf', 'mushroom'],
         ['heart', 'butterfly', 'leaf', 'mushroom', 'flower'],
         ['heart', 'butterfly', 'saturn', 'leaf', 'mushroom', 'flower'],
-      ][this.size][this.index]
+      ][this.size][this.bead - 1]
+    },
+    scale() {
+      return {
+        heart: 2.7,
+        butterfly: 2.8,
+        saturn: 3.35,
+        leaf: 2.5,
+        mushroom: 2.6,
+        flower: 2.5,
+      }[this.name]
+    },
+    angle() {
+      return 2 * Math.PI * this.bead / this.size
     },
     goalAngle() {
       return [
@@ -29,15 +41,17 @@ export default {
         [80, 15, 105, 255, -15],
         [80, 15, 165, 105, 195, -15],
         [80, 40, 170, 105, 255, 195, -40],
-      ][this.size][this.index]
+      ][this.size][this.bead] * Math.PI / 180
     },
     x() {
-      return radius * Math.sin(2 * Math.PI * i / size) +
-        30 * Math.sin(goalAngles[i] * Math.PI / 180)
+      return this.radius * (
+        Math.sin(this.angle) + 0.3 * Math.sin(this.goalAngle)
+      )
     },
     y() {
-      return -radius * Math.cos(2 * Math.PI * i / size) -
-        30 * Math.cos(goalAngles[i] * Math.PI / 180)
+      return -this.radius * (
+        Math.cos(this.angle) + 0.3 * Math.cos(this.goalAngle)
+      )
     },
   },
 }
@@ -45,9 +59,9 @@ export default {
 
 <template>
   <g :transform="`translate(${x},${y})`">
-    <use :href="`#${name}-outline`" :style="{ 'transform': 'scale(2.7)' }"/>
+    <use
+      :href="`#${name}-outline`"
+      :style="{ 'transform': `scale(${scale})` }"
+    />
   </g>
 </template>
-
-<style scoped>
-</style>

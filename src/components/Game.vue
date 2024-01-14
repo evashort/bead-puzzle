@@ -1,5 +1,6 @@
 <script setup>
 import Board from './Board.vue'
+import Goal from './Goal.vue'
 import Permute from '../Permute.js'
 import SimpleGraph from '../SimpleGraph.js'
 </script>
@@ -512,16 +513,6 @@ export default {
     },
     activeBeadScale() {
       return 5/3
-    },
-    beadScales() {
-      return {
-        heart: 2.7,
-        butterfly: 2.8,
-        saturn: 3.35,
-        leaf: 2.5,
-        mushroom: 2.6,
-        flower: 2.5,
-      }
     },
     clickRadius() {
       return 42
@@ -1231,24 +1222,12 @@ export default {
         :controlLength="30"
         :radius="100"
       />
-      <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
-        <use href="#heart-outline" :style="{ 'transform': 'scale(2.7)' }"/>
-      </g>
-      <g v-if="colorIds[1] >= 0" :transform="`translate(${goalXs[colorIds[1] + 1]},${goalYs[colorIds[1] + 1]})`">
-        <use href="#butterfly-outline" :style="{ 'transform': 'scale(2.8)' }"/>
-      </g>
-      <g v-if="colorIds[2] >= 0" :transform="`translate(${goalXs[colorIds[2] + 1]},${goalYs[colorIds[2] + 1]})`">
-        <use href="#saturn-outline" :style="{ 'transform': 'scale(3.35)' }"/>
-      </g>
-      <g v-if="colorIds[3] >= 0" :transform="`translate(${goalXs[colorIds[3] + 1]},${goalYs[colorIds[3] + 1]})`">
-        <use href="#leaf-outline" :style="{ 'transform': 'scale(2.5)' }"/>
-      </g>
-      <g v-if="colorIds[4] >= 0" :transform="`translate(${goalXs[colorIds[4] + 1]},${goalYs[colorIds[4] + 1]})`">
-        <use href="#mushroom-outline" :style="{ 'transform': 'scale(2.6)' }"/>
-      </g>
-      <g v-if="colorIds[5] >= 0" :transform="`translate(${goalXs[colorIds[5] + 1]},${goalYs[colorIds[5] + 1]})`">
-        <use href="#flower-outline" :style="{ 'transform': 'scale(2.5)' }"/>
-      </g>
+      <Goal
+        v-for="i in size - 1"
+        :size="size"
+        :bead="i"
+        :radius="100"
+      />
     </svg>
   </button>
 </template>

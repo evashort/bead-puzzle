@@ -24,18 +24,14 @@ export default {
       ][this.size][this.bead]
     },
     scale() {
-      if (this.name) {
-        return {
-          heart: 2.7,
-          butterfly: 2.8,
-          saturn: 3.35,
-          leaf: 2.5,
-          mushroom: 2.6,
-          flower: 2.5,
-        }[this.name] * (this.selected ? 5/3 : 1)
-      }
-
-      return 1
+      return {
+        heart: 2.7,
+        butterfly: 2.8,
+        saturn: 3.35,
+        leaf: 2.5,
+        mushroom: 2.6,
+        flower: 2.5,
+      }[this.name] * (this.selected ? 5/3 : 1)
     },
     beadClasses() {
       return {
