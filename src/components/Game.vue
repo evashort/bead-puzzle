@@ -1096,6 +1096,12 @@ export default {
         <image id="leaf-bead" x="-6" y="-6" width="12" height="12" href="../assets/leaf.svg"/>
         <image id="mushroom-bead" x="-6" y="-6" width="12" height="12" href="../assets/mushroom.svg"/>
         <image id="flower-bead" x="-6" y="-6" width="12" height="12" href="../assets/flower.svg"/>
+        <image id="heart-outline" x="-4" y="-4" width="8" height="8" href="../assets/heart_outline.svg"/>
+        <image id="butterfly-outline" x="-4" y="-4" width="8" height="8" href="../assets/butterfly_outline.svg"/>
+        <image id="saturn-outline" x="-4" y="-4" width="8" height="8" href="../assets/saturn_outline.svg"/>
+        <image id="leaf-outline" x="-4" y="-4" width="8" height="8" href="../assets/leaf_outline.svg"/>
+        <image id="mushroom-outline" x="-4" y="-4" width="8" height="8" href="../assets/mushroom_outline.svg"/>
+        <image id="flower-outline" x="-4" y="-4" width="8" height="8" href="../assets/flower_outline.svg"/>
       </defs>
       <g v-for="node in size">
         <circle
@@ -1226,40 +1232,22 @@ export default {
         :radius="100"
       />
       <g v-if="colorIds[0] >= 0" :transform="`translate(${goalXs[colorIds[0] + 1]},${goalYs[colorIds[0] + 1]})`">
-        <image x="-4" y="-4" width="8" height="8"
-          href="../assets/heart_outline.svg"
-          :style="{ 'transform': 'scale(2.7)' }"
-        />
+        <use href="#heart-outline" :style="{ 'transform': 'scale(2.7)' }"/>
       </g>
       <g v-if="colorIds[1] >= 0" :transform="`translate(${goalXs[colorIds[1] + 1]},${goalYs[colorIds[1] + 1]})`">
-        <image x="-4" y="-4" width="8" height="8"
-          href="../assets/butterfly_outline.svg"
-          :style="{ 'transform': 'scale(2.8)' }"
-        />
+        <use href="#butterfly-outline" :style="{ 'transform': 'scale(2.8)' }"/>
       </g>
       <g v-if="colorIds[2] >= 0" :transform="`translate(${goalXs[colorIds[2] + 1]},${goalYs[colorIds[2] + 1]})`">
-        <image x="-4" y="-4" width="8" height="8"
-          href="../assets/saturn_outline.svg"
-          :style="{ 'transform': 'scale(3.35)' }"
-        />
+        <use href="#saturn-outline" :style="{ 'transform': 'scale(3.35)' }"/>
       </g>
       <g v-if="colorIds[3] >= 0" :transform="`translate(${goalXs[colorIds[3] + 1]},${goalYs[colorIds[3] + 1]})`">
-        <image x="-4" y="-4" width="8" height="8"
-          href="../assets/leaf_outline.svg"
-          :style="{ 'transform': 'scale(2.5)' }"
-        />
+        <use href="#leaf-outline" :style="{ 'transform': 'scale(2.5)' }"/>
       </g>
       <g v-if="colorIds[4] >= 0" :transform="`translate(${goalXs[colorIds[4] + 1]},${goalYs[colorIds[4] + 1]})`">
-        <image x="-4" y="-4" width="8" height="8"
-          href="../assets/mushroom_outline.svg"
-          :style="{ 'transform': 'scale(2.6)' }"
-        />
+        <use href="#mushroom-outline" :style="{ 'transform': 'scale(2.6)' }"/>
       </g>
       <g v-if="colorIds[5] >= 0" :transform="`translate(${goalXs[colorIds[5] + 1]},${goalYs[colorIds[5] + 1]})`">
-        <image x="-4" y="-4" width="8" height="8"
-          href="../assets/flower_outline.svg"
-          :style="{ 'transform': 'scale(2.5)' }"
-        />
+        <use href="#flower-outline" :style="{ 'transform': 'scale(2.5)' }"/>
       </g>
     </svg>
   </button>
