@@ -23,14 +23,6 @@ export default {
       showOldArrow: false,
       backwardsInLoop: false,
       continuingLoop: false,
-
-      /*
-      animation legend:
-      0 = static
-      1 = animate
-      2 = animate alternate
-      */
-      animations: new Uint8Array(0),
       oldBeads: [],
 
       // trophy state
@@ -112,37 +104,6 @@ export default {
 
       return edges
     },
-    idColors() {
-      return [
-        [],
-        [],
-        [4],
-        [1, 4],
-        [0, 1, 4],
-        [0, 1, 3, 4],
-        [0, 1, 3, 4, 5],
-        [0, 1, 2, 3, 4, 5],
-      ][this.size]
-    },
-    colorHex() {
-      return [
-        "#cacaca",
-        "#b51d14",
-        "#ddb310",
-        "#00b25d",
-        "#00beff",
-        "#3e59f0", // 4053d3 -> color-mix(in lch, #4d64ff, #0750f4) = #3e59f0
-        "#fb49b0",
-      ]
-    },
-    colorIds() {
-      let colorIds = new Int8Array(6).fill(-1)
-      for (let [id, color] of this.idColors.entries()) {
-        colorIds[color] = id
-      }
-
-      return colorIds
-    },
     hole() {
       return this.history[this.history.length - 1]
     },
@@ -194,36 +155,6 @@ export default {
       let ys = new Float64Array(this.size)
       for (let i = 0; i < this.size; i++) {
         ys[i] = -100 * Math.cos(2 * Math.PI * i / this.size)
-      }
-
-      return ys
-    },
-    goalAngles() {
-      return [
-        [],
-        [90],
-        [80, 100],
-        [80, 15, -15],
-        [80, 170, 100, 190],
-        [80, 15, 105, 255, -15],
-        [80, 15, 165, 105, 195, -15],
-        [80, 40, 170, 105, 255, 195, -40],
-      ]
-    },
-    goalXs() {
-      let xs = new Float64Array(this.size)
-      let angles = this.goalAngles[this.size]
-      for (let i = 0; i < this.size; i++) {
-        xs[i] = this.nodeXs[i] + 30 * Math.sin(angles[i] * Math.PI / 180)
-      }
-
-      return xs
-    },
-    goalYs() {
-      let ys = new Float64Array(this.size)
-      let angles = this.goalAngles[this.size]
-      for (let i = 0; i < this.size; i++) {
-        ys[i] = this.nodeYs[i] - 30 * Math.cos(angles[i] * Math.PI / 180)
       }
 
       return ys
@@ -371,47 +302,6 @@ export default {
     oldArrowPath() {
       return this.edgePaths[[this.oldHole, this.hole].toString()]
     },
-    beadRadius() {
-      return 10
-    },
-    beadHeight() {
-      return this.beadRadius * Math.sqrt(3)
-    },
-    beadClasses() {
-      let result = []
-      for (let id = 0; id < this.size - 1; id++) {
-        let node = Permute.findValue(this.beads, id + 1)
-        let historyIndex = this.extra.indexOf(node, this.activeStart)
-        result.push(
-          {
-            bead: true,
-            tail: node == this.tail && this.showTail &&
-              (node != this.extra[this.loopStart] || this.oldBeads[id] == this.hole),
-            onPath: historyIndex >= 0 && historyIndex <= this.activeEnd,
-            animate: this.animations[id],
-            alternate: this.animations[id] == 2,
-            reverse: historyIndex > 0 && this.oldBeads[id] == this.extra[historyIndex - 1],
-          }
-        )
-      }
-
-      return result
-    },
-    beadOffsetPaths() {
-      let result = []
-      for (let id = 0; id < this.size - 1; id++) {
-        let node = Permute.findValue(this.beads, id + 1)
-        let edge =
-          node == this.tail && this.showTail &&
-            node != this.extra[this.loopStart] ?
-          [this.hole, this.tail] :
-          [this.oldBeads[id], node]
-        let path = this.edgePaths[edge.toString()]
-        result.push(`path('${path}')`)
-      }
-
-      return result
-    },
     trophyExitStart() {
       if (this.reversed) {
         return this.oldHole
@@ -508,12 +398,6 @@ export default {
         wasPushed: this.trophyPushed,
         unpaused: !this.trophyEnterPaused,
       }
-    },
-    normalBeadScale() {
-      return 1
-    },
-    activeBeadScale() {
-      return 5/3
     },
     clickRadius() {
       return 42
@@ -692,7 +576,6 @@ export default {
       this.trophyWasPushed = this.showTail
       let id = Permute.getValue(this.beads, this.tail) - 1
       this.beads = Permute.swap(this.beads, this.hole, this.tail)
-      this.animations[id] = 1 + this.animations[id] % 2
       this.oldBeads[id] = this.tail
       this.trophyAlternate = !this.trophyAlternate
       this.oldHole = this.hole
@@ -788,7 +671,6 @@ export default {
         this.tail = this.hole
         let id = Permute.getValue(this.beads, newHole) - 1
         this.beads = Permute.swap(this.beads, newHole, this.tail)
-        this.animations[id] = 1 + this.animations[id] % 2
         this.oldBeads[id] = newHole
         this.trophyAlternate = !this.trophyAlternate
         this.showOldArrow = false
@@ -988,7 +870,6 @@ export default {
           this.oldBeads[i] = Permute.findValue(this.beads, i + 1)
         }
 
-        this.animations = new Uint8Array(this.oldBeads.length)
         this.history = [...newState.history]
         this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
@@ -1013,7 +894,6 @@ export default {
     },
     canAnimate(newCanAnimate, oldCanAnimate) {
       if (newCanAnimate) {
-        this.animations = new Uint8Array(this.oldBeads.length)
         this.showOldArrow = false
         this.backwardsInLoop = false
         this.continuingLoop = false
@@ -1072,14 +952,6 @@ export default {
   >
     <svg id="game-view" viewBox="-143 -143 286 286" @pointerdown="onPointerDown" @click.stop.prevent="clicked" @pointerup="clicked">
       <defs>
-        <!-- http://tsitsul.in/blog/coloropt/ -->
-        <radialGradient r="0.55" id="checked-0"> <stop offset="77%" :stop-color="colorHex[0]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-1"> <stop offset="77%" :stop-color="colorHex[1]" stop-opacity="0.25"/> <stop offset="100%" stop-opacity="0"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-2"> <stop offset="77%" :stop-color="colorHex[2]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-3"> <stop offset="77%" :stop-color="colorHex[3]" stop-opacity="0.25"/> <stop offset="98%" stop-opacity="0"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-4"> <stop offset="77%" :stop-color="colorHex[4]" stop-opacity="0.25"/> <stop offset="96%" stop-opacity="0"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-5"> <stop offset="77%" :stop-color="colorHex[5]" stop-opacity="0.25"/> <stop offset="100%" stop-opacity="0"/> </radialGradient>
-        <radialGradient r="0.55" id="checked-6"> <stop offset="77%" :stop-color="colorHex[6]" stop-opacity="0.25"/> <stop offset="97%" stop-opacity="0"/> </radialGradient>
         <image id="star" x="-6" y="-6" width="12" height="12" href="../assets/star.svg"/>
         <image id="star-small" x="-4" y="-4" width="8" height="8" href="../assets/star_small.svg"/>
         <image id="heart-bead" x="-6" y="-6" width="12" height="12" href="../assets/heart.svg"/>
@@ -1360,53 +1232,9 @@ button {
 .canAnimate .spinGroup.ghost {
   transition: transform 0s 0.05s;
 }
-.edge {
-  fill: none;
-  stroke: var(--color-text);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-dasharray: 4 12;
-}
-.canAnimate .edge {
-  transition: d 0.5s;
-}
-.edge.arrow {
-  stroke-dasharray: 8 8;
-  stroke-dashoffset: 2;
-}
-.edge.active {
-  stroke-dasharray: none;
-}
-.outline {
-  stroke-width: 3;
-  stroke: var(--color-text);
-}
-/*
-tail onPath undo reverse offset-rotate
-0    0                   -90deg
-0    1           0       auto
-0    1           1       reverse
-1                        reverse
-*/
-.bead {
-  offset-distance: 100%;
-  offset-rotate: -90deg;
-}
-.bead.onPath {
-  offset-rotate: auto;
-}
-.bead.onPath.reverse, .bead.tail {
-  offset-rotate: reverse;
-}
-.canAnimate .bead.animate {
-  animation: slide 0.75s ease forwards;
-}
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
-}
-.canAnimate .bead.alternate {
-  animation-name: slide2;
 }
 @keyframes slide2 {
   from { offset-distance: 0%; }
