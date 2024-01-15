@@ -1,6 +1,7 @@
 <script setup>
 import Board from './Board.vue'
 import Goal from './Goal.vue'
+import Holes from './Holes.vue'
 import Permute from '../Permute.js'
 import SimpleGraph from '../SimpleGraph.js'
 </script>
@@ -1094,23 +1095,11 @@ export default {
         <image id="mushroom-outline" x="-4" y="-4" width="8" height="8" href="../assets/mushroom_outline.svg"/>
         <image id="flower-outline" x="-4" y="-4" width="8" height="8" href="../assets/flower_outline.svg"/>
       </defs>
-      <g v-for="node in size">
-        <circle
-          v-if="node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won"
-          :fill="node >= 2 ? `url('#checked-${idColors[node - 2] + 1}')` : `url('#checked-0')`"
-          :r="clickRadius * 1.3"
-          :cx="nodeXs[node - 1]"
-          :cy="nodeYs[node - 1]"
-        />
-      </g>
-      <circle
-        v-for="node in size"
-        fill="var(--color-background)"
-        :r="clickRadius"
-        :cx="nodeXs[node - 1]"
-        :cy="nodeYs[node - 1]"
-        :class="{touchCircle: true, checked: node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won}"
-        :style="(node >= 2 ? Permute.getValue(beads, node - 1) == node - 1 : won) ? {stroke: node >= 2 ? colorHex[idColors[node - 2] + 1] : colorHex[0]} : {}"
+      <Holes
+        :size="size"
+        :beads="beads"
+        :radius="100"
+        :clickRadius="clickRadius"
       />
       <circle
         fill="var(--color-background)"
