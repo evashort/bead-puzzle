@@ -25,7 +25,7 @@ export default {
     },
     headPath() {
       let r = this.headRadius, hr = 0.5 * this.headHeight
-      return `M ${hr} ${-r} L ${-hr} ${0} L ${hr} ${r}`
+      return `M ${-hr} ${-r} L ${hr} ${0} L ${-hr} ${r}`
     },
     coneRadius() {
       // there is a notch in the back of the arrow head shadow to prevent it
@@ -56,24 +56,24 @@ export default {
       // stroke had unit radius
       let v = sr / sin
       let cr = this.coneRadius
-      //    ⌢
-      //  /  /
-      let upperFin = `M ${hr + sin} ${-r + cos} A ${sr} ${sr} 0 0 0 ${hr - sin} ${-r - cos} L ${-hr - sin} ${-cos} `
-      // (
-      let nose = `A ${sr} ${sr} 0 0 0 ${-hr - sin} ${cos} `
-      //  \  \
-      //    ⌣
-      let lowerFin = `L ${hr - sin} ${r + cos} A ${sr} ${sr} 0 0 0 ${hr + sin} ${r - cos} L ${-hr + sr * v + cr * cot} ${cr} `
-      //   <︠_
-      // note that the angle of the ︠_ part may be wider or narrower than the
-      // angle of the < part depending on coneRadius. the angle changes right
+      //  ⌢
+      // \  \
+      let upperFin = `M ${-hr - sin} ${-r + cos} A ${sr} ${sr} 0 0 1 ${-hr + sin} ${-r - cos} L ${hr + sin} ${-cos} `
+      //     )
+      let nose = `A ${sr} ${sr} 0 0 1 ${hr + sin} ${cos} `
+      // /  /
+      //  ⌣
+      let lowerFin = `L ${-hr + sin} ${r + cos} A ${sr} ${sr} 0 0 1 ${-hr + -sin} ${r - cos} L ${hr - sr * v - cr * cot} ${cr} `
+      //  ︡_>
+      // note that the angle of the ︡_ part may be wider or narrower than the
+      // angle of the > part depending on coneRadius. the angle changes right
       // at the intersection of the head and the tail.
-      let notch = `L ${-hr + fr * v + tr * cot} ${tr} L ${-hr} ${0} L ${-hr + fr * v + tr * cot} ${-tr} L ${-hr + sr * v + cr * cot} ${-cr} Z`
-      //    ⌢
-      //  /  /
-      // ( <︠_
-      //  \  \
-      //    ⌣
+      let notch = `L ${hr - fr * v - tr * cot} ${tr} L ${hr} ${0} L ${hr - fr * v - tr * cot} ${-tr} L ${hr - sr * v - cr * cot} ${-cr} Z`
+      //  ⌢
+      // \  \
+      //  ︡_> )
+      // /  /
+      //  ⌣
       return upperFin + nose + lowerFin + notch
     },
   },
@@ -98,13 +98,11 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-  offset-rotate: reverse;
 }
 .shadow {
   fill: var(--color-background);
-  offset-rotate: reverse;
 }
 .facingA {
-  offset-rotate: auto;
+  offset-rotate: reverse;
 }
 </style>
