@@ -9,6 +9,9 @@ export default {
     beads: Number,
     radius: Number,
     clickRadius: Number,
+    smallClickRadius: Number,
+    buttonY: Number,
+    smallButtonY: Number,
   },
   computed: {
     colorNames() {
@@ -114,17 +117,19 @@ export default {
   />
   <circle
     v-for="name in colorNames"
-    fill="var(--color-background)"
     :r="clickRadius"
     :cx="centers[name].x"
     :cy="centers[name].y"
     :class="{hole: true, glowing: shownColorNames.has(name)}"
     :style="{ '--glow-color': colors[name] }"
   />
+  <circle :r="clickRadius" :cx="0" :cy="buttonY" class="hole"/>
+  <circle :r="smallClickRadius" :cx="0" :cy="smallButtonY" class="hole"/>
 </template>
 
 <style scoped>
 .hole {
+  fill: var(--color-background);
   stroke: #444444;
   stroke-width: 1px;
 }

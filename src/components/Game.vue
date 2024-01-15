@@ -1100,20 +1100,9 @@ export default {
         :beads="beads"
         :radius="100"
         :clickRadius="clickRadius"
-      />
-      <circle
-        fill="var(--color-background)"
-        :r="clickRadius"
-        :cx="0"
-        :cy="spinButtonY"
-        :class="{touchCircle: true}"
-      />
-      <circle
-        fill="var(--color-background)"
-        :r="smallClickRadius"
-        :cx="0"
-        :cy="smallSpinButtonY"
-        :class="{touchCircle: true}"
+        :smallClickRadius="smallClickRadius"
+        :buttonY="spinButtonY"
+        :smallButtonY="smallSpinButtonY"
       />
       <mask id="trophy-exit-mask">
         <circle
@@ -1237,14 +1226,6 @@ button {
   border: 2px solid #444444;
   border-radius: 2px;
   background-color: black;
-}
-.touchCircle {
-  stroke: #444444;
-  stroke-width: 1px;
-}
-.touchCircle.checked {
-  stroke-width: 0.75;
-  stroke-opacity: 1;
 }
 .terminator {
   opacity: 0;
