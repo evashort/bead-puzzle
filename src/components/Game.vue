@@ -1,4 +1,5 @@
 <script setup>
+import Arrow from './Arrow.vue'
 import Board from './Board.vue'
 import Goal from './Goal.vue'
 import Holes from './Holes.vue'
@@ -245,46 +246,6 @@ export default {
       }
 
       return edgeClasses
-    },
-    headRadius() {
-      return 12
-    },
-    headHeight() {
-      return this.headRadius * Math.sqrt(1.5)
-    },
-    headPath() {
-      let r = this.headRadius, hr = 0.5 * this.headHeight
-      return `M ${hr} ${-r} L ${-hr} ${0} L ${hr} ${r}`
-    },
-    headShadowWidth() {
-      return 12
-    },
-    edgeStrokeWidth() {
-      return 4
-    },
-    edgeConeRadius() {
-      // there is a notch in the back of the arrow head shadow to prevent it
-      // from covering the arrow edge. the notch is exactly as wide as the
-      // arrow edge where it intersects the arrow, but it gets wider further
-      // away from the intersection in case the arrow edge is slightly curved.
-      // this value controls the width of the widest part of the notch. it
-      // should be larger than 0.5 * edgeStrokeWidth
-      return 4
-    },
-    headShadowPath() {
-      let r = this.headRadius, hr = 0.5 * this.headHeight
-      let sr = 0.5 * this.headShadowWidth
-      let cos = this.headHeight
-      let sin = this.headRadius
-      let cot = cos / sin
-      let scale = sr / Math.sqrt(cos * cos + sin * sin)
-      cos *= scale
-      sin *= scale
-      let er = 0.5 * this.edgeStrokeWidth
-      let fr = er // fr is head stroke radius, which happens to be the same as edge stroke radius
-      let v = sr / sin // distance from center of arrow head to the concave corner, if the stroke had unit radius
-      let cr = this.edgeConeRadius
-      return `M ${hr + sin} ${-r + cos} A ${sr} ${sr} 0 0 0 ${hr - sin} ${-r - cos} L ${-hr - sin} ${-cos} A ${sr} ${sr} 0 0 0 ${-hr - sin} ${cos} L ${hr - sin} ${r + cos} A ${sr} ${sr} 0 0 0 ${hr + sin} ${r - cos} L ${-hr + sr * v + cr * cot} ${cr} L ${-hr + fr * v + er * cot} ${er} L ${-hr} ${0} L ${-hr + fr * v + er * cot} ${-er} L ${-hr + sr * v + cr * cot} ${-cr} Z`
     },
     terminatorRadius() {
       return this.curvedPaths ? 28 : 36
@@ -1013,20 +974,43 @@ export default {
           :class="{ oldTerminator: true, close: backwardsInLoop, delay: continuingLoop && !showOldArrow, alternate: trophyAlternate }"
         />
       </g>
+      <Board
+        :key="graphId"
+        :graphId="graphId"
+        :beads="beads"
+        :history="history"
+        :tail="showTail ? tail : -1"
+        :controlLength="30"
+        :radius="100"
+      />
+      <Goal
+        v-for="i in size - 1"
+        :size="size"
+        :bead="i"
+        :radius="100"
+      />
       <g
-        :style="{ 'offset-path': `path('${oldArrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
         :class="{headGroup: true, animate: showOldArrow, alternate: trophyAlternate}"
       >
-        <path :d="headShadowPath" class="head shadow"/>
-        <path :d="headPath" class="head"/>
+        <Arrow
+          :shown="true"
+          :path="oldArrowPath"
+          :facingA="true"
+          :headRadius="12"
+          :radius="100"
+          :strokeWidth="4"
+          :shadowWidth="12"
+        />
       </g>
-      <g
-        v-if=showTail
-        :style="{ 'offset-path': `path('${arrowPath}')`, 'offset-distance': `${100 * 0.5 * headHeight / 160}%` }"
-      >
-        <path :d="headShadowPath" class="head shadow"/>
-        <path :d="headPath" class="head"/>
-      </g>
+      <Arrow
+        :shown="showTail"
+        :path="arrowPath"
+        :facingA="true"
+        :headRadius="12"
+        :radius="100"
+        :strokeWidth="4"
+        :shadowWidth="12"
+      />
       <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
         <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
           :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
@@ -1063,21 +1047,6 @@ export default {
           </g>
         </g>
       </template>
-      <Board
-        :key="graphId"
-        :graphId="graphId"
-        :beads="beads"
-        :history="history"
-        :tail="showTail ? tail : -1"
-        :controlLength="30"
-        :radius="100"
-      />
-      <Goal
-        v-for="i in size - 1"
-        :size="size"
-        :bead="i"
-        :radius="100"
-      />
     </svg>
   </button>
 </template>
@@ -1173,16 +1142,12 @@ button {
     stroke-width: 0;
   }
 }
-.head, .cross {
+.cross {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-}
-.head.shadow {
-  stroke: none;
-  fill: var(--color-background);
 }
 .headGroup {
   opacity: 0;
