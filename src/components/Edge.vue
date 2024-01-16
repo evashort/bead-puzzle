@@ -3,12 +3,20 @@ export default {
   props: {
     path: String,
     onPath: Boolean,
+    hideStart: Boolean,
+    hideEnd: Boolean,
   },
 }
 </script>
 
 <template>
   <path :class="{edge: true, onPath: onPath}" :d="path"/>
+  <circle
+    v-if="hideStart || hideEnd"
+    :r="28"
+    :class="{ terminator: true, end: hideEnd }"
+    :style="{ 'offset-path': `path('${path}')` }"
+  />
 </template>
 
 <style scoped>
@@ -26,5 +34,14 @@ export default {
 
 .edge.onPath {
   stroke-dasharray: none;
+}
+
+.terminator {
+  fill: var(--color-background);
+  offset-distance: 0%;
+}
+
+.terminator.end {
+  offset-distance: 100%;
 }
 </style>

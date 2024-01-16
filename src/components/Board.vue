@@ -67,6 +67,32 @@ export default {
 
       return result
     },
+    truncatedEdge() {
+      if (
+        this.history.length >= 2 && !(
+          this.hasLoop && this.tail == this.history[1]
+        )
+      ) {
+        return [this.history[0], this.history[1]]
+      }
+
+      return null
+    },
+    edgeOrder() {
+      let result = []
+      if (this.truncatedEdge) {
+        result.push(this.truncatedEdge.toSorted())
+      }
+
+      let seen = new Set(result.map(String))
+      for (let edge of SimpleGraph.edges(this.graph)) {
+        if (!seen.has(edge.toString())) {
+          result.push(edge)
+        }
+      }
+
+      return result
+    },
     beadOrientations() {
       let result = {}
       for (let i = 0; i < this.altHistory.length; i++) {
@@ -273,10 +299,12 @@ export default {
 
 <template>
   <Edge
-    v-for="edge of SimpleGraph.edges(this.graph)"
+    v-for="edge of edgeOrder"
     :key="edge.toString()"
     :path="edgePaths[edge]"
     :onPath="activeEdges[edge.toString()] ?? false"
+    :hideStart="truncatedEdge && edge.toString() == truncatedEdge.toString()"
+    :hideEnd="truncatedEdge && edge.toString() == truncatedEdge.toReversed().toString()"
   />
   <!-- including edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
@@ -291,6 +319,6 @@ export default {
     :onPath="Object.hasOwn(activeEdges, sortedPair(bead.a, bead.b))"
     :moving="bead.moving"
     :bead="i"
-    :selected="false"
+    :selected="bead.b == tail"
   />
 </template>
