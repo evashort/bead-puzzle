@@ -278,7 +278,7 @@ export default {
     :path="edgePaths[edge]"
     :onPath="activeEdges[edge.toString()] ?? false"
   />
-  <!-- inclusding edge in the key allows the slide animation to play again when
+  <!-- including edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
     animation to play again when a different bead moves onto the edge. -->
   <Bead
