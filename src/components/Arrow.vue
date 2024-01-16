@@ -41,7 +41,20 @@ export default {
       // below it except for the tail of the arrow. I did it because the tail
       // of the arrow sometimes needs to be underneath the "terminator"
       // circle, so I can't put the tail above the head.
+      //   headHeight = 2 * heightRadius (hr)
+      //   ⌜⎺⌝
+      //   \  ⎫
+      //    \ ⎬headRadius (r)
+      // ____\⎭
+      //     /   note: these measurements are taken as if shadowWidth is zero
+      //    /    (it's not) and named as if the arrow is pointing upward (it's
+      //   /     pointing right)
       let r = this.headRadius, hr = 0.5 * this.headHeight
+      //  ⌢
+      // \  \       /
+      //  ︡_> )  sin ︡⎸ sr (shadowRadius; half of shadow's "stroke width")
+      // /︡―┄/┄┄┄┄┄> ―cos―︡―       /
+      //  ⌣      /              /
       let cos = this.headHeight, sin = this.headRadius
       let cot = cos / sin
       let sr = 0.5 * this.shadowWidth
