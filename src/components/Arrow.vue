@@ -66,7 +66,8 @@ export default {
       // radius
       let fr = tr
       // distance from center of arrow head to the concave corner, if the
-      // stroke had unit radius
+      // stroke had unit radius (I'm referring to the actual arrow head which
+      // has only one concave corner, rather than the shadow which has up to 3)
       let v = sr / sin
       let cr = this.coneRadius
       //  ⌢
