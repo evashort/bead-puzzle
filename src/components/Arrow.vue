@@ -51,9 +51,9 @@ export default {
       //   /     pointing right)
       let r = this.headRadius, hr = 0.5 * this.headHeight
       //  ⌢
-      // \  \       /
-      //  ︡_> )  sin ︡⎸ sr (shadowRadius; half of shadow's "stroke width")
-      // /︡―┄/┄┄┄┄┄> ―cos―︡―       /
+      // \  \     θ↴/
+      //  ︡_> )  cos ︡⎸ sr (shadowRadius; half of shadow's "stroke width")
+      // /︡―┄/┄┄┄┄┄> ―sin―︡―       /
       //  ⌣      /              /
       let cos = this.headHeight, sin = this.headRadius
       let cot = cos / sin
