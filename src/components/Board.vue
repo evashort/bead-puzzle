@@ -12,7 +12,7 @@ export default {
       SimpleGraph.fromString(this.graphId)
     )
     let beadStarts = []
-    for (let bead = 1; bead < size; bead++) {
+    for (let bead = 0; bead < size; bead++) {
       beadStarts.push(Permute.findValue(this.beads, bead))
     }
     return {
@@ -124,7 +124,7 @@ export default {
       for (let bead = 1; bead < this.size; bead++) {
         let b = Permute.findValue(this.beads, bead)
         let [a, c] = this.beadOrientations[b] ?? [b, b]
-        let start = this.beadStarts[bead - 1]
+        let start = this.beadStarts[bead]
         let reverse = start == c || a == b
         if (reverse) {
           a = c
@@ -259,13 +259,13 @@ export default {
   watch: {
     beads(newBeads, oldBeads) {
       let newBeadStarts = []
-      for (let bead = 1; bead < this.size; bead++) {
+      for (let bead = 0; bead < this.size; bead++) {
         let start = Permute.findValue(oldBeads, bead)
         let end = Permute.findValue(newBeads, bead)
         if (end != start) {
           newBeadStarts.push(start)
         } else {
-          newBeadStarts.push(this.beadStarts[bead - 1])
+          newBeadStarts.push(this.beadStarts[bead])
         }
       }
 
@@ -284,10 +284,10 @@ export default {
         let orientation = this.beadOrientations[a] ?? [a, a]
         // this condition determines whether the bead's edge will change due to
         // extra changing, see beadEdges()
-        if (!orientation.includes(this.beadStarts[bead - 1])) {
+        if (!orientation.includes(this.beadStarts[bead])) {
           // if so, prevent the slide animation from being replayed
           newBeadStarts = newBeadStarts || this.beadStarts.slice()
-          newBeadStarts[bead - 1] = a
+          newBeadStarts[bead] = a
         }
       }
 

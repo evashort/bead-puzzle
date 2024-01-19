@@ -39,6 +39,7 @@ export default {
 .terminator {
   fill: var(--color-background);
   offset-distance: 0%;
+  offset-rotate: none;
 }
 
 .terminator.end {
