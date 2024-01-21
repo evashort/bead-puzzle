@@ -1,7 +1,6 @@
 <script setup>
 import Arrow from './Arrow.vue'
 import Board from './Board.vue'
-import Cover from './Cover.vue'
 import Goal from './Goal.vue'
 import Holes from './Holes.vue'
 import Permute from '../Permute.js'
@@ -1003,7 +1002,7 @@ export default {
           :shadowWidth="12"
         />
       </g>
-      <!-- <Arrow
+      <Arrow
         :shown="showTail"
         :path="arrowPath"
         :facingA="true"
@@ -1011,14 +1010,6 @@ export default {
         :radius="100"
         :strokeWidth="4"
         :shadowWidth="12"
-      /> -->
-      <Cover
-        :shown="showTail"
-        :path="arrowPath"
-        :atEnd="false"
-        :strokeWidth="4"
-        :radius="28"
-        :degrees="90"
       />
       <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
         <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"

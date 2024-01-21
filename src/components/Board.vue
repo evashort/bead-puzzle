@@ -1,5 +1,6 @@
 <script setup>
 import Edge from './Edge.vue'
+import { HiddenEnd } from '../HiddenEnd'
 import Bead from './Bead.vue'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
@@ -77,21 +78,6 @@ export default {
       }
 
       return null
-    },
-    edgeOrder() {
-      let result = []
-      if (this.truncatedEdge) {
-        result.push(this.truncatedEdge.toSorted())
-      }
-
-      let seen = new Set(result.map(String))
-      for (let edge of SimpleGraph.edges(this.graph)) {
-        if (!seen.has(edge.toString())) {
-          result.push(edge)
-        }
-      }
-
-      return result
     },
     beadOrientations() {
       let result = {}
@@ -299,12 +285,11 @@ export default {
 
 <template>
   <Edge
-    v-for="edge of edgeOrder"
+    v-for="edge of SimpleGraph.edges(this.graph)"
     :key="edge.toString()"
     :path="edgePaths[edge]"
     :onPath="activeEdges[edge.toString()] ?? false"
-    :hideStart="truncatedEdge && edge.toString() == truncatedEdge.toString()"
-    :hideEnd="truncatedEdge && edge.toString() == truncatedEdge.toReversed().toString()"
+    :hiddenEnd="truncatedEdge && edge.toString() == truncatedEdge.toSorted() ? (truncatedEdge[1] < truncatedEdge[0] ? HiddenEnd.B : HiddenEnd.A) : HiddenEnd.None"
   />
   <!-- including edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
