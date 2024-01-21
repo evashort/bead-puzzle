@@ -14,6 +14,7 @@ export default {
   },
   props: {
     path: String,
+    length: Number,
     onPath: Boolean,
     hiddenEnd: HiddenEnd,
   },
@@ -105,6 +106,7 @@ export default {
   <path
     :class="{ edge: true, onPath: onPath, alternate: alternate, hidden: hidden, animate: animate }"
     :d="orientedPath"
+    :pathLength="length"
     :style="{ '--old-path': `path('${orientedOldPath}')`, '--gap': 28 }"
   />
 </template>

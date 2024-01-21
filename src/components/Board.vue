@@ -58,12 +58,18 @@ export default {
         let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
         let [tx2, ty2] = this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
         let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
-        result[edge] = `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`
+        result[edge] = {
+          path: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`,
+          length: Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)),
+        }
       }
 
       for (let a = 0; a < this.size; a++) {
         let x = this.getX(a), y = this.getY(a)
-        result[[a, a]] = `M${x} ${y}`
+        result[[a, a]] = {
+          path: `M${x} ${y}`,
+          length: 0,
+        }
       }
 
       return result
@@ -312,7 +318,8 @@ export default {
   <Edge
     v-for="edge of SimpleGraph.edges(this.graph)"
     :key="edge.toString()"
-    :path="edgePaths[edge]"
+    :path="edgePaths[edge].path"
+    :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
     :hiddenEnd="getHiddenEnd(edge)"
   />
@@ -323,7 +330,7 @@ export default {
     v-for="(bead, i) in beadEdges"
     :key="`${i}:${sortedPair(bead.a, bead.b)}`"
     :size="size"
-    :path="edgePaths[sortedPair(bead.a, bead.b)]"
+    :path="edgePaths[sortedPair(bead.a, bead.b)].path"
     :facingA="(bead.b < bead.a) != bead.reverse"
     :moveToA="bead.b < bead.a"
     :onPath="Object.hasOwn(activeEdges, sortedPair(bead.a, bead.b))"
