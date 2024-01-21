@@ -8,6 +8,8 @@ export default {
     return {
       oldPath: null,
       alternate: false,
+      animate: false,
+      reversed: false,
     }
   },
   props: {
@@ -58,9 +60,7 @@ export default {
   },
   methods: {
     orient(path) {
-      if (
-        this.hiddenEnd != HiddenEnd.B && this.hiddenEnd != HiddenEnd.DelayB
-      ) {
+      if (!this.reversed) {
         return path
       }
 
@@ -77,14 +77,33 @@ export default {
     path(newPath, oldPath) {
       this.oldPath = oldPath
       this.alternate = !this.alternate
-    }
-  }
+    },
+    hiddenEnd: {
+      handler(newHiddenEnd, oldHiddenEnd) {
+        let oldShown = oldHiddenEnd == HiddenEnd.None ||
+          oldHiddenEnd == HiddenEnd.DelayNone
+        let newShown = newHiddenEnd == HiddenEnd.None ||
+          newHiddenEnd == HiddenEnd.DelayNone
+        if (newShown != oldShown) {
+          this.animate = newHiddenEnd == HiddenEnd.DelayA ||
+            newHiddenEnd == HiddenEnd.DelayB ||
+            newHiddenEnd == HiddenEnd.DelayNone
+        }
+
+        if (!newShown) {
+          this.reversed = newHiddenEnd == HiddenEnd.B ||
+            newHiddenEnd == HiddenEnd.DelayB
+        }
+      },
+      immediate: true,
+    },
+  },
 }
 </script>
 
 <template>
   <path
-    :class="{ edge: true, onPath: onPath, alternate: alternate, hidden: hidden }"
+    :class="{ edge: true, onPath: onPath, alternate: alternate, hidden: hidden, animate: animate }"
     :d="orientedPath"
     :style="{ '--old-path': `path('${orientedOldPath}')`, '--gap': 28 }"
   />
@@ -127,11 +146,11 @@ export default {
   stroke-dasharray: 0 var(--gap) 100%;
 }
 
-.canAnimate .edge.onPath.hidden {
+.canAnimate .edge.onPath.hidden.animate {
   animation: hideEnd 0.45s ease 0.3s backwards;
 }
 
-.canAnimate .edge.onPath {
+.canAnimate .edge.onPath.animate {
   animation: revealEnd 0.45s ease 0.3s backwards;
 }
 

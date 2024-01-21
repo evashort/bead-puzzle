@@ -38,9 +38,8 @@ export default {
     },
     shadowPath() {
       // I put a lot of work into creating a shape that would cover any edges
-      // below it except for the tail of the arrow. I did it because the tail
-      // of the arrow sometimes needs to be underneath the "terminator"
-      // circle, so I can't put the tail above the head.
+      // below it except for the tail of the arrow. This is a lot more
+      // convenient than dynamically reordering the edges.
       //   headHeight = 2 * heightRadius (hr)
       //   ⌜⎺⌝
       //   \  ⎫
