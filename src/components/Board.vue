@@ -74,7 +74,11 @@ export default {
           this.hasLoop && this.tail == this.history[1]
         )
       ) {
-        return [this.history[0], this.history[1]]
+        let start = this.history.lastIndexOf(
+          this.altHistory[this.altHistory.length - 1],
+          -2,
+        )
+        return [this.history[start], this.history[start + 1]]
       }
 
       return null

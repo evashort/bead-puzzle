@@ -142,11 +142,11 @@ export default {
   animation: hideEnd 0.45s ease 0.3s backwards, bend2 0.5s;
 }
 
-.canAnimate .edge.animate {
+.canAnimate .edge.animate.onPath {
   animation: revealEnd 0.45s ease 0.3s backwards, bend 0.5s;
 }
 
-.canAnimate .edge.animate.alternate {
+.canAnimate .edge.animate.onPath.alternate {
   animation: revealEnd 0.45s ease 0.3s backwards, bend2 0.5s;
 }
 
