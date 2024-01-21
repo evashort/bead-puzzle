@@ -118,12 +118,36 @@ export default {
   stroke-dasharray: 4 12;
 }
 
+.edge.onPath {
+  stroke-dasharray: none;
+}
+
+.edge.onPath.hidden {
+  stroke-dasharray: 0 var(--gap) 100%;
+}
+
 .canAnimate .edge {
   animation: bend 0.5s;
 }
 
 .canAnimate .edge.alternate {
   animation: bend2 0.5s;
+}
+
+.canAnimate .edge.animate.hidden {
+  animation: hideEnd 0.45s ease 0.3s backwards, bend 0.5s;
+}
+
+.canAnimate .edge.animate.hidden.alternate {
+  animation: hideEnd 0.45s ease 0.3s backwards, bend2 0.5s;
+}
+
+.canAnimate .edge.animate {
+  animation: revealEnd 0.45s ease 0.3s backwards, bend 0.5s;
+}
+
+.canAnimate .edge.animate.alternate {
+  animation: revealEnd 0.45s ease 0.3s backwards, bend2 0.5s;
 }
 
 @keyframes bend {
@@ -136,22 +160,6 @@ export default {
   from {
     d: var(--old-path);
   }
-}
-
-.edge.onPath {
-  stroke-dasharray: none;
-}
-
-.edge.onPath.hidden {
-  stroke-dasharray: 0 var(--gap) 100%;
-}
-
-.canAnimate .edge.onPath.hidden.animate {
-  animation: hideEnd 0.45s ease 0.3s backwards;
-}
-
-.canAnimate .edge.onPath.animate {
-  animation: revealEnd 0.45s ease 0.3s backwards;
 }
 
 @keyframes hideEnd {

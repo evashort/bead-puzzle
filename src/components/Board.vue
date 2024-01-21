@@ -79,6 +79,13 @@ export default {
 
       return null
     },
+    truncatedEdgeString() {
+      return this.truncatedEdge ? this.truncatedEdge.toSorted().toString() :
+        null
+    },
+    hole() {
+      return Permute.findValue(this.beads, 0)
+    },
     beadOrientations() {
       let result = {}
       for (let i = 0; i < this.altHistory.length; i++) {
@@ -241,6 +248,20 @@ export default {
     swapIf(condition, a, b) {
       return condition ? [b, a] : [a, b]
     },
+    getHiddenEnd(edge) {
+      if (edge.toString() == this.truncatedEdgeString) {
+        let delay = this.beadStarts[0] == this.truncatedEdge[0]
+        let bHidden = this.truncatedEdge[1] < this.truncatedEdge[0]
+        return bHidden ? (delay ? HiddenEnd.DelayB : HiddenEnd.B) :
+          (delay ? HiddenEnd.DelayA : HiddenEnd.A)
+      }
+
+      if (edge.includes(this.beadStarts[0]) && !edge.includes(this.hole)) {
+        return HiddenEnd.DelayNone
+      }
+
+      return HiddenEnd.None
+    },
   },
   watch: {
     beads(newBeads, oldBeads) {
@@ -289,7 +310,7 @@ export default {
     :key="edge.toString()"
     :path="edgePaths[edge]"
     :onPath="activeEdges[edge.toString()] ?? false"
-    :hiddenEnd="truncatedEdge && edge.toString() == truncatedEdge.toSorted() ? (truncatedEdge[1] < truncatedEdge[0] ? HiddenEnd.B : HiddenEnd.A) : HiddenEnd.None"
+    :hiddenEnd="getHiddenEnd(edge)"
   />
   <!-- including edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
