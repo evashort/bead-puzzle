@@ -4,6 +4,7 @@ export default {
     shown: Boolean,
     path: String,
     length: Number,
+    controlLength: Number,
     offset: Number,
   },
   computed: {
@@ -48,9 +49,26 @@ export default {
       )
     },
     t() {
-      // TODO: 15*3t(1-t)^2+85*3(1-t)t^2+100*t^3 from 0 to 1
-      // 50x + 25 - 25cos(pi*x) from 0 to 1
-      return (this.offset + this.length * this.facingB) / this.length
+      // https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B%C3%A9zier_curves
+      // x = A(1-t)^3 + B*3t(1-t)^2 + C*3(1-t)t^2 + D*t^3
+      // A = 0, B = c/l, C = 1 - c/l, D = 1
+      // x = c/l*3t(1-t)^2 + (1-c/l)*3(1-t)t^2 + t^3
+      // c/l = 0: x ~= 1/2 - cos(pi*t)/2
+      // c/l = 1/3: x = t
+      // x = 1/2 - cos(pi*t)/2
+      // cos(pi*t)/2 = 1/2 - x
+      // cos(pi*t) = 1 - 2x
+      // pi*t = acos(1-2x)
+      // t = acos(1-2x)/pi
+      // t = (1 - 3c/l)acos(1-2x)/pi + 3c/l*x
+      let x = (this.offset + this.length * this.facingB) / this.length
+      // m = "how much does controlLength matter"
+      // without this parameter, the formula assigns too much importance to
+      // controlLength and the arrow heads are too far back. I decreased m
+      // until none of the arrow tails stuck out in front of the arrow heads.
+      let m = 0.3
+      let ratio = Math.pow(3 * this.controlLength / this.length, m)
+      return (1 - ratio) * Math.acos(1 - 2 * x) / Math.PI + ratio * x
     },
     sign() {
       return this.facingB ? 1 : -1

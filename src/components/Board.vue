@@ -330,6 +330,7 @@ export default {
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
     :hiddenEnd="getHiddenEnd(edge)"
+    :controlLength="controlLength"
   />
   <!-- including edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide

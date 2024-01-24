@@ -16,6 +16,7 @@ export default {
     length: Number,
     onPath: Boolean,
     hiddenEnd: HiddenEnd,
+    controlLength: Number,
   },
   computed: {
     hidden() {
@@ -54,12 +55,14 @@ export default {
     :shown="true"
     :path="path"
     :length="length"
+    :controlLength="controlLength"
     :offset="-5"
   />
   <Arrow
     :shown="true"
     :path="path"
     :length="length"
+    :controlLength="controlLength"
     :offset="5"
   />
   <path
