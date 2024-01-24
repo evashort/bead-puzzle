@@ -1,4 +1,5 @@
 <script setup>
+import Arrow from './Arrow.vue'
 import { HiddenEnd } from '../HiddenEnd'
 </script>
 
@@ -49,6 +50,18 @@ export default {
 </script>
 
 <template>
+  <Arrow
+    :shown="true"
+    :path="path"
+    :length="length"
+    :offset="-5"
+  />
+  <Arrow
+    :shown="true"
+    :path="path"
+    :length="length"
+    :offset="5"
+  />
   <path
     :class="{ edge: true, onPath: onPath, hidden: hidden, animate: animate, reversed: reversed }"
     :d="path"

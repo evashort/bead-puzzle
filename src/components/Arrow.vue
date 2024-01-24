@@ -3,91 +3,110 @@ export default {
   props: {
     shown: Boolean,
     path: String,
-    facingA: Boolean,
-    headRadius: Number,
-    radius: Number,
-    strokeWidth: Number,
-    shadowWidth: Number,
+    length: Number,
+    offset: Number,
   },
   computed: {
+    headRadius() {
+      return 12
+    },
     headHeight() {
       return this.headRadius * Math.sqrt(1.5)
     },
-    offsetDistance() {
-      // tuned based on what makes the arrow look best
-      let averageEdgeLength = 1.6 * this.radius
-      let offsetFraction = 0.5 * this.headHeight / averageEdgeLength
-      if (!this.facingA) {
-        offsetFraction = 1 - offsetFraction
+    headPath() {
+      let r = this.headRadius, h = this.headHeight
+      return `M ${-h} ${-r} L ${0} ${0} L ${-h} ${r}`
+    },
+    x() {
+      return this.points ? this.bezier(this.t, ...this.points.map(p => p.x)) :
+        0
+    },
+    y() {
+      return this.points ? this.bezier(this.t, ...this.points.map(p => p.y)) :
+        0
+    },
+    angle() {
+      if (!this.points) {
+        return 0
       }
 
-      return 100 * offsetFraction + '%'
+      let dx = this.bezierSlope(this.t, ...this.points.map(p => p.x))
+      let dy = this.bezierSlope(this.t, ...this.points.map(p => p.y))
+      let angle = Math.atan2(dy * this.sign, dx * this.sign)
+      if (angle > this.straightAngle + Math.PI) {
+        angle -= 2 * Math.PI
+      } else if (angle <= this.straightAngle - Math.PI) {
+        angle += 2 * Math.PI
+      }
+
+      return angle
     },
-    headPath() {
-      let r = this.headRadius, hr = 0.5 * this.headHeight
-      return `M ${-hr} ${-r} L ${hr} ${0} L ${-hr} ${r}`
+    straightAngle() {
+      return Math.atan2(
+        (this.points[3].y - this.points[0].y) * this.sign,
+        (this.points[3].x - this.points[0].x) * this.sign,
+      )
     },
-    coneRadius() {
-      // there is a notch in the back of the arrow head shadow to prevent it
-      // from covering the arrow tail. the notch is exactly as wide as the
-      // arrow tail where the head and tail intersect, but it gets wider
-      // further away from the intersection in case the arrow tail is slightly
-      // curved. this value controls the width of the widest part of the
-      // notch. it should be larger than 0.5 * strokeWidth
-      return this.strokeWidth
+    t() {
+      // TODO: 15*3t(1-t)^2+85*3(1-t)t^2+100*t^3 from 0 to 1
+      // 50x + 25 - 25cos(pi*x) from 0 to 1
+      return (this.offset + this.length * this.facingB) / this.length
     },
-    shadowPath() {
-      // I put a lot of work into creating a shape that would cover any edges
-      // below it except for the tail of the arrow. This is a lot more
-      // convenient than dynamically reordering the edges.
-      //   headHeight = 2 * heightRadius (hr)
-      //   ⌜⎺⌝
-      //   \  ⎫
-      //    \ ⎬headRadius (r)
-      // ____\⎭
-      //     /   note: these measurements are taken as if shadowWidth is zero
-      //    /    (it's not) and named as if the arrow is pointing upward (it's
-      //   /     pointing right)
-      let r = this.headRadius, hr = 0.5 * this.headHeight
-      //  ⌢
-      // \  \     θ↴/
-      //  ︡_> )  cos ︡⎸ sr (shadowRadius; half of shadow's "stroke width")
-      // /︡―┄/┄┄┄┄┄> ―sin―︡―       /
-      //  ⌣      /              /
-      let cos = this.headHeight, sin = this.headRadius
-      let cot = cos / sin
-      let sr = 0.5 * this.shadowWidth
-      let scale = sr / Math.sqrt(cos * cos + sin * sin)
-      cos *= scale
-      sin *= scale
-      let tr = 0.5 * this.strokeWidth
-      // fr is head stroke radius, which happens to be the same as tail stroke
-      // radius
-      let fr = tr
-      // distance from center of arrow head to the concave corner, if the
-      // stroke had unit radius (I'm referring to the actual arrow head which
-      // has only one concave corner, rather than the shadow which has up to 3)
-      let v = sr / sin
-      let cr = this.coneRadius
-      //  ⌢
-      // \  \
-      let upperFin = `M ${-hr - sin} ${-r + cos} A ${sr} ${sr} 0 0 1 ${-hr + sin} ${-r - cos} L ${hr + sin} ${-cos} `
-      //     )
-      let nose = `A ${sr} ${sr} 0 0 1 ${hr + sin} ${cos} `
-      // /  /
-      //  ⌣
-      let lowerFin = `L ${-hr + sin} ${r + cos} A ${sr} ${sr} 0 0 1 ${-hr + -sin} ${r - cos} L ${hr - sr * v - cr * cot} ${cr} `
-      //  ︡_>
-      // note that the angle of the ︡_ part may be wider or narrower than the
-      // angle of the > part depending on coneRadius. the angle changes right
-      // at the intersection of the head and the tail.
-      let notch = `L ${hr - fr * v - tr * cot} ${tr} L ${hr} ${0} L ${hr - fr * v - tr * cot} ${-tr} L ${hr - sr * v - cr * cot} ${-cr} Z`
-      //  ⌢
-      // \  \
-      //  ︡_> )
-      // /  /
-      //  ⌣
-      return upperFin + nose + lowerFin + notch
+    sign() {
+      return this.facingB ? 1 : -1
+    },
+    facingB() {
+      // take the reciprocal to allow negative zero
+      // https://dev.to/emnudge/identifying-negative-zero-2j1o
+      return 1 / this.offset < 0
+    },
+    points() {
+      let match = this.path.match(this.pathPattern)
+      if (!match) {
+        return null
+      }
+
+      let [, x1, y1, cx1, cy1, cx2, cy2, x2, y2] = match
+      return [
+        { x: parseFloat(x1), y: parseFloat(y1) },
+        { x: parseFloat(cx1), y: parseFloat(cy1) },
+        { x: parseFloat(cx2), y: parseFloat(cy2) },
+        { x: parseFloat(x2), y: parseFloat(y2) },
+      ]
+    },
+    pathPattern() {
+      // https://www.w3.org/TR/SVG11/paths.html#PathDataBNF
+      // regex can't parse SVG path syntax properly because backtracking allows
+      // "56" to be parsed as "5, 6", so we parse using a very simplified
+      // approximation of the syntax which assumes that the path has no syntax
+      // errors and that numbers are separated (e.g. "-5-6" won't occur).
+      let number = '[-+0-9.eE]+'
+      let arg = `(${number})`
+      let wsp = '[ \\t\\r\\n]*'
+      let sep = `[, \\t\\r\\n]+`
+      let curve = [
+        [arg, arg].join(sep),
+        'C',
+        [arg, arg, arg, arg, arg, arg].join(sep),
+      ].join(wsp)
+      return new RegExp(curve)
+    },
+  },
+  methods: {
+    bezier(x, a, b, c, d) {
+      let y = 1 - x
+      let e = y * a + x * b, f = y * b + x * c, g = y * c + x * d
+      let h = y * e + x * f, i = y * f + x * g
+      let j = y * h + x * i
+      return j
+    },
+    bezierSlope(x, a, b, c, d) {
+      // https://computergraphics.stackexchange.com/questions/10551/how-to-take-the-derivative-of-a-b%C3%A9zier-curve
+      let r = b - a, s = c - b, t = d - c
+      let y = 1 - x
+      let u = y * r + x * s, v = y * s + x * t
+      let w = y * u + x * v
+      return 3 * w
     },
   },
 }
@@ -95,16 +114,18 @@ export default {
 
 <template>
   <g
-    v-if=shown
-    :class="{ facingA: facingA }"
-    :style="{ 'offset-path': `path('${path}')`, 'offset-distance': offsetDistance }"
+    class="headGroup"
+    :style="{ transform: `translate(${x}px, ${y}px) rotate(${angle}rad) translateX(${Math.abs(offset)}px)` }"
   >
-    <path :d="shadowPath" class="shadow"/>
-    <path :d="headPath" class="head"/>
+    <path v-if=shown :d="headPath" class="shadow"/>
+    <path v-if=shown :d="headPath" class="head"/>
   </g>
 </template>
 
 <style scoped>
+.headGroup {
+  transition: transform 0.5s;
+}
 .head {
   stroke: var(--color-text);
   stroke-width: 4;
@@ -113,7 +134,11 @@ export default {
   fill: none;
 }
 .shadow {
-  fill: var(--color-background);
+  stroke: var(--color-background);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
 .facingA {
   offset-rotate: reverse;

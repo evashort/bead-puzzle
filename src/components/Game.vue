@@ -1,5 +1,4 @@
 <script setup>
-import Arrow from './Arrow.vue'
 import Board from './Board.vue'
 import Goal from './Goal.vue'
 import Holes from './Holes.vue'
@@ -988,28 +987,6 @@ export default {
         :size="size"
         :bead="i"
         :radius="100"
-      />
-      <g
-        :class="{headGroup: true, animate: showOldArrow, alternate: trophyAlternate}"
-      >
-        <Arrow
-          :shown="true"
-          :path="oldArrowPath"
-          :facingA="true"
-          :headRadius="12"
-          :radius="100"
-          :strokeWidth="4"
-          :shadowWidth="12"
-        />
-      </g>
-      <Arrow
-        :shown="showTail"
-        :path="arrowPath"
-        :facingA="true"
-        :headRadius="12"
-        :radius="100"
-        :strokeWidth="4"
-        :shadowWidth="12"
       />
       <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
         <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
