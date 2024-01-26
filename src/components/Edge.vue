@@ -17,6 +17,8 @@ export default {
     onPath: Boolean,
     hiddenEnd: HiddenEnd,
     controlLength: Number,
+    aArrow: Boolean,
+    bArrow: Boolean,
   },
   computed: {
     hidden() {
@@ -52,18 +54,18 @@ export default {
 
 <template>
   <Arrow
-    :shown="true"
+    :shown="aArrow"
     :path="path"
     :length="length"
     :controlLength="controlLength"
-    :offset="-5"
+    :offset="-7"
   />
   <Arrow
-    :shown="true"
+    :shown="bArrow"
     :path="path"
     :length="length"
     :controlLength="controlLength"
-    :offset="5"
+    :offset="7"
   />
   <path
     :class="{ edge: true, onPath: onPath, hidden: hidden, animate: animate, reversed: reversed }"

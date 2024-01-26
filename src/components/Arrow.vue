@@ -141,8 +141,8 @@ export default {
 </template>
 
 <style scoped>
-.headGroup {
-  transition: transform 0.5s;
+.canAnimate .headGroup {
+  transition: transform 0.7s -0.2s;
 }
 .head {
   stroke: var(--color-text);

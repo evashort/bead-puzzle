@@ -94,7 +94,7 @@ export default {
         null
     },
     hole() {
-      return Permute.findValue(this.beads, 0)
+      return Permute.findZero(this.beads)
     },
     beadOrientations() {
       let result = {}
@@ -331,6 +331,8 @@ export default {
     :onPath="activeEdges[edge.toString()] ?? false"
     :hiddenEnd="getHiddenEnd(edge)"
     :controlLength="controlLength"
+    :aArrow="edge[0] == tail && edge[1] == hole"
+    :bArrow="edge[0] == hole && edge[1] == tail"
   />
   <!-- including edge in the key allows the slide animation to play again when
     the bead moves to a different edge. including i in the key allows the slide
