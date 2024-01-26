@@ -20,9 +20,6 @@ export default {
       clickingButton: false,
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
-      showOldArrow: false,
-      backwardsInLoop: false,
-      continuingLoop: false,
       oldBeads: [],
 
       // trophy state
@@ -53,57 +50,6 @@ export default {
     size() {
       return SimpleGraph.bytesToNodeCount(this.graph)
     },
-    edges() {
-      let edges = []
-      let [firstA, firstB] = []
-      if (this.backwardsInLoop) {
-        if (this.oldHole == this.history[1]) {
-          firstA = this.history[1]
-          firstB = this.history[2]
-        } else {
-          firstA = this.history[this.history.length - 2]
-          firstB = this.history[this.history.length - 3]
-        }
-        if (firstB < firstA) {
-          [firstB, firstA] = [firstA, firstB]
-        }
-        
-        edges.push([firstA, firstB])
-      }
-
-      let [secondA, secondB] = this.history
-      if (this.history.length >= 2) {
-        if (secondB < secondA) {
-          [secondB, secondA] = [secondA, secondB]
-        }
-
-        edges.push([secondA, secondB])
-      }
-
-      if (this.continuingLoop) {
-        firstA = this.history[this.history.length - 1]
-        firstB = this.history[this.history.length - 2]
-        if (firstB < firstA) {
-          [firstB, firstA] = [firstA, firstB]
-        }
-        
-        edges.push([firstA, firstB])
-      }
-
-      for (let a = 0; a < this.size; a++) {
-        for (let b = a + 1; b < this.size; b++) {
-          if (
-            SimpleGraph.hasEdge(this.graph, a, b) &&
-              (a != firstA || b != firstB) &&
-              (a != secondA || b != secondB)
-          ) {
-            edges.push([a, b])
-          }
-        }
-      }
-
-      return edges
-    },
     hole() {
       return this.history[this.history.length - 1]
     },
@@ -120,18 +66,10 @@ export default {
 
       return 0
     },
-    activeEnd() {
-      return this.history.length - 1
-    },
-    activeStart() {
-      return this.history.length >= 2 &&
-        this.hole == this.history[0] && this.tail == this.history[1] && this.showTail ?
-        0 : this.loopStart
-    },
     deadEnd() {
       let edges = 0
-      for (let i = 0; i < this.size; i++) {
-        edges += SimpleGraph.hasEdge(this.graph, this.hole, i)
+      for (let _ of SimpleGraph.nodeEdges(this.graph, this.hole)) {
+        edges += 1
         if (edges > 1) {
           return false
         }
@@ -166,7 +104,7 @@ export default {
         edgePaths[[a, a].toString()] = `M ${this.nodeXs[a]} ${this.nodeYs[a]}`
       }
 
-      for (let [baseA, baseB] of this.edges) {
+      for (let [baseA, baseB] of SimpleGraph.edges(this.graph)) {
         for (let [a, b] of [[baseA, baseB], [baseB, baseA]]) {
           let name = [a, b].toString()
           let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
@@ -226,26 +164,6 @@ export default {
 
       return edgePaths
     },
-    edgeClasses() {
-      let edgeClasses = {}
-      for (let [a, b] of this.edges) {
-        edgeClasses[[a, b].toString()] = {edge: true}
-        edgeClasses[[b, a].toString()] = {edge: true}
-      }
-
-      for (let i = this.activeStart; i < this.activeEnd; i++) {
-        let a = this.history[i], b = this.history[i + 1]
-        edgeClasses[[a, b].toString()]['active'] = true
-        edgeClasses[[b, a].toString()]['active'] = true
-      }
-
-      if (this.showTail) {
-        edgeClasses[[this.hole, this.tail].toString()]['arrow'] = true
-        edgeClasses[[this.tail, this.hole].toString()]['arrow'] = true
-      }
-
-      return edgeClasses
-    },
     terminatorRadius() {
       return this.curvedPaths ? 28 : 36
     },
@@ -255,12 +173,6 @@ export default {
     crossPath() {
       let d = this.crossRadius * Math.sqrt(0.5)
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
-    },
-    arrowPath() {
-      return this.edgePaths[[this.hole, this.tail].toString()]
-    },
-    oldArrowPath() {
-      return this.edgePaths[[this.oldHole, this.hole].toString()]
     },
     trophyExitStart() {
       if (this.reversed) {
@@ -540,16 +452,12 @@ export default {
       this.trophyAlternate = !this.trophyAlternate
       this.oldHole = this.hole
       this.reversed = false
-      this.showOldArrow = false
-      this.backwardsInLoop = false
-      this.continuingLoop = false
       if (this.reversing) {
         this.history.pop()
         if (this.history[0] == this.oldHole) {
           // reverse the loop
           this.history.reverse()
           this.history.push(this.history[0])
-          this.backwardsInLoop = true
         } else {
           // not a loop
           this.reversed = true
@@ -562,9 +470,6 @@ export default {
           return
         }
       } else {
-        this.continuingLoop = this.history.length >= 3 &&
-          this.oldHole == this.history[0] &&
-          this.tail == this.history[1]
         this.history.push(this.tail)
       }
 
@@ -633,14 +538,10 @@ export default {
         this.beads = Permute.swap(this.beads, newHole, this.tail)
         this.oldBeads[id] = newHole
         this.trophyAlternate = !this.trophyAlternate
-        this.showOldArrow = false
-        this.backwardsInLoop = false
-        this.continuingLoop = false
         this.history.pop()
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
           this.history.unshift(this.hole)
-          this.backwardsInLoop = true
         }
       }
     },
@@ -697,14 +598,12 @@ export default {
         if (target == this.hole) {
           if (this.history.length >= 2) {
             this.goBack()
-            this.showOldArrow = true
           } else {
             this.showCross = true
           }
         } else if (SimpleGraph.hasEdge(this.graph, target, this.hole)) {
           this.tail = target
           this.goForwardHelp()
-          this.showOldArrow = true
         } else {
           this.showCross = true
         }
@@ -833,9 +732,6 @@ export default {
         this.history = [...newState.history]
         this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
-        this.showOldArrow = false
-        this.backwardsInLoop = false
-        this.continuingLoop = false
       },
       immediate: true,
     },
@@ -854,9 +750,6 @@ export default {
     },
     canAnimate(newCanAnimate, oldCanAnimate) {
       if (newCanAnimate) {
-        this.showOldArrow = false
-        this.backwardsInLoop = false
-        this.continuingLoop = false
         this.trophyEnterPaused = true
         this.trophyExitPaused = true
       }
@@ -954,25 +847,6 @@ export default {
         >
         </circle>
       </mask>
-      <g
-        v-for="(edge, i) in edges"
-        :key="`${edge.toString()},${size}`"
-      >
-        <circle
-          v-if="backwardsInLoop ? i == 1 : i == 0"
-          :cx="nodeXs[history[0]]"
-          :cy="nodeYs[history[0]]"
-          :r="terminatorRadius"
-          :class="{ terminator: true, shown: edgeClasses[edge.toString()]['active'], hidden: edgeClasses[edge.toString()]['arrow'], delay: this.history.length == 2 }"
-        />
-        <circle
-          v-if="backwardsInLoop ? i == 0 : i == 1"
-          :cx="nodeXs[oldHole]"
-          :cy="nodeYs[oldHole]"
-          :r="terminatorRadius * 0.5"
-          :class="{ oldTerminator: true, close: backwardsInLoop, delay: continuingLoop && !showOldArrow, alternate: trophyAlternate }"
-        />
-      </g>
       <Board
         :key="graphId"
         :graphId="graphId"
@@ -1045,103 +919,12 @@ button {
   border-radius: 2px;
   background-color: black;
 }
-.terminator {
-  opacity: 0;
-  fill: var(--color-background);
-}
-.terminator.shown {
-  opacity: 1;
-}
-.terminator.shown.hidden {
-  opacity: 0;
-}
-.canAnimate .terminator.shown.delay {
-  animation: delay 0.45s
-}
-@keyframes delay {
-  from { opacity: 0; }
-  to { opacity: 0; }
-}
-.oldTerminator {
-  stroke: var(--color-background);
-  stroke-width: 0;
-  fill: none;
-}
-.canAnimate .oldTerminator.close {
-  animation: close 0.45s ease 0.3s backwards
-}
-@keyframes close {
-  from {
-    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
-    stroke-width: v-bind(terminatorRadius);
-  }
-  to {
-    r: calc(100% * v-bind(terminatorRadius) / 286);
-    stroke-width: 0;
-  }
-}
-.canAnimate .oldTerminator.close.alternate {
-  animation: close2 0.45s ease 0.3s backwards
-}
-@keyframes close2 {
-  from {
-    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
-    stroke-width: v-bind(terminatorRadius);
-  }
-  to {
-    r: calc(100% * v-bind(terminatorRadius) / 286);
-    stroke-width: 0;
-  }
-}
-.canAnimate .oldTerminator.delay {
-  animation: oldDelay 0.45s ease 0.3s backwards
-}
-@keyframes oldDelay {
-  from {
-    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
-    stroke-width: v-bind(terminatorRadius);
-  }
-  to {
-    r: 0%;
-    stroke-width: 0;
-  }
-}
-.canAnimate .oldTerminator.delay.alternate {
-  animation: oldDelay2 0.45s ease 0.3s backwards
-}
-@keyframes oldDelay2 {
-  from {
-    r: calc(100% * 0.5 * v-bind(terminatorRadius) / 286);
-    stroke-width: v-bind(terminatorRadius);
-  }
-  to {
-    r: 0%;
-    stroke-width: 0;
-  }
-}
 .cross {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
-}
-.headGroup {
-  opacity: 0;
-}
-.canAnimate .headGroup.animate {
-  animation: oldArrow 0.45s;
-}
-.canAnimate .headGroup.animate.alternate {
-  animation: oldArrow2 0.45s;
-}
-@keyframes oldArrow {
-  from { opacity: 1; }
-  to { opacity: 1; }
-}
-@keyframes oldArrow2 {
-  from { opacity: 1; }
-  to { opacity: 1; }
 }
 .cross.shadow {
   stroke: var(--color-background);

@@ -74,6 +74,25 @@ export default {
 
       return result
     },
+    edgeOrder() {
+      let top = []
+      if (this.tail >= 0) {
+        top.push(this.sortedPair(this.hole, this.tail))
+      } else if (this.beadStarts[0] != this.hole) {
+        top.push(this.sortedPair(this.beadStarts[0], this.hole))
+      }
+
+      let order = []
+      let seen = new Set(top.map(String))
+      for (let edge of SimpleGraph.edges(this.graph)) {
+        if (!seen.has(edge.toString())) {
+          order.push(edge)
+        }
+      }
+
+      for (let edge of top) { order.push(edge) }
+      return order
+    },
     truncatedEdge() {
       if (
         this.history.length >= 2 && !(
@@ -302,7 +321,7 @@ export default {
 
 <template>
   <Edge
-    v-for="edge of SimpleGraph.edges(this.graph)"
+    v-for="edge in edgeOrder"
     :key="edge.toString()"
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
