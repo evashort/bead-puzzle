@@ -313,6 +313,7 @@ export default {
     :bArrow="edge[0] == hole && edge[1] == tail"
     :aOldArrow="edge[0] == hole && edge[1] == beadStarts[0]"
     :bOldArrow="edge[0] == beadStarts[0] && edge[1] == hole"
+    :suppressOldArrow="tail >= 0"
   />
   <!-- including bead.b in the key allows the slide animation to play again
     when the bead moves. including i in the key allows the slide animation to

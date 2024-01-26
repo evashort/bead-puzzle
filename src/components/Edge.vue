@@ -21,6 +21,7 @@ export default {
     bArrow: Boolean,
     aOldArrow: Boolean,
     bOldArrow: Boolean,
+    suppressOldArrow: Boolean,
   },
   computed: {
     hidden() {
@@ -56,7 +57,7 @@ export default {
 
 <template>
   <Arrow
-    :shown="aArrow || aOldArrow"
+    :shown="aArrow || (aOldArrow && !suppressOldArrow)"
     :disappear="aOldArrow"
     :path="path"
     :length="length"
@@ -64,7 +65,7 @@ export default {
     :offset="-7"
   />
   <Arrow
-    :shown="bArrow || bOldArrow"
+    :shown="bArrow || (bOldArrow && !suppressOldArrow)"
     :disappear="bOldArrow"
     :path="path"
     :length="length"
