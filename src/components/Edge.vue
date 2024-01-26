@@ -19,6 +19,8 @@ export default {
     controlLength: Number,
     aArrow: Boolean,
     bArrow: Boolean,
+    aOldArrow: Boolean,
+    bOldArrow: Boolean,
   },
   computed: {
     hidden() {
@@ -54,14 +56,16 @@ export default {
 
 <template>
   <Arrow
-    :shown="aArrow"
+    :shown="aArrow || aOldArrow"
+    :disappear="aOldArrow"
     :path="path"
     :length="length"
     :controlLength="controlLength"
     :offset="-7"
   />
   <Arrow
-    :shown="bArrow"
+    :shown="bArrow || bOldArrow"
+    :disappear="bOldArrow"
     :path="path"
     :length="length"
     :controlLength="controlLength"

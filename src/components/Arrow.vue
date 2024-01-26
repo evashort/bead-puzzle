@@ -2,6 +2,7 @@
 export default {
   props: {
     shown: Boolean,
+    disappear: Boolean,
     path: String,
     length: Number,
     controlLength: Number,
@@ -132,7 +133,7 @@ export default {
 
 <template>
   <g
-    class="headGroup"
+    :class="{ headGroup: true, disappear: disappear }"
     :style="{ transform: `translate(${x}px, ${y}px) rotate(${angle}rad) translateX(${Math.abs(offset)}px)` }"
   >
     <path v-if=shown :d="headPath" class="shadow"/>
@@ -143,6 +144,16 @@ export default {
 <style scoped>
 .canAnimate .headGroup {
   transition: transform 0.7s -0.2s;
+}
+.headGroup.disappear {
+  opacity: 0;
+}
+.canAnimate .headGroup.disappear {
+  animation: disappear 0.45s;
+}
+@keyframes disappear {
+  from { opacity: 1; }
+  to { opacity: 1; }
 }
 .head {
   stroke: var(--color-text);
