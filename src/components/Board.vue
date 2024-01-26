@@ -296,28 +296,6 @@ export default {
 
       this.beadStarts = newBeadStarts
     },
-    extra(newExtra, oldExtra) {
-      if (newExtra.toString() == oldExtra.toString()) {
-        // this watcher gets triggered too much because two Javascript arrays
-        // are never equal
-        return
-      }
-
-      let newBeadStarts = false
-      for (let a of newExtra) {
-        let bead = Permute.getValue(this.beads, a)
-        let orientation = this.beadOrientations[a] ?? [a, a]
-        // this condition determines whether the bead's edge will change due to
-        // extra changing, see beadEdges()
-        if (!orientation.includes(this.beadStarts[bead])) {
-          // if so, prevent the slide animation from being replayed
-          newBeadStarts = newBeadStarts || this.beadStarts.slice()
-          newBeadStarts[bead] = a
-        }
-      }
-
-      this.beadStarts = newBeadStarts || this.beadStarts
-    },
   },
 }
 </script>
@@ -336,12 +314,12 @@ export default {
     :aOldArrow="edge[0] == hole && edge[1] == beadStarts[0]"
     :bOldArrow="edge[0] == beadStarts[0] && edge[1] == hole"
   />
-  <!-- including edge in the key allows the slide animation to play again when
-    the bead moves to a different edge. including i in the key allows the slide
-    animation to play again when a different bead moves onto the edge. -->
+  <!-- including bead.b in the key allows the slide animation to play again
+    when the bead moves. including i in the key allows the slide animation to
+    play again when a different bead moves into the old spot. -->
   <Bead
     v-for="(bead, i) in beadEdges"
-    :key="`${i}:${sortedPair(bead.a, bead.b)}`"
+    :key="`${i}:${bead.b}`"
     :size="size"
     :path="edgePaths[sortedPair(bead.a, bead.b)].path"
     :facingA="(bead.b < bead.a) != bead.reverse"

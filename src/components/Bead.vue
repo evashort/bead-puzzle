@@ -1,5 +1,10 @@
 <script>
 export default {
+  data() {
+    return {
+      alreadyMoved: false,
+    }
+  },
   props: {
     size: Number,
     path: String,
@@ -39,10 +44,15 @@ export default {
         facingA: this.facingA,
         moveToA: this.moveToA,
         onPath: this.onPath,
-        moving: this.moving,
+        moving: this.moving && !this.alreadyMoved,
       }
     },
   },
+  watch: {
+    moving(newMoving, oldMoving) {
+      this.alreadyMoved = true
+    }
+  }
 }
 </script>
 
