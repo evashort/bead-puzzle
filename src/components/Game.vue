@@ -819,6 +819,25 @@ export default {
         <image id="leaf-outline" x="-4" y="-4" width="8" height="8" href="../assets/leaf_outline.svg"/>
         <image id="mushroom-outline" x="-4" y="-4" width="8" height="8" href="../assets/mushroom_outline.svg"/>
         <image id="flower-outline" x="-4" y="-4" width="8" height="8" href="../assets/flower_outline.svg"/>
+        <path
+          id="head-path"
+          :d="`M ${-12*Math.sqrt(1.5)} -12 L 0 0 L ${-12*Math.sqrt(1.5)} 12`"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"
+        />
+        <use
+          id="head-stroke"
+          href="#head-path"
+          stroke="var(--color-text)"
+          stroke-width="4"
+        />
+        <use
+          id="head-shadow"
+          href="#head-path"
+          stroke="var(--color-background)"
+          stroke-width="12"
+        />
       </defs>
       <Holes
         :size="size"
@@ -875,7 +894,7 @@ export default {
       <g
         :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
         :class="{crossGroup: true, ghost: !showCross}"
-        :opacity="showCross ? 1 : 0"
+        :visibility="showCross ? 'initial' : 'hidden'"
       >
         <path :d="crossPath" class="cross shadow"/>
         <path :d="crossPath" class="cross"/>
@@ -931,7 +950,7 @@ button {
   stroke-width: 12;
 }
 .canAnimate .crossGroup.ghost {
-  transition: opacity 0s 0.35s;
+  transition: visibility 0s 0.35s;
 }
 .spinIcon {
   stroke: var(--color-text);

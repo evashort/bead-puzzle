@@ -50,7 +50,7 @@ export default {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
-  opacity: 0;
+  visibility: hidden;
 }
 
 .canAnimate .tail {
@@ -58,18 +58,18 @@ export default {
 }
 
 .tail.aArrow {
-  opacity: 1;
+  visibility: initial;
   stroke-dasharray: var(--dash-length) 100%;
 }
 
 .tail.bArrow {
-  opacity: 1;
+  visibility: initial;
   stroke-dasharray: 100% var(--non-dash-length);
   stroke-dashoffset: 100%;
 }
 
-.tail.aArrow.disappear {
-  opacity: 0;
+.tail.disappear {
+  visibility: hidden;
 }
 
 .canAnimate .tail.aArrow.disappear {
@@ -77,8 +77,8 @@ export default {
 }
 
 @keyframes disappear {
-  from { opacity: 1; }
-  to { opacity: 1; }
+  from { visibility: initial; }
+  to { visibility: initial; }
 }
 
 .canAnimate .tail.bArrow.disappear {
@@ -86,7 +86,7 @@ export default {
 }
 
 @keyframes disappear2 {
-  from { opacity: 1; }
-  to { opacity: 1; }
+  from { visibility: initial; }
+  to { visibility: initial; }
 }
 </style>

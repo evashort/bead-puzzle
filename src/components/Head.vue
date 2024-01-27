@@ -9,16 +9,6 @@ export default {
     offset: Number,
   },
   computed: {
-    headRadius() {
-      return 12
-    },
-    headHeight() {
-      return this.headRadius * Math.sqrt(1.5)
-    },
-    headPath() {
-      let r = this.headRadius, h = this.headHeight
-      return `M ${-h} ${-r} L ${0} ${0} L ${-h} ${r}`
-    },
     x() {
       return this.points ? this.bezier(this.t, ...this.points.map(p => p.x)) :
         0
@@ -133,43 +123,34 @@ export default {
 
 <template>
   <g
-    :class="{ headGroup: true, disappear: disappear }"
-    :style="{ transform: `translate(${x}px, ${y}px) rotate(${angle}rad) translateX(${Math.abs(offset)}px)` }"
+    :class="{ head: true, shown: shown, disappear: disappear }"
+    :style="{
+      transform: `translate(${x}px, ${y}px) rotate(${angle}rad) translateX(${Math.abs(offset)}px)`
+    }"
   >
-    <path v-if=shown :d="headPath" class="shadow"/>
-    <path v-if=shown :d="headPath" class="head"/>
+    <use v-if=shown href="#head-shadow"/>
+    <use v-if=shown href="#head-stroke"/>
   </g>
 </template>
 
 <style scoped>
-.canAnimate .headGroup {
+.head {
+  visibility: hidden;
+}
+.head.shown {
+  visibility: initial;
+}
+.canAnimate .head {
   transition: transform 0.7s -0.2s;
 }
-.headGroup.disappear {
-  opacity: 0;
+.head.disappear {
+  visibility: hidden;
 }
-.canAnimate .headGroup.disappear {
+.canAnimate .head.disappear {
   animation: disappear 0.45s;
 }
 @keyframes disappear {
-  from { opacity: 1; }
-  to { opacity: 1; }
-}
-.head {
-  stroke: var(--color-text);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-}
-.shadow {
-  stroke: var(--color-background);
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-}
-.facingA {
-  offset-rotate: reverse;
+  from { visibility: initial; }
+  to { visibility: initial; }
 }
 </style>
