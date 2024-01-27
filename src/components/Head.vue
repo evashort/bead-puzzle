@@ -153,4 +153,7 @@ export default {
   from { visibility: initial; }
   to { visibility: initial; }
 }
+.head:not(.shown) {
+  visibility: hidden !important;
+}
 </style>

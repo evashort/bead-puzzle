@@ -18,14 +18,41 @@ export default {
   computed: {
     dashLength() {
       return this.onPath ? 20 : 11
-    }
+    },
+    aShown() {
+      return this.aArrow ||
+        (this.aOldArrow && !this.bArrow && !this.suppressOldArrow)
+    },
+    bShown() {
+      return this.bArrow ||
+        (this.bOldArrow && !this.aArrow && !this.suppressOldArrow)
+    },
   },
 }
+/*
+aArrow bArrow aOldArrow bOldArrow suppressOldArrow visibility dasharray disappear suppress
+0      0      0         0                          0                    0
+1      0      0         0                          1          A         0         0
+0      1      0         0                          1          B         0         0
+0      0      1         0         0                0          A         A         0
+0      1      1         0                          1          B         A         0
+0      0      0         1         0                0          B         B         0
+1      0      0         1                          1          A         B         0
+0      0      1         0         1                                     A         1
+0      0      0         1         1                                     B         1
+
+suppress = suppressOldArrow && !aArrow && !bArrow
+disappearA = aOldArrow
+disappearB = aOldArrow
+dasharrayA = aArrow || (aOldArrow && !bArrow)
+dasharrayB = bArrow || (bOldArrow && !aArrow)
+visibility = aArrow || bArrow
+*/
 </script>
 
 <template>
   <Head
-    :shown="aArrow || (aOldArrow && !suppressOldArrow)"
+    :shown="aShown"
     :disappear="aOldArrow"
     :path="path"
     :length="length"
@@ -33,21 +60,20 @@ export default {
     :offset="7"
   />
   <Head
-    :shown="bArrow || (bOldArrow && !suppressOldArrow)"
+    :shown="bShown"
     :disappear="bOldArrow"
     :path="path"
     :length="length"
     :controlLength="controlLength"
     :offset="-7"
   />
-  <!-- TODO: make sure aArrow class is not set based on aOldArrow if bArrow is
-       true -->
   <path
     :class="{
       tail: true,
-      aArrow: aArrow || (aOldArrow && !suppressOldArrow),
-      bArrow: bArrow || (bOldArrow && !suppressOldArrow),
-      disappear: (aOldArrow || bOldArrow) && !(aArrow || bArrow)
+      aShown: aShown,
+      bShown: bShown,
+      aDisappear: aOldArrow,
+      bDisappear: bOldArrow,
     }"
     :d="path"
     :pathLength="length"
@@ -71,36 +97,36 @@ export default {
   transition: d 0.5s;
 }
 
-.tail.aArrow {
+.tail.aShown {
   visibility: initial;
   stroke-dasharray: var(--dash-length) 100%;
 }
 
-.tail.bArrow {
+.tail.bShown {
   visibility: initial;
   stroke-dasharray: 100% var(--non-dash-length);
   stroke-dashoffset: 100%;
 }
 
-.tail.disappear {
-  visibility: hidden;
+.canAnimate .tail.aDisappear {
+  animation: aDisappear 0.45s;
 }
 
-.canAnimate .tail.aArrow.disappear {
-  animation: disappear 0.45s;
-}
-
-@keyframes disappear {
+@keyframes aDisappear {
   from { visibility: initial; }
   to { visibility: initial; }
 }
 
-.canAnimate .tail.bArrow.disappear {
-  animation: disappear2 0.45s;
+.canAnimate .tail.bDisappear {
+  animation: bDisappear 0.45s;
 }
 
-@keyframes disappear2 {
+@keyframes bDisappear {
   from { visibility: initial; }
   to { visibility: initial; }
+}
+
+.tail:not(.aShown, .bShown) {
+  visibility: hidden !important;
 }
 </style>
