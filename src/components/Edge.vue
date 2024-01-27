@@ -1,5 +1,4 @@
 <script setup>
-import Arrow from './Arrow.vue'
 import { HiddenEnd } from '../HiddenEnd'
 </script>
 
@@ -16,12 +15,6 @@ export default {
     length: Number,
     onPath: Boolean,
     hiddenEnd: HiddenEnd,
-    controlLength: Number,
-    aArrow: Boolean,
-    bArrow: Boolean,
-    aOldArrow: Boolean,
-    bOldArrow: Boolean,
-    suppressOldArrow: Boolean,
   },
   computed: {
     hidden() {
@@ -56,22 +49,6 @@ export default {
 </script>
 
 <template>
-  <Arrow
-    :shown="aArrow || (aOldArrow && !suppressOldArrow)"
-    :disappear="aOldArrow"
-    :path="path"
-    :length="length"
-    :controlLength="controlLength"
-    :offset="-7"
-  />
-  <Arrow
-    :shown="bArrow || (bOldArrow && !suppressOldArrow)"
-    :disappear="bOldArrow"
-    :path="path"
-    :length="length"
-    :controlLength="controlLength"
-    :offset="7"
-  />
   <path
     :class="{ edge: true, onPath: onPath, hidden: hidden, animate: animate, reversed: reversed }"
     :d="path"

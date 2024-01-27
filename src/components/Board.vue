@@ -1,4 +1,5 @@
 <script setup>
+import Arrow from './Arrow.vue'
 import Edge from './Edge.vue'
 import { HiddenEnd } from '../HiddenEnd'
 import Bead from './Bead.vue'
@@ -73,25 +74,6 @@ export default {
       }
 
       return result
-    },
-    edgeOrder() {
-      let top = []
-      if (this.tail >= 0) {
-        top.push(this.sortedPair(this.hole, this.tail))
-      } else if (this.beadStarts[0] != this.hole) {
-        top.push(this.sortedPair(this.beadStarts[0], this.hole))
-      }
-
-      let order = []
-      let seen = new Set(top.map(String))
-      for (let edge of SimpleGraph.edges(this.graph)) {
-        if (!seen.has(edge.toString())) {
-          order.push(edge)
-        }
-      }
-
-      for (let edge of top) { order.push(edge) }
-      return order
     },
     truncatedEdge() {
       if (
@@ -321,17 +303,23 @@ export default {
 
 <template>
   <Edge
-    v-for="edge in edgeOrder"
+    v-for="edge in SimpleGraph.edges(this.graph)"
     :key="edge.toString()"
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
     :hiddenEnd="getHiddenEnd(edge)"
+  />
+  <Arrow
+    v-for="edge in SimpleGraph.edges(this.graph)"
+    :key="edge.toString()"
+    :path="edgePaths[edge].path"
+    :length="edgePaths[edge].length"
     :controlLength="controlLength"
-    :aArrow="edge[0] == tail && edge[1] == hole"
-    :bArrow="edge[0] == hole && edge[1] == tail"
-    :aOldArrow="edge[0] == hole && edge[1] == beadStarts[0]"
-    :bOldArrow="edge[0] == beadStarts[0] && edge[1] == hole"
+    :aArrow="edge[0] == hole && edge[1] == tail"
+    :bArrow="edge[0] == tail && edge[1] == hole"
+    :aOldArrow="edge[0] == beadStarts[0] && edge[1] == hole"
+    :bOldArrow="edge[0] == hole && edge[1] == beadStarts[0]"
     :suppressOldArrow="tail >= 0"
   />
   <!-- including bead.b in the key allows the slide animation to play again
