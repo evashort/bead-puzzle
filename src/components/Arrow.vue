@@ -8,11 +8,17 @@ export default {
     path: String,
     length: Number,
     controlLength: Number,
+    onPath: Boolean,
     aArrow: Boolean,
     bArrow: Boolean,
     aOldArrow: Boolean,
     bOldArrow: Boolean,
     suppressOldArrow: Boolean,
+  },
+  computed: {
+    dashLength() {
+      return this.onPath ? 20 : 11
+    }
   },
 }
 </script>
@@ -37,10 +43,18 @@ export default {
   <!-- TODO: make sure aArrow class is not set based on aOldArrow if bArrow is
        true -->
   <path
-    :class="{ tail: true, aArrow: aArrow || (aOldArrow && !suppressOldArrow), bArrow: bArrow || (bOldArrow && !suppressOldArrow), disappear: (aOldArrow || bOldArrow) && !(aArrow || bArrow) }"
+    :class="{
+      tail: true,
+      aArrow: aArrow || (aOldArrow && !suppressOldArrow),
+      bArrow: bArrow || (bOldArrow && !suppressOldArrow),
+      disappear: (aOldArrow || bOldArrow) && !(aArrow || bArrow)
+    }"
     :d="path"
     :pathLength="length"
-    :style="{ '--dash-length': 20, '--non-dash-length': length - 20 }"
+    :style="{
+      '--dash-length': dashLength,
+      '--non-dash-length': length - dashLength
+    }"
   />
 </template>
 
