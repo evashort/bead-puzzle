@@ -75,6 +75,24 @@ export default {
 
       return result
     },
+    oldTruncatedEdge() {
+      if (this.history.length < 3) {
+        return null
+      } else if (this.beadStarts[0] == this.history[1]) {
+        return [this.history[1], this.history[2]]
+      } else if (this.beadStarts[0] == this.history[this.history.length - 2]) {
+        return [
+          this.history[this.history.length - 2],
+          this.history[this.history.length - 3],
+        ]
+      } else {
+        return null
+      }
+    },
+    oldTruncatedEdgeString() {
+      return this.oldTruncatedEdge ?
+        this.oldTruncatedEdge.toSorted().toString() : null
+    },
     truncatedEdge() {
       if (
         this.history.length >= 2 && !(
@@ -275,8 +293,9 @@ export default {
           (delay ? HiddenEnd.DelayA : HiddenEnd.A)
       }
 
-      if (edge.includes(this.beadStarts[0]) && !edge.includes(this.hole)) {
-        return HiddenEnd.DelayNone
+      if (edge.toString() == this.oldTruncatedEdgeString) {
+        let bHidden = this.oldTruncatedEdge[1] < this.oldTruncatedEdge[0]
+        return bHidden ? HiddenEnd.DelayNone : HiddenEnd.DelayNone
       }
 
       return HiddenEnd.None
