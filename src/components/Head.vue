@@ -5,7 +5,6 @@ export default {
     disappear: Boolean,
     path: String,
     length: Number,
-    controlLength: Number,
     offset: Number,
   },
   computed: {
@@ -61,6 +60,12 @@ export default {
       let ratio = Math.pow(3 * this.controlLength / this.length, m)
       return (1 - ratio) * Math.acos(1 - 2 * x) / Math.PI + ratio * x
     },
+    controlLength() {
+      let point = this.facingB ? this.points[3] : this.points[0]
+      let control = this.facingB ? this.points[2] : this.points[1]
+      let dx = control.x - point.x, dy = control.y - point.y
+      return Math.sqrt(dx * dx + dy * dy)
+    },
     sign() {
       return this.facingB ? 1 : -1
     },
@@ -76,25 +81,12 @@ export default {
       }
 
       let [, x1, y1, cx1, cy1, cx2, cy2, x2, y2] = match
-      let result = [
+      return [
         { x: parseFloat(x1), y: parseFloat(y1) },
         { x: parseFloat(cx1), y: parseFloat(cy1) },
         { x: parseFloat(cx2), y: parseFloat(cy2) },
         { x: parseFloat(x2), y: parseFloat(y2) },
       ]
-      if (
-        result[1].x == result[0].x && result[1].y == result[0].y &&
-        result[2].x == result[3].x && result[2].y == result[3].y
-      ) {
-        let dx = result[3].x - result[0].x, dy = result[3].y - result[0].y
-        let factor = this.controlLength / Math.sqrt(dx * dx + dy * dy)
-        result[1].x += dx * factor
-        result[1].y += dy * factor
-        result[2].x -= dx * factor
-        result[2].y -= dy * factor
-      }
-
-      return result
     },
     pathPattern() {
       // https://www.w3.org/TR/SVG11/paths.html#PathDataBNF

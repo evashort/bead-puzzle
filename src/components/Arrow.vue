@@ -56,7 +56,6 @@ visibility = aArrow || bArrow
     :disappear="aOldArrow"
     :path="path"
     :length="length"
-    :controlLength="controlLength"
     :offset="7"
   />
   <Head
@@ -64,7 +63,6 @@ visibility = aArrow || bArrow
     :disappear="bOldArrow"
     :path="path"
     :length="length"
-    :controlLength="controlLength"
     :offset="-7"
   />
   <path

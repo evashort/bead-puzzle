@@ -326,7 +326,6 @@ export default {
     :key="edge.toString()"
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
-    :controlLength="controlLength"
     :onPath="activeEdges[edge.toString()] ?? false"
     :aArrow="edge[0] == hole && edge[1] == tail"
     :bArrow="edge[0] == tail && edge[1] == hole"
