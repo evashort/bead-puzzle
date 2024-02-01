@@ -16,8 +16,13 @@ export default {
     suppressOldArrow: Boolean,
   },
   computed: {
+    strokeRadius() {
+      return 2 // half of stroke-width
+    },
     dashLength() {
-      return this.onPath ? 20 : 11
+      // cut off strokeRadius at the tip of the arrow to make sure the dash
+      // doesn't stick out in front.
+      return (this.onPath ? 20 : 11) - this.strokeRadius
     },
     aShown() {
       return this.aArrow ||
@@ -77,7 +82,8 @@ visibility = aArrow || bArrow
     :pathLength="length"
     :style="{
       '--dash-length': dashLength,
-      '--non-dash-length': length - dashLength
+      '--non-dash-length': length - dashLength - strokeRadius,
+      '--dash-offset': -strokeRadius,
     }"
   />
 </template>
@@ -98,11 +104,12 @@ visibility = aArrow || bArrow
 .tail.aShown {
   visibility: initial;
   stroke-dasharray: var(--dash-length) 100%;
+  stroke-dashoffset: var(--dash-offset);
 }
 
 .tail.bShown {
   visibility: initial;
-  stroke-dasharray: 100% var(--non-dash-length);
+  stroke-dasharray: 100% var(--non-dash-length) var(--dash-length) 100%;
   stroke-dashoffset: 100%;
 }
 
