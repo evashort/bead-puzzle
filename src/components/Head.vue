@@ -51,6 +51,21 @@ export default {
       // pi*t = acos(1-2x)
       // t = acos(1-2x)/pi
       // t = (1 - 3c/l)acos(1-2x)/pi + 3c/l*x
+      // now we improve the approximation even more:
+      /*
+import numpy
+from scipy import interpolate
+from matplotlib import pyplot as plt
+x = numpy.linspace(0, 1, 1000)
+f = interpolate.CubicSpline((3 - 2 * x) * x ** 2, x)
+acos = numpy.arccos(1 - 2 * x) / numpy.pi
+acos_factor = 0.914 # hand-tuned
+line_factor = 0.0862 # hand-tuned
+t_approximation = 0.5 + acos_factor * (acos - 0.5) + line_factor * (x - 0.5)
+plt.plot(x, t_approximation - f(x))
+plt.title('error in t')
+plt.show()
+*/
       let x = (this.offset + this.length * this.facingB) / this.length
       // m = "how much does controlLength matter"
       // without this parameter, the formula assigns too much importance to
@@ -58,7 +73,8 @@ export default {
       // until none of the arrow tails stuck out in front of the arrow heads.
       let m = 0.3
       let ratio = Math.pow(3 * this.controlLength / this.length, m)
-      return (1 - ratio) * Math.acos(1 - 2 * x) / Math.PI + ratio * x
+      let acos = -0.0001 + 0.0862 * x + 0.914 * Math.acos(1 - 2 * x) / Math.PI
+      return (1 - ratio) * acos + ratio * x
     },
     controlLength() {
       let point = this.facingB ? this.points[3] : this.points[0]
