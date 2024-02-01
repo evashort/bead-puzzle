@@ -95,18 +95,21 @@ export default {
     },
     truncatedEdge() {
       if (
-        this.history.length >= 2 && !(
-          this.hasLoop && this.tail == this.history[1]
-        )
+        this.history.length < 2 ||
+        (this.hasLoop && this.tail == this.history[1])
       ) {
-        let start = this.history.lastIndexOf(
-          this.altHistory[this.altHistory.length - 1],
-          -2,
-        )
+        return null
+      }
+
+      let start = this.history.lastIndexOf(
+        this.altHistory[this.altHistory.length - 1],
+        -2,
+      )
+      if (start >= 0) {
         return [this.history[start], this.history[start + 1]]
       }
 
-      return null
+      return [this.history[0], this.history[1]]
     },
     truncatedEdgeString() {
       return this.truncatedEdge ? this.truncatedEdge.toSorted().toString() :
