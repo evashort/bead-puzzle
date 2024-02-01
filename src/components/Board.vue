@@ -101,13 +101,13 @@ export default {
         return null
       }
 
-      let start = this.history.lastIndexOf(
-        this.altHistory[this.altHistory.length - 1],
-        -2,
-      )
-      if (start >= 0) {
-        return [this.history[start], this.history[start + 1]]
-      }
+      // let start = this.history.lastIndexOf(
+      //   this.altHistory[this.altHistory.length - 1],
+      //   -2,
+      // )
+      // if (start >= 0) {
+      //   return [this.history[start], this.history[start + 1]]
+      // }
 
       return [this.history[0], this.history[1]]
     },
@@ -322,7 +322,12 @@ export default {
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
-    :hiddenEnd="getHiddenEnd(edge)"
+    :gap="28"
+    :aHidden
+      ="history.length >= 2 && edge[0] == history[0] && edge[1] == history[1]"
+    :bHidden
+      ="history.length >= 2 && edge[0] == history[1] && edge[1] == history[0]"
+    :arrow="edge.toString() == [hole, tail].sort().toString()"
   />
   <Arrow
     v-for="edge in SimpleGraph.edges(this.graph)"
