@@ -111,6 +111,26 @@ export default {
 
       return [this.history[0], this.history[1]]
     },
+    aArrowEdge() {
+      return [this.hole, this.tail].toString()
+    },
+    bArrowEdge() {
+      return [this.tail, this.hole].toString()
+    },
+    aOldArrowEdge() {
+      return [this.beadStarts[0], this.hole].toString()
+    },
+    bOldArrowEdge() {
+      return [this.hole, this.beadStarts[0]].toString()
+    },
+    aHiddenEdge() {
+      return this.history.length >= 2 ?
+        [this.history[0], this.history[1]].toString() : null
+    },
+    bHiddenEdge() {
+      return this.history.length >= 2 ?
+        [this.history[1], this.history[0]].toString() : null
+    },
     truncatedEdgeString() {
       return this.truncatedEdge ? this.truncatedEdge.toSorted().toString() :
         null
@@ -323,11 +343,9 @@ export default {
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
     :gap="28"
-    :aHidden
-      ="history.length >= 2 && edge[0] == history[0] && edge[1] == history[1]"
-    :bHidden
-      ="history.length >= 2 && edge[0] == history[1] && edge[1] == history[0]"
-    :arrow="edge.toString() == [hole, tail].sort().toString()"
+    :aHidden="edge == aHiddenEdge"
+    :bHidden="edge == bHiddenEdge"
+    :arrow="edge == aArrowEdge || edge == bArrowEdge"
   />
   <Arrow
     v-for="edge in SimpleGraph.edges(this.graph)"
@@ -335,10 +353,10 @@ export default {
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
-    :aArrow="edge[0] == hole && edge[1] == tail"
-    :bArrow="edge[0] == tail && edge[1] == hole"
-    :aOldArrow="edge[0] == beadStarts[0] && edge[1] == hole"
-    :bOldArrow="edge[0] == hole && edge[1] == beadStarts[0]"
+    :aArrow="edge == aArrowEdge"
+    :bArrow="edge == bArrowEdge"
+    :aOldArrow="edge == aOldArrowEdge"
+    :bOldArrow="edge == bOldArrowEdge"
     :suppressOldArrow="tail >= 0"
   />
   <!-- including bead.b in the key allows the slide animation to play again
