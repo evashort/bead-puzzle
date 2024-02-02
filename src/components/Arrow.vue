@@ -113,6 +113,10 @@ visibility = aArrow || bArrow
   stroke-dashoffset: 100%;
 }
 
+.tail.aDisappear, .tail.bDisappear {
+  visibility: hidden;
+}
+
 .canAnimate .tail.aDisappear {
   animation: aDisappear 0.45s;
 }

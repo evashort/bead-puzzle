@@ -1,24 +1,30 @@
 <script>
 export default {
+  data() {
+    return {
+      aDelay: this.a.delay,
+      bDelay: this.b.delay,
+    }
+  },
   props: {
     path: String,
     length: Number,
     onPath: Boolean,
     gap: Number,
-    aHidden: Boolean,
-    bHidden: Boolean,
+    a: { hidden: Boolean, delay: Boolean },
+    b: { hidden: Boolean, delay: Boolean },
     arrow: Boolean,
   },
   computed: {
     dashArray() {
       let dash = 4, space = 12
-      if (!this.aHidden && !this.bHidden) {
+      if (!this.a.hidden && !this.b.hidden) {
         return [dash, space].join(' ')
       }
 
       let dashCount = Math.floor((this.length - this.gap) / (dash + space))
       let result = null
-      if (this.aHidden) {
+      if (this.a.hidden) {
         let overlap = this.gap % (dash + space)
         if (overlap < dash) {
           result = [0, this.gap, dash - overlap, space]
@@ -28,7 +34,7 @@ export default {
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
         }
-      } else if (this.bHidden) {
+      } else if (this.b.hidden) {
         result = []
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
@@ -42,6 +48,18 @@ export default {
       return result.join(' ')
     }
   },
+  watch: {
+    a(newA, oldA) {
+      if (newA.hidden != oldA.hidden) {
+        this.aDelay = newA.delay
+      }
+    },
+    b(newB, oldB) {
+      if (newB.hidden != oldB.hidden) {
+        this.bDelay = newB.delay
+      }
+    },
+  },
 }
 </script>
 
@@ -50,8 +68,10 @@ export default {
     :class="{
       edge: true,
       onPath: onPath,
-      aHidden: aHidden && !arrow,
-      bHidden: bHidden && !arrow,
+      aHidden: a.hidden && !arrow,
+      bHidden: b.hidden && !arrow,
+      aDelay: aDelay,
+      bDelay: bDelay,
     }"
     :d="path"
     :pathLength="length"
@@ -88,19 +108,19 @@ export default {
   stroke-dasharray: var(--non-gap) 100%;
 }
 
-.canAnimate .edge.aAnimate.aHidden {
+.canAnimate .edge.aHidden.aDelay {
   animation: hideStart 0.45s ease 0.3s backwards;
 }
 
-.canAnimate .edge.aAnimate.onPath {
+.canAnimate .edge.bDelay {
   animation: revealStart 0.45s ease 0.3s backwards;
 }
 
-.canAnimate .edge.bAnimate.bHidden {
+.canAnimate .edge.bHidden.bDelay {
   animation: hideEnd 0.45s ease 0.3s backwards;
 }
 
-.canAnimate .edge.bAnimate.onPath {
+.canAnimate .edge.bDelay {
   animation: revealEnd 0.45s ease 0.3s backwards;
 }
 

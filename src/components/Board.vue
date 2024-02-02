@@ -343,8 +343,14 @@ export default {
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge.toString()] ?? false"
     :gap="28"
-    :aHidden="edge == aHiddenEdge"
-    :bHidden="edge == bHiddenEdge"
+    :a="{
+      hidden: edge == aHiddenEdge,
+      delay: edge == aHiddenEdge ? this.beadStarts[0] == edge[0] : false
+    }"
+    :b="{
+      hidden: edge == bHiddenEdge,
+      delay: edge == bHiddenEdge ? this.beadStarts[0] == edge[1] : false
+    }"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
   />
   <Arrow
