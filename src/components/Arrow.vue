@@ -75,8 +75,8 @@ visibility = aArrow || bArrow
       tail: true,
       aShown: aShown,
       bShown: bShown,
-      aDisappear: aOldArrow,
-      bDisappear: bOldArrow,
+      aDisappear: aOldArrow && !bShown,
+      bDisappear: bOldArrow && !aShown,
     }"
     :d="path"
     :pathLength="length"
@@ -101,10 +101,6 @@ visibility = aArrow || bArrow
   transition: d 0.5s;
 }
 
-.tail.aDisappear, .tail.bDisappear {
-  visibility: hidden;
-}
-
 .tail.aShown {
   visibility: initial;
   stroke-dasharray: var(--dash-length) 100%;
@@ -115,6 +111,10 @@ visibility = aArrow || bArrow
   visibility: initial;
   stroke-dasharray: 100% var(--non-dash-length) var(--dash-length) 100%;
   stroke-dashoffset: 100%;
+}
+
+.tail.aDisappear, .tail.bDisappear {
+  visibility: hidden;
 }
 
 .canAnimate .tail.aDisappear {

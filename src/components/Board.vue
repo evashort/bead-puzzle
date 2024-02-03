@@ -1,7 +1,7 @@
 <script setup>
 import Arrow from './Arrow.vue'
 import Edge from './Edge.vue'
-import { HiddenEnd } from '../HiddenEnd'
+import { Visibility } from '../Visibility'
 import Bead from './Bead.vue'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
@@ -75,42 +75,6 @@ export default {
 
       return result
     },
-    oldTruncatedEdge() {
-      if (this.history.length < 3) {
-        return null
-      } else if (this.beadStarts[0] == this.history[1]) {
-        return [this.history[1], this.history[2]]
-      } else if (this.beadStarts[0] == this.history[this.history.length - 2]) {
-        return [
-          this.history[this.history.length - 2],
-          this.history[this.history.length - 3],
-        ]
-      } else {
-        return null
-      }
-    },
-    oldTruncatedEdgeString() {
-      return this.oldTruncatedEdge ?
-        this.oldTruncatedEdge.toSorted().toString() : null
-    },
-    truncatedEdge() {
-      if (
-        this.history.length < 2 ||
-        (this.hasLoop && this.tail == this.history[1])
-      ) {
-        return null
-      }
-
-      // let start = this.history.lastIndexOf(
-      //   this.altHistory[this.altHistory.length - 1],
-      //   -2,
-      // )
-      // if (start >= 0) {
-      //   return [this.history[start], this.history[start + 1]]
-      // }
-
-      return [this.history[0], this.history[1]]
-    },
     aArrowEdge() {
       return [this.hole, this.tail].toString()
     },
@@ -130,10 +94,6 @@ export default {
     bHiddenEdge() {
       return this.history.length >= 2 ?
         [this.history[1], this.history[0]].toString() : null
-    },
-    truncatedEdgeString() {
-      return this.truncatedEdge ? this.truncatedEdge.toSorted().toString() :
-        null
     },
     hole() {
       return Permute.findZero(this.beads)
@@ -300,20 +260,9 @@ export default {
     swapIf(condition, a, b) {
       return condition ? [b, a] : [a, b]
     },
-    getHiddenEnd(edge) {
-      if (edge.toString() == this.truncatedEdgeString) {
-        let delay = this.beadStarts[0] == this.truncatedEdge[0]
-        let bHidden = this.truncatedEdge[1] < this.truncatedEdge[0]
-        return bHidden ? (delay ? HiddenEnd.DelayB : HiddenEnd.B) :
-          (delay ? HiddenEnd.DelayA : HiddenEnd.A)
-      }
-
-      if (edge.toString() == this.oldTruncatedEdgeString) {
-        let bHidden = this.oldTruncatedEdge[1] < this.oldTruncatedEdge[0]
-        return bHidden ? HiddenEnd.DelayNone : HiddenEnd.DelayNone
-      }
-
-      return HiddenEnd.None
+    toVisibility(hidden, delay) {
+      return hidden ? (delay ? Visibility.DelayHidden : Visibility.Hidden) :
+        (delay ? Visibility.DelayShown : Visibility.Shown)
     },
   },
   watch: {
@@ -337,28 +286,30 @@ export default {
 
 <template>
   <Edge
-    v-for="edge in SimpleGraph.edges(this.graph)"
+    v-for="edge in SimpleGraph.edges(graph)"
     :key="edge.toString()"
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
-    :onPath="activeEdges[edge.toString()] ?? false"
+    :onPath="activeEdges[edge] ?? false"
     :gap="28"
-    :a="{
-      hidden: edge == aHiddenEdge,
-      delay: edge == aHiddenEdge ? this.beadStarts[0] == edge[0] : false
-    }"
-    :b="{
-      hidden: edge == bHiddenEdge,
-      delay: edge == bHiddenEdge ? this.beadStarts[0] == edge[1] : false
-    }"
+    :a="toVisibility(
+      edge == aHiddenEdge,
+      edge == aHiddenEdge ? beadStarts[0] == edge[0] :
+        beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
+    )"
+    :b="toVisibility(
+      edge == bHiddenEdge,
+      edge == bHiddenEdge ? beadStarts[0] == edge[1] :
+        beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
+    )"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
   />
   <Arrow
-    v-for="edge in SimpleGraph.edges(this.graph)"
+    v-for="edge in SimpleGraph.edges(graph)"
     :key="edge.toString()"
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
-    :onPath="activeEdges[edge.toString()] ?? false"
+    :onPath="activeEdges[edge] ?? false"
     :aArrow="edge == aArrowEdge"
     :bArrow="edge == bArrowEdge"
     :aOldArrow="edge == aOldArrowEdge"

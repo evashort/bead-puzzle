@@ -1,3 +1,7 @@
+<script setup>
+import { Visibility } from '../Visibility'
+</script>
+
 <script>
 export default {
   data() {
@@ -11,20 +15,20 @@ export default {
     length: Number,
     onPath: Boolean,
     gap: Number,
-    a: { hidden: Boolean, delay: Boolean },
-    b: { hidden: Boolean, delay: Boolean },
+    a: Visibility,
+    b: Visibility,
     arrow: Boolean,
   },
   computed: {
     dashArray() {
       let dash = 4, space = 12
-      if (!this.a.hidden && !this.b.hidden) {
+      if (!this.aHidden && !this.bHidden) {
         return [dash, space].join(' ')
       }
 
       let dashCount = Math.floor((this.length - this.gap) / (dash + space))
       let result = null
-      if (this.a.hidden) {
+      if (this.aHidden) {
         let overlap = this.gap % (dash + space)
         if (overlap < dash) {
           result = [0, this.gap, dash - overlap, space]
@@ -34,7 +38,7 @@ export default {
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
         }
-      } else if (this.b.hidden) {
+      } else if (this.bHidden) {
         result = []
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
@@ -46,17 +50,35 @@ export default {
       }
 
       return result.join(' ')
-    }
+    },
+    aHidden() {
+      return this.hidden(this.a)
+    },
+    bHidden() {
+      return this.hidden(this.b)
+    },
+  },
+  methods: {
+    hidden(visibility) {
+      return visibility == Visibility.Hidden ||
+        visibility == Visibility.DelayHidden
+    },
+    delay(visibility) {
+      return visibility == Visibility.DelayHidden ||
+        visibility == Visibility.DelayShown
+    },
   },
   watch: {
     a(newA, oldA) {
-      if (newA.hidden != oldA.hidden) {
-        this.aDelay = newA.delay
+      if (this.hidden(newA) != this.hidden(oldA)) {
+        this.aDelay = this.delay(newA)
+        this.bDelay &&= !this.aDelay
       }
     },
     b(newB, oldB) {
-      if (newB.hidden != oldB.hidden) {
-        this.bDelay = newB.delay
+      if (this.hidden(newB) != this.hidden(oldB)) {
+        this.bDelay = this.delay(newB)
+        this.aDelay &&= !this.bDelay
       }
     },
   },
@@ -68,8 +90,8 @@ export default {
     :class="{
       edge: true,
       onPath: onPath,
-      aHidden: a.hidden && !arrow,
-      bHidden: b.hidden && !arrow,
+      aHidden: aHidden && !arrow,
+      bHidden: bHidden && !arrow,
       aDelay: aDelay,
       bDelay: bDelay,
     }"
@@ -112,7 +134,7 @@ export default {
   animation: hideStart 0.45s ease 0.3s backwards;
 }
 
-.canAnimate .edge.bDelay {
+.canAnimate .edge.aDelay {
   animation: revealStart 0.45s ease 0.3s backwards;
 }
 
