@@ -95,6 +95,20 @@ export default {
       return this.history.length >= 2 ?
         [this.history[1], this.history[0]].toString() : null
     },
+    altHiddenEdge() {
+      let start = this.history.lastIndexOf(
+        this.altHistory[this.altHistory.length - 1],
+        -2,
+      )
+      return start >= 1 ? [this.history[start], this.history[start + 1]] : null
+    },
+    aAltHiddenEdge() {
+      return this.altHiddenEdge ? this.altHiddenEdge.toString() : null
+    },
+    bAltHiddenEdge() {
+      return this.altHiddenEdge ? this.altHiddenEdge.toReversed().toString() :
+        null
+    },
     hole() {
       return Permute.findZero(this.beads)
     },
@@ -293,12 +307,12 @@ export default {
     :onPath="activeEdges[edge] ?? false"
     :gap="28"
     :a="toVisibility(
-      edge == aHiddenEdge,
+      edge == aHiddenEdge || edge == aAltHiddenEdge,
       edge == aHiddenEdge ? beadStarts[0] == edge[0] :
         beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
     )"
     :b="toVisibility(
-      edge == bHiddenEdge,
+      edge == bHiddenEdge || edge == bAltHiddenEdge,
       edge == bHiddenEdge ? beadStarts[0] == edge[1] :
         beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
