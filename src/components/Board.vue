@@ -109,6 +109,19 @@ export default {
       return this.altHiddenEdge ? this.altHiddenEdge.toReversed().toString() :
         null
     },
+    endEdge() {
+      return this.extra.length >= 1 + (this.tail >= 0) ? [
+        this.altHistory[this.altHistory.length - 1],
+        this.altHistory[this.altHistory.length - 2],
+      ] : null
+    },
+    aEndEdge() {
+      return this.endEdge ? this.endEdge.toString() : null
+    },
+    bEndEdge() {
+      return this.endEdge ? this.endEdge.toReversed().toString() :
+        null
+    },
     hole() {
       return Permute.findZero(this.beads)
     },
@@ -307,17 +320,16 @@ export default {
     :onPath="activeEdges[edge] ?? false"
     :gap="28"
     :a="toVisibility(
-      edge == aHiddenEdge,
+      edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
       edge == aHiddenEdge ? beadStarts[0] == edge[0] :
         beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
     )"
     :b="toVisibility(
-      edge == bHiddenEdge,
+      edge == bHiddenEdge || edge == bAltHiddenEdge || edge == bEndEdge,
       edge == bHiddenEdge ? beadStarts[0] == edge[1] :
         beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
-    :aMasked="edge == aAltHiddenEdge"
-    :bMasked="edge == bAltHiddenEdge"
+    :masked="edge == aAltHiddenEdge || edge == bAltHiddenEdge"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
   />
   <Arrow

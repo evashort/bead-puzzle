@@ -17,15 +17,14 @@ export default {
     gap: Number,
     a: Visibility,
     b: Visibility,
-    aMasked: Boolean,
-    bMasked: Boolean,
+    masked: Boolean,
     arrow: Boolean,
   },
   computed: {
     dashArray() {
       let dash = 4, space = 12
       let result = null
-      if (this.aHidden) {
+      if (this.aHidden && !this.masked) {
         let overlap = this.gap % (dash + space)
         if (overlap < dash) {
           result = [0, this.gap, dash - overlap, space]
@@ -37,7 +36,7 @@ export default {
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
         }
-      } else if (this.bHidden) {
+      } else if (this.bHidden && !this.masked) {
         result = []
         let dashCount = Math.floor((this.length - this.gap) / (dash + space))
         for (; dashCount > 0; dashCount--) {
@@ -47,7 +46,7 @@ export default {
         let extra = (this.length - this.gap) % (dash + space)
         result.push(Math.min(dash, extra))
         result.push('100%')
-      } else if (this.aMasked) {
+      } else if (this.aHidden) {
         result = []
         let dashCount = Math.floor(this.gap / (dash + space))
         for (; dashCount > 0; dashCount--) {
@@ -60,7 +59,7 @@ export default {
         }
 
         result.push('100%')
-      } else if (this.bMasked) {
+      } else if (this.bHidden) {
         let overlap = (this.length - this.gap) % (dash + space)
         let extra = Math.min(dash - overlap, 0)
         result = [this.length - this.gap + extra, space + extra]
@@ -114,7 +113,7 @@ export default {
     :class="{
       edge: true,
       onPath: onPath,
-      masked: aMasked || bMasked,
+      masked: masked,
       aHidden: aHidden && !arrow,
       bHidden: bHidden && !arrow,
       aDelay: aDelay,
@@ -147,16 +146,16 @@ export default {
   stroke-dasharray: none;
 }
 
-.edge.masked {
-  stroke-dasharray: var(--dash-array);
-}
-
 .edge.onPath.aHidden {
   stroke-dasharray: 0 var(--gap) 100%;
 }
 
 .edge.onPath.bHidden {
   stroke-dasharray: var(--non-gap) 100%;
+}
+
+.edge.onPath.masked {
+  stroke-dasharray: var(--dash-array);
 }
 
 .canAnimate .edge.aHidden.aDelay {
