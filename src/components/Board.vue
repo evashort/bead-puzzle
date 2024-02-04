@@ -307,15 +307,17 @@ export default {
     :onPath="activeEdges[edge] ?? false"
     :gap="28"
     :a="toVisibility(
-      edge == aHiddenEdge || edge == aAltHiddenEdge,
+      edge == aHiddenEdge,
       edge == aHiddenEdge ? beadStarts[0] == edge[0] :
         beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
     )"
     :b="toVisibility(
-      edge == bHiddenEdge || edge == bAltHiddenEdge,
+      edge == bHiddenEdge,
       edge == bHiddenEdge ? beadStarts[0] == edge[1] :
         beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
+    :aMasked="edge == aAltHiddenEdge"
+    :bMasked="edge == bAltHiddenEdge"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
   />
   <Arrow

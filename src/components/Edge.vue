@@ -17,16 +17,13 @@ export default {
     gap: Number,
     a: Visibility,
     b: Visibility,
+    aMasked: Boolean,
+    bMasked: Boolean,
     arrow: Boolean,
   },
   computed: {
     dashArray() {
       let dash = 4, space = 12
-      if (!this.aHidden && !this.bHidden) {
-        return [dash, space].join(' ')
-      }
-
-      let dashCount = Math.floor((this.length - this.gap) / (dash + space))
       let result = null
       if (this.aHidden) {
         let overlap = this.gap % (dash + space)
@@ -35,11 +32,14 @@ export default {
         } else {
           result = [0, this.gap + dash + space - overlap]
         }
+
+        let dashCount = Math.floor((this.length - this.gap) / (dash + space))
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
         }
       } else if (this.bHidden) {
         result = []
+        let dashCount = Math.floor((this.length - this.gap) / (dash + space))
         for (; dashCount > 0; dashCount--) {
           result.push(dash, space)
         }
@@ -47,6 +47,30 @@ export default {
         let extra = (this.length - this.gap) % (dash + space)
         result.push(Math.min(dash, extra))
         result.push('100%')
+      } else if (this.aMasked) {
+        result = []
+        let dashCount = Math.floor(this.gap / (dash + space))
+        for (; dashCount > 0; dashCount--) {
+          result.push(dash, space)
+        }
+
+        let extra = this.gap % (dash + space)
+        if (extra > dash) {
+          result.push(dash, extra - dash)
+        }
+
+        result.push('100%')
+      } else if (this.bMasked) {
+        let overlap = (this.length - this.gap) % (dash + space)
+        let extra = Math.min(dash - overlap, 0)
+        result = [this.length - this.gap + extra, space + extra]
+        let dashCount = Math.floor(this.length / (dash + space)) -
+          Math.floor((this.length - this.gap) / (dash + space))
+        for (; dashCount > 0; dashCount--) {
+          result.push(dash, space)
+        }
+      } else {
+        result = [dash, space]
       }
 
       return result.join(' ')
@@ -90,6 +114,7 @@ export default {
     :class="{
       edge: true,
       onPath: onPath,
+      masked: aMasked || bMasked,
       aHidden: aHidden && !arrow,
       bHidden: bHidden && !arrow,
       aDelay: aDelay,
@@ -120,6 +145,10 @@ export default {
 
 .edge.onPath {
   stroke-dasharray: none;
+}
+
+.edge.masked {
+  stroke-dasharray: var(--dash-array);
 }
 
 .edge.onPath.aHidden {
