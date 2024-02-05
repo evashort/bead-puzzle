@@ -291,6 +291,34 @@ export default {
       return hidden ? (delay ? Visibility.DelayHidden : Visibility.Hidden) :
         (delay ? Visibility.DelayShown : Visibility.Shown)
     },
+    getOppositeEdge(a, b) {
+      let primes = this.edgePrimes[this.sortedPair(a, b)]
+      if (primes) {
+        let c = primes[a < b ? 1 : 0]
+        if (c != b) {
+          return c
+        }
+      }
+
+      let bestC = a
+      let bestDistance = 0
+      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
+        let distance = this.getAngleDistance(a, b, c)
+        if (distance > bestDistance) {
+          bestC = c
+          bestDistance = distance
+        }
+      }
+
+      return bestC
+    },
+    getAngleDistance(a, b, c) {
+      // distance from a to c around the perimeter of the circle without
+      // passing b
+      let aToC = (c - a + this.size) % this.size
+      let aToB = (b - a + this.size) % this.size
+      return aToB < aToC ? this.size - aToC : aToC
+    },
   },
   watch: {
     beads(newBeads, oldBeads) {
@@ -331,6 +359,7 @@ export default {
     )"
     :masked="edge == aAltHiddenEdge || edge == bAltHiddenEdge"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
+    :highlight="edge == [hole, getOppositeEdge(tail, hole)].sort().toString()"
   />
   <Arrow
     v-for="edge in SimpleGraph.edges(graph)"
