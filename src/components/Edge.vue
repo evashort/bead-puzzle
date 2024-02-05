@@ -105,6 +105,12 @@ export default {
         this.aDelay &&= !this.bDelay
       }
     },
+    arrow(newArrow, oldArrow) {
+      if (newArrow) {
+        this.aDelay = false
+        this.bDelay = false
+      }
+    },
   },
 }
 </script>
