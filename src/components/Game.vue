@@ -491,29 +491,22 @@ export default {
         return history[1]
       }
 
-      // second choice: new tail creates the longest possible loop
-      let oldHole = history[end - 1]
-      let longest = history.indexOf(history[0], 1) >= 0 ? 1 : 0
-      for (let i = longest; i < end - 1; i++) {
-        let tail = history[i]
-        if (
-          tail != oldHole && // going back shouldn't be the default.
-                             // happens when old hole is start of loop.
-          SimpleGraph.hasEdge(this.graph, hole, tail)
-        ) { return tail }
+      // second choice: keep going as straight as possible
+      if (end >= 1) {
+        let oldHole = history[end - 1]
+        return this.getIngress(hole, oldHole)
       }
 
       // third choice: iterate clockwise and choose the first edge
-      for (let i = 1; i < this.size; i++) {
-        let tail = (hole + i) % this.size
-        if (
-          tail != oldHole && // going back shouldn't be the default
-          SimpleGraph.hasEdge(this.graph, hole, tail)
-        ) { return tail }
+      for (let tail of SimpleGraph.nodeEdges(this.graph, hole)) {
+        if (tail > hole) {
+          return tail
+        }
       }
 
-      // fourth choice: go back (dead end)
-      return oldHole
+      for (let tail of SimpleGraph.nodeEdges(this.graph, hole)) {
+        return tail
+      }
     },
     goBack() {
       if (this.history.length >= 2) {
@@ -694,28 +687,26 @@ export default {
       this.spinButtonClicked = false
       this.smallSpinButtonClicked = false
     },
-    getIngress(center, egress) {
-      let result = egress
-      // calculations are easier with center = 0
-      egress = (egress + this.size - center) % this.size
-      // the entrance should be as close to 180 degrees from the exit as possible
-      let nearSide = 2 * egress >= this.size ? 1 : -1
-      for (let distance = 1; distance < this.size - 1; distance++) {
-        // try near side first so it can be overridden by far side which is better
-        for (let side = nearSide; Math.abs(side) == 1; side -= 2 * nearSide) {
-          let ingress = egress + distance * side
-          if (ingress > 0 && ingress < this.size) {
-            // use real center for graph check
-            let id = (ingress + center) % this.size
-            if (SimpleGraph.hasEdge(this.graph, center, id)) {
-              result = id
-            }
-          }
+    getIngress(b, a) {
+      let bestC = a
+      let bestDistance = 0
+      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
+        let distance = this.getAngleDistance(a, b, c)
+        if (distance > bestDistance) {
+          bestC = c
+          bestDistance = distance
         }
       }
 
-      return result
-    }
+      return bestC
+    },
+    getAngleDistance(a, b, c) {
+      // distance from a to c around the perimeter of the circle without
+      // passing b
+      let aToC = (c - a + this.size) % this.size
+      let aToB = (b - a + this.size) % this.size
+      return aToB < aToC ? this.size - aToC : aToC
+    },
   },
   watch: {
     state: {
