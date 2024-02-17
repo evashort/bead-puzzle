@@ -302,9 +302,17 @@ export default {
 
       let bestC = a
       let bestDistance = 0
+      // among the c with the highest distance, choose the lowest one greater
+      // than b or the lowest one if none are greater than b. we do it this way
+      // so that when this function is used to choose the next tail after a
+      // move, the player can press the right arrow key to cycle through all
+      // the edges without wrapping around to the other side of b.
       for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
         let distance = this.getAngleDistance(a, b, c)
-        if (distance > bestDistance) {
+        if (
+          distance == bestDistance ? (c > b) > (bestC > b) :
+          distance > bestDistance
+        ) {
           bestC = c
           bestDistance = distance
         }
