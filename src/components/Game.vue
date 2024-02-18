@@ -492,21 +492,8 @@ export default {
       }
 
       // second choice: keep going as straight as possible
-      if (end >= 1) {
-        let oldHole = history[end - 1]
-        return this.getIngress(hole, oldHole)
-      }
-
-      // third choice: iterate clockwise and choose the first edge
-      for (let tail of SimpleGraph.nodeEdges(this.graph, hole)) {
-        if (tail > hole) {
-          return tail
-        }
-      }
-
-      for (let tail of SimpleGraph.nodeEdges(this.graph, hole)) {
-        return tail
-      }
+      let oldHole = history[end - 1]
+      return this.getIngress(hole, oldHole)
     },
     goBack() {
       if (this.history.length >= 2) {
@@ -689,7 +676,7 @@ export default {
     },
     getIngress(b, a) {
       let bestC = a
-      let bestDistance = 0
+      let bestDistance = -Infinity
       // among the c with the highest distance, choose the lowest one greater
       // than b or the lowest one if none are greater than b. we do it this way
       // so that when this function is used to choose the next tail after a
@@ -709,11 +696,17 @@ export default {
       return bestC
     },
     getAngleDistance(a, b, c) {
-      // distance from a to c around the perimeter of the circle without
-      // passing b
-      let aToC = (c - a + this.size) % this.size
-      let aToB = (b - a + this.size) % this.size
-      return aToB < aToC ? this.size - aToC : aToC
+      if (a >= 0) {
+        // distance from a to c around the perimeter of the circle without
+        // passing b
+        let aToC = (c - a + this.size) % this.size
+        let aToB = (b - a + this.size) % this.size
+        return aToB < aToC ? this.size - aToC : aToC
+      } else {
+        // so that getOppositeEdge returns the first c greater than b when a is
+        // null, see comment in getOppositeEdge
+        return -1
+      }
     },
   },
   watch: {
