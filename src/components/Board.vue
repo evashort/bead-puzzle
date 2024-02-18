@@ -219,6 +219,16 @@ export default {
 
       return result
     },
+    trophyIngress() {
+      if (this.hasLoop) {
+        return this.history[1]
+      } else {
+        return this.getOppositeEdge(
+          this.history[this.history.length - 2],
+          this.hole,
+        )
+      }
+    },
     hasLoop() {
       return this.history.length >= 2 &&
         this.history[0] == this.history[this.history.length - 1]
@@ -227,12 +237,6 @@ export default {
       return this.tail >= 0 && (
         this.history.length <= 1 ||
         this.tail != this.history[this.history.length - 2]
-      )
-    },
-    trophyIngress() {
-      return this.getOppositeEdge(
-        this.history[this.history.length - 2],
-        this.hole,
       )
     },
   },
