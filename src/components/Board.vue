@@ -227,17 +227,15 @@ export default {
       }
     },
     trophyPushed() {
-      if (
-        (
-          this.history.length >= 2 &&
-          this.tail == this.history[this.history.length - 2]
-        ) || (this.history.length <= 1 && this.tail >= 0)
-      ) {
+      if (this.history.length <= 1) {
+        return this.getOppositeEdge(
+          this.tail >= 0 ? this.tail : this.trophyIngress,
+          this.hole,
+        )
+      } else if (this.tail >= 0 && !this.hasForwardTail) {
         return this.getOppositeEdge(this.tail, this.hole)
-      } else if (this.tail >= 0 || this.history.length >= 1) {
-        return this.history[this.history.length - 2]
       } else {
-        return this.getOppositeEdge(this.trophyIngress, this.hole)
+        return this.beadStarts[0]
       }
     },
     hasLoop() {
