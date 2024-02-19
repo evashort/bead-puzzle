@@ -223,10 +223,7 @@ export default {
       if (this.hasLoop) {
         return this.history[1]
       } else {
-        return this.getOppositeEdge(
-          this.history[this.history.length - 2],
-          this.hole,
-        )
+        return this.getOppositeEdge(this.beadStarts[0], this.hole)
       }
     },
     hasLoop() {
@@ -323,15 +320,15 @@ export default {
       return bestC
     },
     getAngleDistance(a, b, c) {
-      if (a >= 0) {
+      if (a >= 0 && a != b) {
         // distance from a to c around the perimeter of the circle without
         // passing b
         let aToC = (c - a + this.size) % this.size
         let aToB = (b - a + this.size) % this.size
         return aToB < aToC ? this.size - aToC : aToC
       } else {
-        // so that getOppositeEdge returns the first c greater than b when a is
-        // null, see comment in getOppositeEdge
+        // so that getOppositeEdge returns the first c greater than b when a
+        // is null, see comment in getOppositeEdge
         return -1
       }
     },
