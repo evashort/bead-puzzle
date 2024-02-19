@@ -226,6 +226,20 @@ export default {
         return this.getOppositeEdge(this.beadStarts[0], this.hole)
       }
     },
+    trophyPushed() {
+      if (
+        (
+          this.history.length >= 2 &&
+          this.tail == this.history[this.history.length - 2]
+        ) || (this.history.length <= 1 && this.tail >= 0)
+      ) {
+        return this.getOppositeEdge(this.tail, this.hole)
+      } else if (this.tail >= 0 || this.history.length >= 1) {
+        return this.history[this.history.length - 2]
+      } else {
+        return this.getOppositeEdge(this.trophyIngress, this.hole)
+      }
+    },
     hasLoop() {
       return this.history.length >= 2 &&
         this.history[0] == this.history[this.history.length - 1]
@@ -372,7 +386,8 @@ export default {
     )"
     :masked="edge == aAltHiddenEdge || edge == bAltHiddenEdge"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
-    :highlight="edge == [hole, trophyIngress].toSorted().toString()"
+    :highlight="edge == [hole, trophyIngress].toSorted().toString() || edge == [hole, trophyPushed].toSorted().toString()"
+    
   />
   <Arrow
     v-for="edge in SimpleGraph.edges(graph)"
