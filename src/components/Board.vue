@@ -102,7 +102,12 @@ export default {
       let [tx4, ty4] = this.getTangent(x3 - x2, y3 - y2, x5 - x3, y5 - y3, l)
       let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
       let cx4 = x3 + tx4, cy4 = y3 + ty4, cx5 = x5 - tx5, cy5 = y5 - ty5
-      return `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}C${cx4} ${cy4},${cx5} ${cy5},${x5} ${y5}`
+      let endLength = this.getBezierLength(x1, y1, cx1, cy1, cx2, cy2, x3, y3)
+      console.log(endLength)
+      return {
+        d: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}C${cx4} ${cy4},${cx5} ${cy5},${x5} ${y5}`,
+        length: endLength,
+      }
     },
     aArrowEdge() {
       return [this.hole, this.tail].toString()
@@ -282,15 +287,31 @@ export default {
         b < a ? this.edgePrimes[[b, a]]?.toReversed() : this.edgePrimes[[a, b]]
       ) ?? [a, b]
     },
-    getBezierLength(ax, ay, bx, by, cx, cy, dx, dy) {
-      let b1x = 0.5 * (ax + bx)
-      let bcx = 0.5 * (bx + cx)
-      let c2x = 0.5 * (cx + dx)
-      let c1x = 0.5 * (b1x + bcx)
-      let b2x = 0.5 * (bcx + c2x)
+    getBezierLength(ax, ay, bx, by, cx, cy, dx, dy, error=0.1) {
+      let abLength = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay))
+      let bcLength = Math.sqrt((cx - dx) * (cx - dx) + (cy - dy) * (cy - dy))
+      let cdLength = Math.sqrt((dx - cx) * (dx - cx) + (dy - cy) * (dy - cy))
+      let lowerBound = Math.sqrt((dx - ax) * (dx - ax) + (dy - ay) * (dy - ay))
+      let upperBound = abLength + bcLength + cdLength
+      if (upperBound - lowerBound < error) {
+        // overestimate so the trophy rests after the bend when not pushed, so
+        // it doesn't snap rotate when pushed forward
+        return upperBound
+      }
+
+      let b1x = 0.5 * (ax + bx), bcx = 0.5 * (bx + cx), c2x = 0.5 * (cx + dx)
+      let c1x = 0.5 * (b1x + bcx), b2x = 0.5 * (bcx + c2x)
       let d1a2x = 0.5 * (c1x + b2x)
-      // a, b1, c1, d1a2
-      // d1a2, b2, c2, d
+      let b1y = 0.5 * (ay + by), bcy = 0.5 * (by + cy), c2y = 0.5 * (cy + dy)
+      let c1y = 0.5 * (b1y + bcy), b2y = 0.5 * (bcy + c2y)
+      let d1a2y = 0.5 * (c1y + b2y)
+      let l1 = this.getBezierLength(
+        ax, ay, b1x, b1y, c2x, c1y, d1a2x, d1a2y, 1 * error
+      )
+      let l2 = this.getBezierLength(
+        d1a2x, d1a2y, b2x, b2y, c2x, c2y, dx, dy, 1 * error
+      )
+      return l1 + l2
     },
     getOnlyPath(a, b) {
       let result = -1
@@ -437,5 +458,6 @@ export default {
     :bead="i"
     :selected="bead.b == tail"
   />
-  <path :d="trophyPath" fill="none" stroke="red"/>
+  <path :d="trophyPath.d" fill="none" stroke="red"/>
+  <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyPath.length}px`}"/>
 </template>
