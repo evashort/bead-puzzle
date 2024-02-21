@@ -282,6 +282,16 @@ export default {
         b < a ? this.edgePrimes[[b, a]]?.toReversed() : this.edgePrimes[[a, b]]
       ) ?? [a, b]
     },
+    getBezierLength(ax, ay, bx, by, cx, cy, dx, dy) {
+      let b1x = 0.5 * (ax + bx)
+      let bcx = 0.5 * (bx + cx)
+      let c2x = 0.5 * (cx + dx)
+      let c1x = 0.5 * (b1x + bcx)
+      let b2x = 0.5 * (bcx + c2x)
+      let d1a2x = 0.5 * (c1x + b2x)
+      // a, b1, c1, d1a2
+      // d1a2, b2, c2, d
+    },
     getOnlyPath(a, b) {
       let result = -1
       for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
