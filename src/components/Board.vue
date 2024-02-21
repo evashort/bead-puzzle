@@ -76,24 +76,14 @@ export default {
       return result
     },
     trophyPath() {
-      let end = null, start = null
-      if (this.history.length >= 2) {
-        end = this.history[this.history.length - 2]
-        start = this.hasLoop ? this.history[1] :
-          this.getOppositeEdge(end, this.hole)
-      } else {
-        start = this.getOppositeEdge(this.beadStarts[0], this.hole)
-        end = this.getOppositeEdge(start, this.hole)
-      }
-
-      let [a1Prime, b1Prime] = this.getEdgePrimes(end, this.hole)
-      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, start)
+      let [a1Prime, b1Prime] = this.getEdgePrimes(this.trophyEnd, this.hole)
+      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, this.trophyStart)
       let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
-      let x1 = this.getX(end), y1 = this.getY(end)
+      let x1 = this.getX(this.trophyEnd), y1 = this.getY(this.trophyEnd)
       let x2 = this.getX(a2Prime), y2 = this.getY(a2Prime)
       let x3 = this.getX(this.hole), y3 = this.getY(this.hole)
       let x4 = this.getX(b1Prime), y4 = this.getY(b1Prime)
-      let x5 = this.getX(start), y5 = this.getY(start)
+      let x5 = this.getX(this.trophyStart), y5 = this.getY(this.trophyStart)
       let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let l = this.controlLength
       let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x3 - x1, y3 - y1, l)
@@ -106,6 +96,28 @@ export default {
       return {
         d: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}C${cx4} ${cy4},${cx5} ${cy5},${x5} ${y5}`,
         length: endLength,
+      }
+    },
+    trophyStart() {
+      if (this.history.length >= 2) {
+        return this.hasLoop ? this.history[1] :
+          this.getOppositeEdge(this.history[this.history.length - 2], this.hole)
+      } else {
+        return this.getOppositeEdge(this.beadStarts[0], this.hole)
+      }
+    },
+    trophyEnd() {
+      return this.history.length >= 2 ? this.history[this.history.length - 2] :
+        this.getOppositeEdge(this.trophyStart, this.hole)
+    },
+    trophyOffset() {
+      let pushDistance = 18
+      if (this.tail == this.trophyEnd) {
+        return this.trophyPath.length + pushDistance
+      } else if (this.tail >= 0) {
+        return this.trophyPath.length - pushDistance
+      } else {
+        return this.trophyPath.length
       }
     },
     aArrowEdge() {
@@ -458,5 +470,5 @@ export default {
     :selected="bead.b == tail"
   />
   <path :d="trophyPath.d" fill="none" stroke="red"/>
-  <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyPath.length}px`}"/>
+  <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyOffset}px`}"/>
 </template>
