@@ -470,5 +470,5 @@ export default {
     :selected="bead.b == tail"
   />
   <path :d="trophyPath.d" fill="none" stroke="red"/>
-  <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyOffset}px`}"/>
+  <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyOffset}px`, transition: 'offset-distance 0.75s'}"/>
 </template>
