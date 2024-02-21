@@ -86,13 +86,23 @@ export default {
         end = this.getOppositeEdge(start, this.hole)
       }
 
-      let x0 = this.getX(end), y0 = this.getY(end)
-      let x1 = this.getX(this.hole), y1 = this.getY(this.hole)
-      let x2 = this.getX(start), y2 = this.getY(start)
+      let [a1Prime, b1Prime] = this.getEdgePrimes(end, this.hole)
+      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, start)
+      let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
+      let x1 = this.getX(end), y1 = this.getY(end)
+      let x2 = this.getX(a2Prime), y2 = this.getY(a2Prime)
+      let x3 = this.getX(this.hole), y3 = this.getY(this.hole)
+      let x4 = this.getX(b1Prime), y4 = this.getY(b1Prime)
+      let x5 = this.getX(start), y5 = this.getY(start)
+      let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let l = this.controlLength
-      let [tx, ty] = this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
-      let cx = x1 - tx, cy = y1 - ty
-      return `M${x0} ${y0}C${x0} ${y0},${cx} ${cy},${x1} ${y1}S${x2} ${y2},${x2} ${y2}`
+      let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x3 - x1, y3 - y1, l)
+      let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
+      let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x3 - tx2, cy2 = y3 - ty2
+      let [tx4, ty4] = this.getTangent(x3 - x2, y3 - y2, x5 - x3, y5 - y3, l)
+      let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
+      let cx4 = x3 + tx4, cy4 = y3 + ty4, cx5 = x5 - tx5, cy5 = y5 - ty5
+      return `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}C${cx4} ${cy4},${cx5} ${cy5},${x5} ${y5}`
     },
     aArrowEdge() {
       return [this.hole, this.tail].toString()
@@ -266,6 +276,11 @@ export default {
       let len3 = Math.sqrt(dx3 * dx3 + dy3 * dy3)
       let factor = len3 > 0 ? length / len3 : 0
       return [dx3 * factor, dy3 * factor]
+    },
+    getEdgePrimes(a, b) {
+      return (
+        b < a ? this.edgePrimes[[b, a]]?.toReversed() : this.edgePrimes[[a, b]]
+      ) ?? [a, b]
     },
     getOnlyPath(a, b) {
       let result = -1
