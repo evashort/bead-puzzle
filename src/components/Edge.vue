@@ -19,7 +19,6 @@ export default {
     b: Visibility,
     masked: Boolean,
     arrow: Boolean,
-    highlight: Boolean,
   },
   computed: {
     dashArray() {
@@ -125,7 +124,6 @@ export default {
       bHidden: bHidden && !arrow,
       aDelay: aDelay,
       bDelay: bDelay,
-      highlight: highlight,
     }"
     :d="path"
     :pathLength="length"
@@ -144,10 +142,6 @@ export default {
   stroke-width: 4;
   stroke-linecap: round;
   stroke-dasharray: var(--dash-array);
-}
-
-.edge.highlight {
-  stroke: red;
 }
 
 .canAnimate .edge {

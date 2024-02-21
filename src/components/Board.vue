@@ -75,6 +75,25 @@ export default {
 
       return result
     },
+    trophyPath() {
+      let end = null, start = null
+      if (this.history.length >= 2) {
+        end = this.history[this.history.length - 2]
+        start = this.hasLoop ? this.history[1] :
+          this.getOppositeEdge(end, this.hole)
+      } else {
+        start = this.getOppositeEdge(this.beadStarts[0], this.hole)
+        end = this.getOppositeEdge(start, this.hole)
+      }
+
+      let x0 = this.getX(end), y0 = this.getY(end)
+      let x1 = this.getX(this.hole), y1 = this.getY(this.hole)
+      let x2 = this.getX(start), y2 = this.getY(start)
+      let l = this.controlLength
+      let [tx, ty] = this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
+      let cx = x1 - tx, cy = y1 - ty
+      return `M${x0} ${y0}C${x0} ${y0},${cx} ${cy},${x1} ${y1}S${x2} ${y2},${x2} ${y2}`
+    },
     aArrowEdge() {
       return [this.hole, this.tail].toString()
     },
@@ -218,25 +237,6 @@ export default {
       }
 
       return result
-    },
-    trophyIngress() {
-      if (this.hasLoop) {
-        return this.history[1]
-      } else {
-        return this.getOppositeEdge(this.beadStarts[0], this.hole)
-      }
-    },
-    trophyPushed() {
-      if (this.history.length <= 1) {
-        return this.getOppositeEdge(
-          this.tail >= 0 ? this.tail : this.trophyIngress,
-          this.hole,
-        )
-      } else if (this.tail >= 0 && !this.hasForwardTail) {
-        return this.getOppositeEdge(this.tail, this.hole)
-      } else {
-        return this.beadStarts[0]
-      }
     },
     hasLoop() {
       return this.history.length >= 2 &&
@@ -384,8 +384,6 @@ export default {
     )"
     :masked="edge == aAltHiddenEdge || edge == bAltHiddenEdge"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
-    :highlight="edge == [hole, trophyIngress].toSorted().toString() || edge == [hole, trophyPushed].toSorted().toString()"
-    
   />
   <Arrow
     v-for="edge in SimpleGraph.edges(graph)"
@@ -414,4 +412,5 @@ export default {
     :bead="i"
     :selected="bead.b == tail"
   />
+  <path :d="trophyPath" fill="none" stroke="red"/>
 </template>
