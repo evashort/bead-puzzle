@@ -1,3 +1,7 @@
+<script setup>
+import Bezier from '../Bezier.js'
+</script>
+
 <script>
 export default {
   props: {
@@ -9,11 +13,11 @@ export default {
   },
   computed: {
     x() {
-      return this.points ? this.bezier(this.t, ...this.points.map(p => p.x)) :
+      return this.points ? Bezier.value(...this.points.map(p => p.x), this.t) :
         0
     },
     y() {
-      return this.points ? this.bezier(this.t, ...this.points.map(p => p.y)) :
+      return this.points ? Bezier.value(...this.points.map(p => p.y), this.t) :
         0
     },
     angle() {
@@ -21,8 +25,8 @@ export default {
         return 0
       }
 
-      let dx = this.bezierSlope(this.t, ...this.points.map(p => p.x))
-      let dy = this.bezierSlope(this.t, ...this.points.map(p => p.y))
+      let dx = Bezier.slope(...this.points.map(p => p.x), this.t)
+      let dy = Bezier.slope(...this.points.map(p => p.y), this.t)
       let angle = Math.atan2(dy * this.sign, dx * this.sign)
       if (angle > this.straightAngle + Math.PI) {
         angle -= 2 * Math.PI
@@ -39,42 +43,11 @@ export default {
       )
     },
     t() {
-      // https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B%C3%A9zier_curves
-      // x = A(1-t)^3 + B*3t(1-t)^2 + C*3(1-t)t^2 + D*t^3
-      // A = 0, B = c/l, C = 1 - c/l, D = 1
-      // x = c/l*3t(1-t)^2 + (1-c/l)*3(1-t)t^2 + t^3
-      // c/l = 0: x ~= 1/2 - cos(pi*t)/2
-      // c/l = 1/3: x = t
-      // x = 1/2 - cos(pi*t)/2
-      // cos(pi*t)/2 = 1/2 - x
-      // cos(pi*t) = 1 - 2x
-      // pi*t = acos(1-2x)
-      // t = acos(1-2x)/pi
-      // t = (1 - 3c/l)acos(1-2x)/pi + 3c/l*x
-      // now we improve the approximation even more:
-      /*
-import numpy
-from scipy import interpolate
-from matplotlib import pyplot as plt
-x = numpy.linspace(0, 1, 1000)
-f = interpolate.CubicSpline((3 - 2 * x) * x ** 2, x)
-acos = numpy.arccos(1 - 2 * x) / numpy.pi
-acos_factor = 0.914 # hand-tuned
-line_factor = 0.0862 # hand-tuned
-t_approximation = 0.5 + acos_factor * (acos - 0.5) + line_factor * (x - 0.5)
-plt.plot(x, t_approximation - f(x))
-plt.title('error in t')
-plt.show()
-*/
-      let x = (this.offset + this.length * this.facingB) / this.length
-      // m = "how much does controlLength matter"
-      // without this parameter, the formula assigns too much importance to
-      // controlLength and the arrow heads are too far back. I decreased m
-      // until none of the arrow tails stuck out in front of the arrow heads.
-      let m = 0.3
-      let ratio = Math.pow(3 * this.controlLength / this.length, m)
-      let acos = -0.0001 + 0.0862 * x + 0.914 * Math.acos(1 - 2 * x) / Math.PI
-      return (1 - ratio) * acos + ratio * x
+      return Bezier.estimateParameter(
+        this.length,
+        this.controlLength,
+        this.offset + this.length * this.facingB,
+      )
     },
     controlLength() {
       let point = this.facingB ? this.points[3] : this.points[0]
@@ -120,23 +93,6 @@ plt.show()
         [arg, arg, arg, arg, arg, arg].join(sep),
       ].join(wsp)
       return new RegExp(curve)
-    },
-  },
-  methods: {
-    bezier(x, a, b, c, d) {
-      let y = 1 - x
-      let e = y * a + x * b, f = y * b + x * c, g = y * c + x * d
-      let h = y * e + x * f, i = y * f + x * g
-      let j = y * h + x * i
-      return j
-    },
-    bezierSlope(x, a, b, c, d) {
-      // https://computergraphics.stackexchange.com/questions/10551/how-to-take-the-derivative-of-a-b%C3%A9zier-curve
-      let r = b - a, s = c - b, t = d - c
-      let y = 1 - x
-      let u = y * r + x * s, v = y * s + x * t
-      let w = y * u + x * v
-      return 3 * w
     },
   },
 }
