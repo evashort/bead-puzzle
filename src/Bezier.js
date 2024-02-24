@@ -22,20 +22,28 @@ export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1) {
 }
 
 export function slope(a, b, c, d, x) {
-  // https://computergraphics.stackexchange.com/questions/10551/how-to-take-the-derivative-of-a-b%C3%A9zier-curve
-  let r = b - a, s = c - b, t = d - c
-  let y = 1 - x
-  let u = y * r + x * s, v = y * s + x * t
-  let w = y * u + x * v
-  return 3 * w
+    // https://computergraphics.stackexchange.com/questions/10551/how-to-take-the-derivative-of-a-b%C3%A9zier-curve
+    let r = b - a, s = c - b, t = d - c
+    let y = 1 - x
+    let u = y * r + x * s, v = y * s + x * t
+    let w = y * u + x * v
+    return 3 * w
 }
 
 export function value(a, b, c, d, x) {
-  let y = 1 - x
-  let e = y * a + x * b, f = y * b + x * c, g = y * c + x * d
-  let h = y * e + x * f, i = y * f + x * g
-  let j = y * h + x * i
-  return j
+    let y = 1 - x
+    let e = y * a + x * b, f = y * b + x * c, g = y * c + x * d
+    let h = y * e + x * f, i = y * f + x * g
+    let j = y * h + x * i
+    return j
+}
+
+export function split(a, b, c, d, x) {
+    let y = 1 - x
+    let e = y * a + x * b, f = y * b + x * c, g = y * c + x * d
+    let h = y * e + x * f, i = y * f + x * g
+    let j = y * h + x * i
+    return [[a, e, h, j], [j, i, g, d]]
 }
 
 export function estimateParameter(length, controlLength, offset) {
@@ -81,6 +89,7 @@ var Bezier = {
     length: length,
     slope: slope,
     value: value,
+    split: split,
     estimateParameter: estimateParameter,
 }
 

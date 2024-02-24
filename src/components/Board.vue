@@ -81,22 +81,68 @@ export default {
       let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, this.trophyStart)
       let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
       let x1 = this.getX(this.trophyEnd), y1 = this.getY(this.trophyEnd)
-      let x2 = this.getX(a2Prime), y2 = this.getY(a2Prime)
       let x3 = this.getX(this.hole), y3 = this.getY(this.hole)
-      let x4 = this.getX(b1Prime), y4 = this.getY(b1Prime)
       let x5 = this.getX(this.trophyStart), y5 = this.getY(this.trophyStart)
       let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let l = this.controlLength
       let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x3 - x1, y3 - y1, l)
-      let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
-      let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x3 - tx2, cy2 = y3 - ty2
-      let [tx4, ty4] = this.getTangent(x3 - x2, y3 - y2, x5 - x3, y5 - y3, l)
+      let cx1 = x1 + tx1, cy1 = y1 + ty1
       let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
-      let cx4 = x3 + tx4, cy4 = y3 + ty4, cx5 = x5 - tx5, cy5 = y5 - ty5
-      let endLength = Bezier.length(x1, y1, cx1, cy1, cx2, cy2, x3, y3)
-      return {
-        d: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}C${cx4} ${cy4},${cx5} ${cy5},${x5} ${y5}`,
-        length: endLength,
+      let cx5 = x5 - tx5, cy5 = y5 - ty5
+      if (b1Prime == this.trophyStart && a2Prime == this.trophyEnd) {
+        let x4 = x5, y4 = y5
+        let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
+        let cx2 = x3 - tx2, cy2 = y3 - ty2
+        let endLength = Bezier.length(x1, y1, cx1, cy1, cx2, cy2, x3, y3)
+        return {
+          d: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}S${cx5} ${cy5},${x5} ${y5}`,
+          length: endLength,
+        }
+      } else {
+        let spliceLength = 15
+        let spliceControlLength = 13
+
+        let aLength = Math.sqrt((x3 - x1) * (x3 - x1) + (y3 - y1) * (y3 - y1))
+        let aParameter = Bezier.estimateParameter(
+          Math.sqrt((x3 - x1) * (x3 - x1) + (y3 - y1) * (y3 - y1)),
+          b1Prime == this.hole ? 0 : length,
+          aLength - spliceLength,
+        )
+        let x4 = this.getX(b1Prime), y4 = this.getY(b1Prime)
+        let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
+        let cx2 = x3 - tx2, cy2 = y3 - ty2
+        let [[ax1, ax2, ax3, ax4], axRemoved] =
+          Bezier.split(x1, cx1, cx2, x3, aParameter)
+        let [[ay1, ay2, ay3, ay4], ayRemoved] =
+          Bezier.split(y1, cy1, cy2, y3, aParameter)
+        let aFactor = spliceControlLength /
+          Math.sqrt((ax4 - ax3) * (ax4 - ax3) + (ay4 - ay3) * (ay4 - ay3))
+        let sx1 = ax4, sx2 = sx1 + (ax4 - ax3) * aFactor
+        let sy1 = ay4, sy2 = sy1 + (ay4 - ay3) * aFactor
+
+        let bParameter = Bezier.estimateParameter(
+          Math.sqrt((x5 - x3) * (x5 - x3) + (y5 - y3) * (y5 - y3)),
+          a2Prime == this.hole ? 0 : length,
+          spliceLength,
+        )
+        let x2 = this.getX(a2Prime), y2 = this.getY(a2Prime)
+        let [tx4, ty4] = this.getTangent(x3 - x2, y3 - y2, x5 - x3, y5 - y3, l)
+        let cx4 = x3 + tx4, cy4 = y3 + ty4
+        let [bxRemoved, [bx1, bx2, bx3, bx4]] =
+          Bezier.split(x3, cx4, cx5, x5, bParameter)
+        let [byRemoved, [by1, by2, by3, by4]] =
+          Bezier.split(y3, cy4, cy5, y5, bParameter)
+        let bFactor = spliceControlLength /
+          Math.sqrt((bx1 - bx2) * (bx1 - bx2) + (by1 - by2) * (by1 - by2))
+        let sx4 = bx1, sx3 = sx4 + (bx1 - bx2) * bFactor
+        let sy4 = by1, sy3 = sy4 + (by1 - by2) * bFactor
+
+        let endLength = Bezier.length(ax1, ay1, ax2, ay2, ax3, ay3, ax4, ay4) +
+          0.5 * Bezier.length(sx1, sy1, sx2, sy2, sx3, sy3, sx4, sy4)
+        return {
+          d: `M${ax1} ${ay1}C${ax2} ${ay2},${ax3} ${ay3},${ax4} ${ay4}C${sx2} ${sy2},${sx3} ${sy3},${sx4} ${sy4}C${bx2} ${by2},${bx3} ${by3},${bx4} ${by4}`,
+          length: endLength,
+        }
       }
     },
     trophyStart() {
