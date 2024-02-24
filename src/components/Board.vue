@@ -6,6 +6,7 @@ import Bead from './Bead.vue'
 import Bezier from '../Bezier.js'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
+import Trophy from './Trophy.vue'
 </script>
 
 <script>
@@ -29,6 +30,7 @@ export default {
     tail: Number,
     controlLength: Number,
     radius: Number,
+    holeRadius: Number,
   },
   computed: {
     graph() {
@@ -496,7 +498,14 @@ export default {
     :bead="i"
     :selected="bead.b == tail"
   />
-  <path :d="trophyPath.d" fill="none" stroke="red"/>
-  <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyOffset}px`, transition: 'offset-distance 0.75s'}"/>
-  <circle fill="red" r="5" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': '100%'}"/>
+  <!--<path :d="trophyPath.d" fill="none" stroke="red"/>-->
+  <Trophy
+    :path="trophyPath.d"
+    :offset="trophyOffset"
+    :reverse="trophyReversed"
+    :hole="hole"
+    :size="size"
+    :radius="radius"
+    :holeRadius="holeRadius"
+  />
 </template>

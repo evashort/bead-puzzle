@@ -22,16 +22,9 @@ export default {
       smallSpinButtonClicked: false,
       oldBeads: [],
 
-      // trophy state
-      trophyAlternate: false,
       oldHole: 0,
       reversed: false,
-      trophyPushed: false,
-      trophyWasPushed: false,
-      justWon: false,
       hasWon: false,
-      trophyEnterPaused: false,
-      trophyExitPaused: false,
     }
   },
   props: {
@@ -97,179 +90,12 @@ export default {
 
       return ys
     },
-    edgePaths() {
-      let controlLength = 30
-      let edgePaths = {}
-      for (let a = 0; a < this.size; a++) {
-        edgePaths[[a, a].toString()] = `M ${this.nodeXs[a]} ${this.nodeYs[a]}`
-      }
-
-      for (let [baseA, baseB] of SimpleGraph.edges(this.graph)) {
-        for (let [a, b] of [[baseA, baseB], [baseB, baseA]]) {
-          let name = [a, b].toString()
-          let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
-          let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
-          edgePaths[name] =
-              `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2}`
-        }
-      }
-
-      if (!this.curvedPaths) {
-        if (this.showTail && this.tail == this.extra[this.loopStart]) {
-          let id = Permute.getValue(this.beads, this.tail) - 1
-          let a = this.oldBeads[id]
-          if (a != this.hole) {
-            let b = this.tail
-            let name = [a, b].toString()
-            let c = this.hole
-            let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
-            let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
-            let dx3 = this.nodeXs[c] - x2, dy3 = this.nodeYs[c] - y2
-            let scale = 0.1 / Math.sqrt(dx3 * dx3 + dy3 * dy3)
-            dx3 *= scale
-            dy3 *= scale
-            edgePaths[name] = 
-                `M ${x1} ${y1} C ${x1} ${y1}, ${x2} ${y2}, ${x2} ${y2} l ${dx3} ${dy3}`
-          }
-        }
-
-        return edgePaths
-      }
-
-      let endTangent = [0, 0]
-      if (this.extra[this.loopStart] == this.extra[this.loopEnd]) {
-        let a = this.extra[this.loopEnd - 1], b = this.extra[this.loopEnd]
-        endTangent = this.getTangent(this.extra[this.loopStart + 1], b, a)
-      }
-
-      let lastTangent = [-endTangent[0], -endTangent[1]]
-      for (let i = this.loopStart + 1; i <= this.loopEnd; i++) {
-        let a = this.extra[i - 1], b = this.extra[i]
-        let tangent = endTangent
-        if (i < this.loopEnd) {
-          tangent = this.getTangent(this.extra[i + 1], b, a)
-        }
-
-        let x1 = this.nodeXs[a], y1 = this.nodeYs[a]
-        let x2 = this.nodeXs[b], y2 = this.nodeYs[b]
-        let [dx1, dy1] = lastTangent, [dx2, dy2] = tangent
-        let x0 = x1 + dx1 * controlLength, y0 = y1 + dy1 * controlLength
-        let x3 = x2 + dx2 * controlLength, y3 = y2 + dy2 * controlLength
-        edgePaths[[a, b].toString()] =
-          `M ${x1} ${y1} C ${x0} ${y0}, ${x3} ${y3}, ${x2} ${y2}`
-        edgePaths[[b, a].toString()] =
-          `M ${x2} ${y2} C ${x3} ${y3}, ${x0} ${y0}, ${x1} ${y1}`
-        lastTangent = [-tangent[0], -tangent[1]]
-      }
-
-      return edgePaths
-    },
-    terminatorRadius() {
-      return this.curvedPaths ? 28 : 36
-    },
     crossRadius() {
       return 18
     },
     crossPath() {
       let d = this.crossRadius * Math.sqrt(0.5)
       return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
-    },
-    trophyExitStart() {
-      if (this.reversed) {
-        return this.oldHole
-      } else if (this.history.length >= 2) {
-        return this.history[this.history.length - 2]
-      }
-
-      return this.hole
-    },
-    trophyExitEnd() {
-      if (
-        this.history.length >= 3 && this.reversed &&
-        this.oldHole == this.history[1]
-      ) {
-        return this.history[2]
-      } else if (this.reversed) {
-        return this.getIngress(this.oldHole, this.hole)
-      } else if (this.history.length >= 3) {
-        return this.history[this.history.length - 3]
-      } else if (this.history.length >= 2) {
-        let center = this.history[this.history.length - 2]
-        return this.getIngress(center, this.hole)
-      }
-
-      return this.hole
-    },
-    trophyPushedStart() {
-      return this.hole
-    },
-    trophyPushedEnd() {
-      if (this.history.length >= 2) {
-        if (this.hole == this.history[0]) {
-          if (this.reversing) {
-            return this.history[1]
-          }
-
-          return this.history[this.history.length - 2]
-        } else if (this.reversing) {
-          return this.getIngress(this.hole, this.history[this.history.length - 2])
-        }
-
-        return this.history[this.history.length - 2]
-      }
-
-      return this.getIngress(this.hole, this.tail)
-    },
-    trophyEnterStart() {
-        if (this.reversed) {
-        if (this.history.length >= 2) {
-          return this.history[this.history.length - 2]
-        } else {
-          return this.getIngress(this.hole, this.oldHole)
-        }
-      } else if (this.history.length >= 2) {
-        if (this.history[0] == this.hole) {
-          return this.history[1]
-        }
-
-        let egress = this.history[this.history.length - 2]
-        return this.getIngress(this.hole, egress)
-      }
-
-      return this.hole
-    },
-    trophyEnterEnd() {
-      return this.hole
-    },
-    trophyExitPath() {
-      let edge = [this.trophyExitStart, this.trophyExitEnd]
-      let path = this.edgePaths[edge.toString()]
-      return `path('${path}')`
-    },
-    trophyEnterPath() {
-      let edge = this.trophyPushed ?
-        [this.trophyPushedStart, this.trophyPushedEnd] :
-        [this.trophyEnterStart, this.trophyEnterEnd]
-      let path = this.edgePaths[edge.toString()]
-      return `path('${path}')`
-    },
-    trophyExitClasses() {
-      return {
-        trophy: true,
-        reverse: this.reversed,
-        wasPushed: this.trophyWasPushed,
-        unpaused: !this.trophyExitPaused,
-      }
-    },
-    trophyEnterClasses() {
-      return {
-        trophy: true,
-        enter: true,
-        reverse: this.trophyPushed ? this.reversing : this.reversed,
-        pushed: this.showTail,
-        wasPushed: this.trophyPushed,
-        unpaused: !this.trophyEnterPaused,
-      }
     },
     clickRadius() {
       return 42
@@ -378,24 +204,6 @@ export default {
     },
   },
   methods: {
-    getTangent(i, j, k) {
-      let x1 = this.nodeXs[i], y1 = this.nodeYs[i]
-      let x2 = this.nodeXs[j], y2 = this.nodeYs[j]
-      let x3 = this.nodeXs[k], y3 = this.nodeYs[k]
-
-      let dx1 = x2 - x1, dy1 = y2 - y1
-      let len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1)
-
-      let dx2 = x3 - x2, dy2 = y3 - y2
-      let len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
-
-      let dx3 = dx1 * len2 + dx2 * len1
-      let dy3 = dy1 * len2 + dy2 * len1
-      let len3 = Math.sqrt(dx3 * dx3 + dy3 * dy3)
-
-      let factor = len3 > 0 ? 1 / len3 : 0
-      return [dx3 * factor, dy3 * factor]
-    },
     getSpinPath(r, w) {
       let tailAngle = 160, headAngle = -30, sweep = 0, largeArc = 1
       let s = -1 + 2 * sweep
@@ -445,11 +253,9 @@ export default {
       }
     },
     goForwardHelp() {
-      this.trophyWasPushed = this.showTail
       let id = Permute.getValue(this.beads, this.tail) - 1
       this.beads = Permute.swap(this.beads, this.hole, this.tail)
       this.oldBeads[id] = this.tail
-      this.trophyAlternate = !this.trophyAlternate
       this.oldHole = this.hole
       this.reversed = false
       if (this.reversing) {
@@ -498,8 +304,6 @@ export default {
     goBack() {
       if (this.history.length >= 2) {
         let newHole = this.history[this.history.length - 2]
-        this.trophyWasPushed = this.showTail &&
-          this.history[this.history.length - 2] == this.tail
         // always show tail when undoing win because winning hides tail.
         //
         // tutorial levels have dead ends which cause the tail to be hidden
@@ -509,15 +313,10 @@ export default {
 
         this.oldHole = this.hole
         this.reversed = true
-        if (!this.reversing) {
-          this.trophyPushed = false
-        }
-
         this.tail = this.hole
         let id = Permute.getValue(this.beads, newHole) - 1
         this.beads = Permute.swap(this.beads, newHole, this.tail)
         this.oldBeads[id] = newHole
-        this.trophyAlternate = !this.trophyAlternate
         this.history.pop()
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
@@ -740,20 +539,12 @@ export default {
       },
       immediate: true,
     },
-    canAnimate(newCanAnimate, oldCanAnimate) {
-      if (newCanAnimate) {
-        this.trophyEnterPaused = true
-        this.trophyExitPaused = true
-      }
-    },
     beads(newBeads, oldBeads) {
       let newWon = this.beads == 0
-      this.justWon = false
       if (newWon != this.won) {
         if (newWon) {
           this.showTail = false
         } else {
-          this.justWon = true
           this.hasWon = true
         }
 
@@ -761,19 +552,10 @@ export default {
         this.$emit('update:won', newWon)
       }
 
-      this.trophyPushed = this.showTail
-      this.trophyEnterPaused = false
-      this.trophyExitPaused = false
       this.$emit('update:state', { beads: this.beads, history: this.history })
     },
     tail(newTail, oldTail) {
       this.$emit('update:tail', newTail)
-    },
-    showTail(newShowTail, oldShowTail) {
-      this.trophyEnterPaused = false
-      if (newShowTail) {
-        this.trophyPushed = true
-      }
     },
   },
 }
@@ -840,24 +622,6 @@ export default {
         :buttonY="spinButtonY"
         :smallButtonY="smallSpinButtonY"
       />
-      <mask id="trophy-exit-mask">
-        <circle
-          :cx="nodeXs[trophyExitStart]"
-          :cy="nodeYs[trophyExitStart]"
-          :r="clickRadius"
-          fill="white"
-        >
-        </circle>
-      </mask>
-      <mask id="trophy-enter-mask">
-        <circle
-          :cx="nodeXs[trophyEnterEnd]"
-          :cy="nodeYs[trophyEnterEnd]"
-          :r="clickRadius"
-          fill="white"
-        >
-        </circle>
-      </mask>
       <Board
         :key="graphId"
         :graphId="graphId"
@@ -866,6 +630,7 @@ export default {
         :tail="showTail ? tail : -1"
         :controlLength="30"
         :radius="100"
+        :holeRadius="clickRadius"
       />
       <Goal
         v-for="i in size - 1"
@@ -873,16 +638,6 @@ export default {
         :bead="i"
         :radius="100"
       />
-      <g v-if="hasWon || (won && trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-enter-mask)' : 'url(#trophy-exit-mask)'">
-        <use :href="(trophyAlternate ? won : justWon) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyEnterClasses : trophyExitClasses"
-          :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyEnterPath : trophyExitPath}"
-        />
-      </g>
-      <g v-if="hasWon || (won && !trophyAlternate)" :mask="trophyAlternate ? 'url(#trophy-exit-mask)' : 'url(#trophy-enter-mask)'">
-        <use :href="(trophyAlternate ? justWon : won) ? '#star' : '#star-small'" :class="trophyAlternate ? trophyExitClasses : trophyEnterClasses"
-          :style="{ 'transform': 'scale(2.7) rotate(90deg)', 'offset-path': trophyAlternate ? trophyExitPath : trophyEnterPath}"
-        />
-      </g>
       <g
         :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
         :class="{crossGroup: true, ghost: !showCross}"
@@ -975,45 +730,5 @@ button {
 @keyframes slide2 {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
-}
-.trophy {
-  offset-rotate: auto;
-  offset-distance: 100%;
-}
-.canAnimate .trophy.unpaused {
-  animation: slide 0.75s ease forwards;
-}
-.canAnimate .trophy.wasPushed.unpaused {
-  animation: wasPushed 0.75s ease forwards;
-}
-@keyframes wasPushed {
-  from { offset-distance: calc(100% * 0.2); }
-  to { offset-distance: 100%; }
-}
-.canAnimate .trophy.enter.unpaused {
-  animation: slide2 0.75s ease forwards;
-}
-.trophy.enter.wasPushed {
-  offset-distance: 0%;
-}
-.canAnimate .trophy.enter.wasPushed.unpaused {
-  animation: unpushed 0.5s ease forwards;
-}
-@keyframes unpushed {
-  from { offset-distance: calc(100% * 0.2); }
-  to { offset-distance: 0%; }
-}
-.trophy.reverse {
-  offset-rotate: reverse;
-}
-@keyframes pushed {
-  from { offset-distance: 0%; }
-  to { offset-distance: calc(100% * 0.2); }
-}
-.trophy.enter.pushed {
-  offset-distance: calc(100% * 0.2);
-}
-.canAnimate .trophy.enter.pushed.unpaused {
-  animation: pushed calc(0.75s * (1 - 0.2)) ease forwards;
 }
 </style>
