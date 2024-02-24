@@ -77,19 +77,21 @@ export default {
       return result
     },
     trophyPath() {
-      let [a1Prime, b1Prime] = this.getEdgePrimes(this.trophyEnd, this.hole)
-      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, this.trophyStart)
+      let a = this.trophyReversed ? this.trophyStart : this.trophyEnd
+      let b = this.trophyReversed ? this.trophyEnd : this.trophyStart
+      let [a1Prime, b1Prime] = this.getEdgePrimes(a, this.hole)
+      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, b)
       let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
-      let x1 = this.getX(this.trophyEnd), y1 = this.getY(this.trophyEnd)
+      let x1 = this.getX(a), y1 = this.getY(a)
       let x3 = this.getX(this.hole), y3 = this.getY(this.hole)
-      let x5 = this.getX(this.trophyStart), y5 = this.getY(this.trophyStart)
+      let x5 = this.getX(b), y5 = this.getY(b)
       let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let l = this.controlLength
       let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x3 - x1, y3 - y1, l)
       let cx1 = x1 + tx1, cy1 = y1 + ty1
       let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
       let cx5 = x5 - tx5, cy5 = y5 - ty5
-      if (b1Prime == this.trophyStart && a2Prime == this.trophyEnd) {
+      if (b1Prime == b && a2Prime == a) {
         let x4 = x5, y4 = y5
         let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
         let cx2 = x3 - tx2, cy2 = y3 - ty2
@@ -144,6 +146,9 @@ export default {
           length: endLength,
         }
       }
+    },
+    trophyReversed() {
+      return this.beadStarts[0] != this.trophyEnd
     },
     trophyStart() {
       if (this.history.length >= 2) {
@@ -492,4 +497,5 @@ export default {
   />
   <path :d="trophyPath.d" fill="none" stroke="red"/>
   <circle fill="red" r="10" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': `${trophyOffset}px`, transition: 'offset-distance 0.75s'}"/>
+  <circle fill="red" r="5" :style="{'offset-path': `path('${trophyPath.d}')`, 'offset-distance': '100%'}"/>
 </template>

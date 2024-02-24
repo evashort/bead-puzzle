@@ -1,10 +1,10 @@
-export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1) {
+export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1, depth=80) {
     let abLength = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay))
     let bcLength = Math.sqrt((cx - bx) * (cx - bx) + (cy - by) * (cy - by))
     let cdLength = Math.sqrt((dx - cx) * (dx - cx) + (dy - cy) * (dy - cy))
     let lowerBound = Math.sqrt((dx - ax) * (dx - ax) + (dy - ay) * (dy - ay))
     let upperBound = abLength + bcLength + cdLength
-    if (upperBound - lowerBound < error) {
+    if (upperBound - lowerBound < error || depth <= 0) {
         // overestimate so the trophy rests after the bend when not pushed, so
         // it doesn't snap rotate when pushed forward
         return upperBound
@@ -16,8 +16,10 @@ export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1) {
     let b1y = 0.5 * (ay + by), bcy = 0.5 * (by + cy), c2y = 0.5 * (cy + dy)
     let c1y = 0.5 * (b1y + bcy), b2y = 0.5 * (bcy + c2y)
     let d1a2y = 0.5 * (c1y + b2y)
-    let l1 = length(ax, ay, b1x, b1y, c1x, c1y, d1a2x, d1a2y, 0.5 * error)
-    let l2 = length(d1a2x, d1a2y, b2x, b2y, c2x, c2y, dx, dy, 0.5 * error)
+    error *= 0.5
+    depth--
+    let l1 = length(ax, ay, b1x, b1y, c1x, c1y, d1a2x, d1a2y, error, depth)
+    let l2 = length(d1a2x, d1a2y, b2x, b2y, c2x, c2y, dx, dy, error, depth)
     return l1 + l2
 }
 
