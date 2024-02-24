@@ -156,7 +156,7 @@ export default {
         null
     },
     endEdge() {
-      return this.extra.length >= 1 + (this.tail >= 0) ? [
+      return this.extra.length >= 1 + this.hasForwardTail ? [
         this.altHistory[this.altHistory.length - 1],
         this.altHistory[this.altHistory.length - 2],
       ] : null
