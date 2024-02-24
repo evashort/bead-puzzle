@@ -164,10 +164,11 @@ export default {
     },
     trophyOffset() {
       let pushDistance = 18
+      let pushDelta = this.trophyReversed ? -pushDistance : pushDistance
       if (this.tail == this.trophyEnd) {
-        return this.trophyPath.length + pushDistance
+        return this.trophyPath.length + pushDelta
       } else if (this.tail >= 0) {
-        return this.trophyPath.length - pushDistance
+        return this.trophyPath.length - pushDelta
       } else {
         return this.trophyPath.length
       }
