@@ -1,13 +1,6 @@
 <script>
 export default {
-  data() {
-    let choices = ['red', 'orange', 'green', 'blue', 'purple', 'gray']
-    return {
-      randomColor: choices[Math.floor(Math.random() * choices.length)]
-    }
-  },
   props: {
-    color: String,
     path: String,
     offset: Number,
     reverse: Boolean,
@@ -29,7 +22,7 @@ export default {
 </script>
 
 <template>
-  <path :d="path" fill="none" :stroke="color"/>
+  <!--<path :d="path" fill="none" stroke="red"/>-->
   <mask :id="`trophy-mask-${hole}`" v-if="visible">
     <circle
       :cx="x"

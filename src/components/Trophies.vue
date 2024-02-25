@@ -21,16 +21,11 @@ export default {
   },
   computed: {
     trophies() {
-      let hiddenIndex = this.firstKey % 3
-      return [
-        [this.hiddenTrophy, this.oldTrophy, this.trophy][hiddenIndex],
-        [this.oldTrophy, this.trophy, this.hiddenTrophy][hiddenIndex],
-        [this.trophy, this.hiddenTrophy, this.oldTrophy][hiddenIndex],
-      ]
+      return [this.oldTrophy, this.trophy, this.hiddenTrophy]
     },
     trophy() {
       return {
-        key: (this.firstKey + 2 - this.firstKey % 3) % 6,
+        key: (this.firstKey + 1) % 6,
         path: this.state.path,
         offset: this.offset,
         reverse: this.state.reverse,
@@ -40,7 +35,7 @@ export default {
     },
     oldTrophy() {
       return {
-        key: (this.firstKey + 2 - (this.firstKey + 1) % 3) % 6,
+        key: this.firstKey % 6,
         path: this.oldPath,
         offset: 0,
         reverse: this.oldReverse,
@@ -50,7 +45,7 @@ export default {
     },
     hiddenTrophy() {
       return {
-        key: (this.firstKey + 2 - (this.firstKey + 2) % 3) % 6,
+        key: (this.firstKey + 2) % 6,
         path: "M-10 0L10 0",
         offset: Infinity,
         reverse: false,
@@ -77,7 +72,6 @@ export default {
   <Trophy
     v-for="trophy in trophies"
     :key="trophy.key"
-    :color="['red', 'orange', 'green', 'blue', 'purple', 'gray'][trophy.key]"
     :path="trophy.path"
     :offset="trophy.offset"
     :reverse="trophy.reverse"
