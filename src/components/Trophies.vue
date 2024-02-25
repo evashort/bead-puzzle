@@ -77,6 +77,7 @@ export default {
   <Trophy
     v-for="trophy in trophies"
     :key="trophy.key"
+    :color="['red', 'orange', 'green', 'blue', 'purple', 'gray'][trophy.key]"
     :path="trophy.path"
     :offset="trophy.offset"
     :reverse="trophy.reverse"

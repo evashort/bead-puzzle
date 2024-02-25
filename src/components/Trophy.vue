@@ -1,12 +1,13 @@
 <script>
 export default {
   data() {
-    let choices = ['red', 'orange', 'green', 'blue', 'purple']
+    let choices = ['red', 'orange', 'green', 'blue', 'purple', 'gray']
     return {
-      color: choices[Math.floor(Math.random() * choices.length)]
+      randomColor: choices[Math.floor(Math.random() * choices.length)]
     }
   },
   props: {
+    color: String,
     path: String,
     offset: Number,
     reverse: Boolean,
