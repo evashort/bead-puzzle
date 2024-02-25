@@ -6,7 +6,7 @@ import Bead from './Bead.vue'
 import Bezier from '../Bezier.js'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
-import Trophy from './Trophy.vue'
+import Trophies from './Trophies.vue'
 </script>
 
 <script>
@@ -173,6 +173,13 @@ export default {
         return this.trophyPath.length - pushDelta
       } else {
         return this.trophyPath.length
+      }
+    },
+    trophyState() {
+      return {
+        path: this.trophyPath.d,
+        hole: this.hole,
+        reverse: this.trophyReversed,
       }
     },
     aArrowEdge() {
@@ -499,11 +506,9 @@ export default {
     :selected="bead.b == tail"
   />
   <!--<path :d="trophyPath.d" fill="none" stroke="red"/>-->
-  <Trophy
-    :path="trophyPath.d"
+  <Trophies
+    :state="trophyState"
     :offset="trophyOffset"
-    :reverse="trophyReversed"
-    :hole="hole"
     :size="size"
     :radius="radius"
     :holeRadius="holeRadius"

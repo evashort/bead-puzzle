@@ -8,6 +8,7 @@ export default {
     size: Number,
     radius: Number,
     holeRadius: Number,
+    visible: Boolean,
   },
   computed: {
     x() {
@@ -21,7 +22,7 @@ export default {
 </script>
 
 <template>
-  <mask :id="`trophy-mask-${hole}`">
+  <mask :id="`trophy-mask-${hole}`" v-if="visible">
     <circle
       :cx="x"
       :cy="y"
@@ -30,11 +31,11 @@ export default {
     >
     </circle>
   </mask>
-  <g :mask="`url(#trophy-mask-${hole})`">
+  <g :mask="visible ? `url(#trophy-mask-${hole})` : 'none'">
     <use
       href="#star-small"
-      :class="{ trophy: true, reverse: reverse }"
-      :style="{ offsetPath: `path('${path}')`, offsetDistance: `${offset}px`}"
+      :class="{ trophy: true, reverse: reverse, hidden: !visible }"
+      :style="{ offsetPath: `path('${path}')`, offsetDistance: offset == Infinity ? '100%' : `${offset}px`}"
     />
   </g>
 </template>
@@ -47,5 +48,8 @@ export default {
 }
 .trophy.reverse {
   offset-rotate: auto;
+}
+.trophy.hidden {
+  visibility: hidden;
 }
 </style>
