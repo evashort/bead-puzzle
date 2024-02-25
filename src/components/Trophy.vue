@@ -1,5 +1,11 @@
 <script>
 export default {
+  data() {
+    let choices = ['red', 'orange', 'green', 'blue', 'purple']
+    return {
+      color: choices[Math.floor(Math.random() * choices.length)]
+    }
+  },
   props: {
     path: String,
     offset: Number,
@@ -22,6 +28,7 @@ export default {
 </script>
 
 <template>
+  <path :d="path" fill="none" :stroke="color"/>
   <mask :id="`trophy-mask-${hole}`" v-if="visible">
     <circle
       :cx="x"

@@ -51,7 +51,7 @@ export default {
     hiddenTrophy() {
       return {
         key: (this.firstKey + 2 - (this.firstKey + 2) % 3) % 6,
-        path: "",
+        path: "M-10 0L10 0",
         offset: Infinity,
         reverse: false,
         hole: 0,

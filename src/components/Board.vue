@@ -505,7 +505,6 @@ export default {
     :bead="i"
     :selected="bead.b == tail"
   />
-  <!--<path :d="trophyPath.d" fill="none" stroke="red"/>-->
   <Trophies
     :state="trophyState"
     :offset="trophyOffset"
