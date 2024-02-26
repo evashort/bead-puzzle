@@ -8,6 +8,7 @@ export default {
     return {
       firstKey: 0,
       oldPath: "",
+      oldTotalLength: 0,
       oldHole: 0,
       oldReverse: false,
       exitViaStart: false,
@@ -29,6 +30,7 @@ export default {
         key: (this.firstKey + 1) % 6,
         path: this.state.path,
         offset: this.offset,
+        totalLength: this.state.totalLength,
         reverse: this.state.reverse,
         hole: this.state.hole,
         visible: true,
@@ -39,6 +41,7 @@ export default {
         key: this.firstKey % 6,
         path: this.oldPath,
         offset: this.exitViaStart ? Infinity : 0,
+        totalLength: this.oldTotalLength,
         reverse: this.oldReverse,
         hole: this.oldHole,
         visible: this.oldPath ? true : false,
@@ -49,6 +52,7 @@ export default {
         key: (this.firstKey + 2) % 6,
         path: "M0 0",
         offset: Infinity,
+        totalLength: 0,
         reverse: false,
         hole: 0,
         visible: false,
@@ -60,6 +64,7 @@ export default {
       if (newState.hole != oldState.hole) {
         this.oldHole = oldState.hole
         this.oldPath = oldState.path
+        this.oldTotalLength = oldState.totalLength
         this.oldReverse = oldState.reverse
         this.exitViaStart = (newState.hole == oldState.end) != oldState.reverse
         this.firstKey += 1
@@ -76,6 +81,7 @@ export default {
     :key="trophy.key"
     :path="trophy.path"
     :offset="trophy.offset"
+    :totalLength="trophy.totalLength"
     :reverse="trophy.reverse"
     :hole="trophy.hole"
     :size="size"

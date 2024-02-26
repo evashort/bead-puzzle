@@ -98,11 +98,13 @@ export default {
       if (b1Prime == b && a2Prime == a) {
         let x4 = x5, y4 = y5
         let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
-        let cx2 = x3 - tx2, cy2 = y3 - ty2
+        let cx2 = x3 - tx2, cy2 = y3 - ty2, cx4 = x3 + tx2, cy4 = y3 + ty2
         let endLength = Bezier.length(x1, y1, cx1, cy1, cx2, cy2, x3, y3)
+        let startLength = Bezier.length(x3, y3, cx4, cy4, cx5, cy5, x5, y5)
         return {
           d: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x3} ${y3}S${cx5} ${cy5},${x5} ${y5}`,
-          length: endLength,
+          endLength: endLength,
+          totalLength: endLength + startLength,
         }
       } else {
         let spliceLength = 15
@@ -143,11 +145,14 @@ export default {
         let sx4 = bx1, sx3 = sx4 + (bx1 - bx2) * bFactor
         let sy4 = by1, sy3 = sy4 + (by1 - by2) * bFactor
 
-        let endLength = Bezier.length(ax1, ay1, ax2, ay2, ax3, ay3, ax4, ay4) +
-          0.5 * Bezier.length(sx1, sy1, sx2, sy2, sx3, sy3, sx4, sy4)
+        let actualSpliceLength =
+          Bezier.length(sx1, sy1, sx2, sy2, sx3, sy3, sx4, sy4)
+        let endLength = Bezier.length(ax1, ay1, ax2, ay2, ax3, ay3, ax4, ay4)
+        let startLength = Bezier.length(bx1, by1, bx2, by2, bx3, by3, bx4, by4)
         return {
           d: `M${ax1} ${ay1}C${ax2} ${ay2},${ax3} ${ay3},${ax4} ${ay4}C${sx2} ${sy2},${sx3} ${sy3},${sx4} ${sy4}C${bx2} ${by2},${bx3} ${by3},${bx4} ${by4}`,
-          length: endLength,
+          endLength: endLength + 0.5 * actualSpliceLength,
+          totalLength: endLength + actualSpliceLength + startLength,
         }
       }
     },
@@ -170,16 +175,17 @@ export default {
       let pushDistance = 18
       let pushDelta = this.trophyReversed ? -pushDistance : pushDistance
       if (this.tail == this.trophyEnd) {
-        return this.trophyPath.length + pushDelta
+        return this.trophyPath.endLength + pushDelta
       } else if (this.tail >= 0) {
-        return this.trophyPath.length - pushDelta
+        return this.trophyPath.endLength - pushDelta
       } else {
-        return this.trophyPath.length
+        return this.trophyPath.endLength
       }
     },
     trophyState() {
       return {
         path: this.trophyPath.d,
+        totalLength: this.trophyPath.totalLength,
         hole: this.hole,
         reverse: this.trophyReversed,
         end: this.trophyEnd,

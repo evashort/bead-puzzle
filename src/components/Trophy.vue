@@ -1,8 +1,14 @@
 <script>
 export default {
+  data() {
+    return {
+      offsetChange: 0,
+    }
+  },
   props: {
     path: String,
     offset: Number,
+    totalLength: Number,
     reverse: Boolean,
     hole: Number,
     size: Number,
@@ -16,6 +22,17 @@ export default {
     },
     y() {
       return -this.radius * Math.cos(2 * Math.PI * this.hole / this.size)
+    },
+    transitionDuration() {
+      return 0.75 * (0.35 * this.offsetChange / 80 + 0.65)
+    }
+  },
+  watch: {
+    offset(newOffset, oldOffset) {
+      this.offsetChange = Math.abs(
+        (newOffset == Infinity ? this.totalLength : newOffset) -
+          (oldOffset == Infinity ? this.totalLength : oldOffset)
+      )
     },
   },
 }
@@ -36,14 +53,18 @@ export default {
     <use
       href="#star-small"
       :class="{ trophy: true, reverse: reverse, hidden: !visible }"
-      :style="{ offsetPath: `path('${path}')`, offsetDistance: offset == Infinity ? '100%' : `${offset}px`}"
+      :style="{
+        offsetPath: `path('${path}')`,
+        offsetDistance: offset == Infinity ? '100%' : `${offset}px`,
+        transitionDuration: `${transitionDuration}s`,
+      }"
     />
   </g>
 </template>
 
 <style scoped>
 .trophy {
-  transition: offset-distance 0.75s;
+  transition-property: offset-distance;
   transform: scale(2.7) rotate(90deg);
   offset-rotate: reverse;
 }
