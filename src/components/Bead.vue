@@ -8,6 +8,7 @@ export default {
   props: {
     size: Number,
     path: String,
+    pathLength: Number,
     facingA: Boolean,
     moveToA: Boolean,
     onPath: Boolean,
@@ -47,6 +48,10 @@ export default {
         moving: this.moving && !this.alreadyMoved,
       }
     },
+    duration() {
+      let seconds = 0.25 * 0.0075 * this.pathLength + 0.75 * 0.75
+      return `${seconds}s`
+    },
   },
   watch: {
     moving(newMoving, oldMoving) {
@@ -61,7 +66,11 @@ export default {
     v-if="name"
     :href="`#${name}-bead`"
     :class="beadClasses"
-    :style="{ '--scale': scale, 'offset-path': `path('${path}')` }"
+    :style="{
+      '--scale': scale,
+      'offset-path': `path('${path}')`,
+      '--duration': duration,
+    }"
   />
 </template>
 
@@ -92,7 +101,7 @@ moveToA moving offset-distance
   offset-distance: 0%;
 }
 .canAnimate .bead.moving {
-  animation: slide 0.75s ease forwards;
+  animation: slide var(--duration) ease forwards;
 }
 @keyframes slide {
   from { offset-distance: 0%; }

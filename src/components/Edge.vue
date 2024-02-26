@@ -8,6 +8,7 @@ export default {
     return {
       aDelay: this.a.delay,
       bDelay: this.b.delay,
+      delayLength: this.length,
     }
   },
   props: {
@@ -17,6 +18,8 @@ export default {
     gap: Number,
     a: Visibility,
     b: Visibility,
+    aPrimeLength: Number,
+    bPrimeLength: Number,
     masked: Boolean,
     arrow: Boolean,
   },
@@ -80,6 +83,16 @@ export default {
     bHidden() {
       return this.hidden(this.b)
     },
+    animationDelay() {
+      let seconds = 0.25 * (this.totalSeconds - 0.45) + 0.75 * 0.3
+      return `${seconds}s`
+    },
+    animationDuration() {
+      return '0.45s'
+    },
+    totalSeconds() {
+      return 0.25 * 0.0075 * this.delayLength + 0.75 * 0.75
+    },
   },
   methods: {
     hidden(visibility) {
@@ -96,12 +109,14 @@ export default {
       if (this.hidden(newA) != this.hidden(oldA)) {
         this.aDelay = this.delay(newA)
         this.bDelay &&= !this.aDelay
+        this.delayLength = this.hidden(newA) ? this.length : this.aPrimeLength
       }
     },
     b(newB, oldB) {
       if (this.hidden(newB) != this.hidden(oldB)) {
         this.bDelay = this.delay(newB)
         this.aDelay &&= !this.bDelay
+        this.delayLength = this.hidden(newB) ? this.length : this.bPrimeLength
       }
     },
     arrow(newArrow, oldArrow) {
@@ -131,6 +146,8 @@ export default {
       '--gap': gap,
       '--non-gap': length - gap,
       '--dash-array': dashArray,
+      '--delay': animationDelay,
+      '--duration': animationDuration,
     }"
   />
 </template>
@@ -165,19 +182,19 @@ export default {
 }
 
 .canAnimate .edge.aHidden.aDelay {
-  animation: hideStart 0.45s ease 0.3s backwards;
+  animation: hideStart var(--duration) ease var(--delay) backwards;
 }
 
 .canAnimate .edge.aDelay {
-  animation: revealStart 0.45s ease 0.3s backwards;
+  animation: revealStart var(--duration) ease var(--delay) backwards;
 }
 
 .canAnimate .edge.bHidden.bDelay {
-  animation: hideEnd 0.45s ease 0.3s backwards;
+  animation: hideEnd var(--duration) ease var(--delay) backwards;
 }
 
 .canAnimate .edge.bDelay {
-  animation: revealEnd 0.45s ease 0.3s backwards;
+  animation: revealEnd var(--duration) ease var(--delay) backwards;
 }
 
 @keyframes hideStart {

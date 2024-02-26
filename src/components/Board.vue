@@ -72,7 +72,9 @@ export default {
         let x = this.getX(a), y = this.getY(a)
         result[[a, a]] = {
           path: `M${x} ${y}`,
-          length: 0,
+          // if this length is used it's a bug but possibly a minor one where
+          // falling back to an average-ish edge length is good enough.
+          length: 1.5 * this.radius,
         }
       }
 
@@ -361,6 +363,11 @@ export default {
         b < a ? this.edgePrimes[[b, a]]?.toReversed() : this.edgePrimes[[a, b]]
       ) ?? [a, b]
     },
+    getPrimeLength(edge, index) {
+      return this.edgePaths[
+        this.sortedPair(edge[index], (this.edgePrimes[edge] ?? edge)[index])
+      ].length
+    },
     getOnlyPath(a, b) {
       let result = -1
       for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
@@ -476,6 +483,8 @@ export default {
       edge == bHiddenEdge ? beadStarts[0] == edge[1] :
         beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
+    :aPrimeLength="getPrimeLength(edge, 0)"
+    :bPrimeLength="getPrimeLength(edge, 1)"
     :masked="edge == aAltHiddenEdge || edge == bAltHiddenEdge"
     :arrow="edge == aArrowEdge || edge == bArrowEdge"
   />
@@ -499,6 +508,7 @@ export default {
     :key="`${i}:${bead.b}`"
     :size="size"
     :path="edgePaths[sortedPair(bead.a, bead.b)].path"
+    :pathLength="edgePaths[sortedPair(bead.a, bead.b)].length"
     :facingA="(bead.b < bead.a) != bead.reverse"
     :moveToA="bead.b < bead.a"
     :onPath="Object.hasOwn(activeEdges, sortedPair(bead.a, bead.b))"
