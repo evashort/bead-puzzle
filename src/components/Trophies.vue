@@ -61,7 +61,7 @@ export default {
         this.oldHole = oldState.hole
         this.oldPath = oldState.path
         this.oldReverse = oldState.reverse
-        this.exitViaStart = newState.hole == oldState.end
+        this.exitViaStart = (newState.hole == oldState.end) != oldState.reverse
         this.firstKey += 1
         this.firstKey %= 6
       }

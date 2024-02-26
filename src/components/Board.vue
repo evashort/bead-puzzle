@@ -180,7 +180,7 @@ export default {
         path: this.trophyPath.d,
         hole: this.hole,
         reverse: this.trophyReversed,
-        end: this.trophyReversed ? this.trophyStart : this.trophyEnd,
+        end: this.trophyEnd,
       }
     },
     aArrowEdge() {
