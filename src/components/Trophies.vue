@@ -10,6 +10,7 @@ export default {
       oldPath: "",
       oldHole: 0,
       oldReverse: false,
+      exitViaStart: false,
     }
   },
   props: {
@@ -37,7 +38,7 @@ export default {
       return {
         key: this.firstKey % 6,
         path: this.oldPath,
-        offset: 0,
+        offset: this.exitViaStart ? Infinity : 0,
         reverse: this.oldReverse,
         hole: this.oldHole,
         visible: this.oldPath ? true : false,
@@ -46,7 +47,7 @@ export default {
     hiddenTrophy() {
       return {
         key: (this.firstKey + 2) % 6,
-        path: "M-10 0L10 0",
+        path: "M0 0",
         offset: Infinity,
         reverse: false,
         hole: 0,
@@ -60,6 +61,7 @@ export default {
         this.oldHole = oldState.hole
         this.oldPath = oldState.path
         this.oldReverse = oldState.reverse
+        this.exitViaStart = newState.hole == oldState.end
         this.firstKey += 1
         this.firstKey %= 6
       }
@@ -82,14 +84,3 @@ export default {
     :visible="trophy.visible"
   />
 </template>
-
-<style scoped>
-.trophy {
-  transition: offset-distance 0.75s;
-  transform: scale(2.7) rotate(90deg);
-  offset-rotate: reverse;
-}
-.trophy.reverse {
-  offset-rotate: auto;
-}
-</style>
