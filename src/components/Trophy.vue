@@ -24,7 +24,7 @@ export default {
       return -this.radius * Math.cos(2 * Math.PI * this.hole / this.size)
     },
     transitionDuration() {
-      return 0.75 * (0.35 * this.offsetChange / 80 + 0.65)
+      return 0.75 * Math.pow(this.offsetChange / 150, 0.1)
     }
   },
   watch: {
