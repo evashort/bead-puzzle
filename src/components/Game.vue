@@ -628,7 +628,8 @@ export default {
         :beads="beads"
         :history="history"
         :tail="showTail ? tail : -1"
-        :controlLength="30"
+        :controlLength="curvedPaths ? 30 : 0"
+        :gap="curvedPaths ? 28 : 36"
         :radius="100"
         :holeRadius="clickRadius"
       />

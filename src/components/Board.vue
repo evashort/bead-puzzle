@@ -29,6 +29,7 @@ export default {
     history: Array,
     tail: Number,
     controlLength: Number,
+    gap: Number,
     radius: Number,
     holeRadius: Number,
   },
@@ -172,7 +173,7 @@ export default {
         this.getOppositeEdge(this.trophyStart, this.hole)
     },
     trophyOffset() {
-      let pushDistance = 18
+      let pushDistance = 0.64 * this.gap
       let pushDelta = this.trophyReversed ? -pushDistance : pushDistance
       if (this.tail == this.trophyEnd) {
         return this.trophyPath.endLength + pushDelta
@@ -478,7 +479,7 @@ export default {
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge] ?? false"
-    :gap="28"
+    :gap="gap"
     :a="toVisibility(
       edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
       edge == aHiddenEdge ? beadStarts[0] == edge[0] :
