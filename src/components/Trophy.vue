@@ -64,9 +64,12 @@ export default {
 
 <style scoped>
 .trophy {
-  transition-property: offset-distance;
+  transition-property: none;
   transform: scale(2.7) rotate(90deg);
   offset-rotate: reverse;
+}
+.canAnimate .trophy {
+  transition-property: offset-distance;
 }
 .trophy.reverse {
   offset-rotate: auto;

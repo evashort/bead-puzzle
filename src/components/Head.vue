@@ -123,12 +123,15 @@ export default {
 .head.disappear {
   visibility: hidden;
 }
-.canAnimate .head.disappear {
-  animation: disappear 0.45s;
+.head.disappear {
+  animation: disappear 0s;
 }
 @keyframes disappear {
   from { visibility: initial; }
   to { visibility: initial; }
+}
+.canAnimate .head.disappear {
+  animation-duration: 0.45s;
 }
 .head:not(.shown) {
   visibility: hidden !important;

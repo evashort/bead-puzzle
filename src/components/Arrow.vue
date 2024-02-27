@@ -117,8 +117,8 @@ visibility = aArrow || bArrow
   visibility: hidden;
 }
 
-.canAnimate .tail.aDisappear {
-  animation: aDisappear 0.45s;
+.tail.aDisappear {
+  animation: aDisappear 0s;
 }
 
 @keyframes aDisappear {
@@ -126,13 +126,17 @@ visibility = aArrow || bArrow
   to { visibility: initial; }
 }
 
-.canAnimate .tail.bDisappear {
-  animation: bDisappear 0.45s;
+.tail.bDisappear {
+  animation: bDisappear 0s;
 }
 
 @keyframes bDisappear {
   from { visibility: initial; }
   to { visibility: initial; }
+}
+
+.canAnimate .tail {
+  animation-duration: 0.45s;
 }
 
 .tail:not(.aShown, .bShown) {

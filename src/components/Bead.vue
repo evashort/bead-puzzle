@@ -100,14 +100,17 @@ moveToA moving offset-distance
 .bead.moveToA {
   offset-distance: 0%;
 }
+.bead.moving {
+  animation: slide 0s ease forwards;
+}
 .canAnimate .bead.moving {
-  animation: slide var(--duration) ease forwards;
+  animation-duration: var(--duration);
 }
 @keyframes slide {
   from { offset-distance: 0%; }
   to { offset-distance: 100%; }
 }
-.canAnimate .bead.moving.moveToA {
+.bead.moving.moveToA {
   /* use a different animation instead of "animation-direction: reverse" so
      that the animation plays again when changing direction */
   animation-name: slide-back;

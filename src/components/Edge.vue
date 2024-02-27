@@ -181,20 +181,25 @@ export default {
   stroke-dasharray: var(--dash-array);
 }
 
-.canAnimate .edge.aHidden.aDelay {
-  animation: hideStart var(--duration) ease var(--delay) backwards;
+.edge.aHidden.aDelay {
+  animation: hideStart 0s ease 0s backwards;
 }
 
-.canAnimate .edge.aDelay {
-  animation: revealStart var(--duration) ease var(--delay) backwards;
+.edge.aDelay {
+  animation: revealStart 0s ease 0s backwards;
 }
 
-.canAnimate .edge.bHidden.bDelay {
-  animation: hideEnd var(--duration) ease var(--delay) backwards;
+.edge.bHidden.bDelay {
+  animation: hideEnd 0s ease 0s backwards;
 }
 
-.canAnimate .edge.bDelay {
-  animation: revealEnd var(--duration) ease var(--delay) backwards;
+.edge.bDelay {
+  animation: revealEnd 0s ease 0s backwards;
+}
+
+.canAnimate .edge {
+  animation-duration: var(--duration);
+  animation-delay: var(--delay);
 }
 
 @keyframes hideStart {
