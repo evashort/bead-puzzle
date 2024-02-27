@@ -5,9 +5,7 @@ export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1, depth=80) {
     let lowerBound = Math.sqrt((dx - ax) * (dx - ax) + (dy - ay) * (dy - ay))
     let upperBound = abLength + bcLength + cdLength
     if (upperBound - lowerBound < error || depth <= 0) {
-        // overestimate so the trophy rests after the bend when not pushed, so
-        // it doesn't snap rotate when pushed forward
-        return upperBound
+        return 0.5 * (lowerBound + upperBound)
     }
 
     let b1x = 0.5 * (ax + bx), bcx = 0.5 * (bx + cx), c2x = 0.5 * (cx + dx)

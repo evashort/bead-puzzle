@@ -46,7 +46,11 @@ export default {
         let a = this.loopHistory(i), b = this.loopHistory(i + 1)
         let aPrime = this.loopHistory(i - 1)
         let bPrime = this.loopHistory(i + 2)
-        result[this.sortedPair(a, b)] = this.swapIf(b < a, aPrime, bPrime)
+        let aTurn = i < this.history.length ?
+          (bPrime == b ? undefined : b < a) :
+          (aPrime == a ? undefined : b >= a)
+        result[this.sortedPair(a, b)] =
+          b < a ? [bPrime, aPrime, aTurn] : [aPrime, bPrime, aTurn]
       }
 
       return result
@@ -54,18 +58,38 @@ export default {
     edgePaths() {
       let result = {}
       for (let edge of SimpleGraph.edges(this.graph)) {
-        let [aPrime, bPrime] = this.edgePrimes[edge] ?? edge
-        let x0 = this.getX(aPrime), y0 = this.getY(aPrime)
         let x1 = this.getX(edge[0]), y1 = this.getY(edge[0])
         let x2 = this.getX(edge[1]), y2 = this.getY(edge[1])
-        let x3 = this.getX(bPrime), y3 = this.getY(bPrime)
+        let path = null
+        let length = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+        let [aPrime, bPrime, aTurn] = this.edgePrimes[edge] ?? edge
         let l = this.controlLength
-        let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
-        let [tx2, ty2] = this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
-        let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
+        if (l > 0) {
+          let x0 = this.getX(aPrime), y0 = this.getY(aPrime)
+          let x3 = this.getX(bPrime), y3 = this.getY(bPrime)
+          let [tx1, ty1] =
+            this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
+          let [tx2, ty2] =
+            this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
+          let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
+          path = `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`
+        } else if (aTurn == undefined) {
+          path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
+        } else {
+          let dx = aTurn ? this.getX(aPrime) - x1 : this.getX(bPrime) - x2
+          let dy = aTurn ? this.getY(aPrime) - y1 : this.getY(bPrime) - y2
+          let factor = 0.1 / Math.sqrt(dx * dx + dy *dy)
+          if (aTurn) {
+            let x0 = x1 + dx * factor, y0 = y1 + dy * factor
+            path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
+          } else {
+            let x3 = x2 + dx * factor, y3 = y2 + dy * factor
+            path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
+          }
+        }
         result[edge] = {
-          path: `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`,
-          length: Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)),
+          path: path,
+          length: length,
         }
       }
 
@@ -84,14 +108,24 @@ export default {
     trophyPath() {
       let a = this.trophyReversed ? this.trophyStart : this.trophyEnd
       let b = this.trophyReversed ? this.trophyEnd : this.trophyStart
-      let [a1Prime, b1Prime] = this.getEdgePrimes(a, this.hole)
-      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, b)
-      let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
       let x1 = this.getX(a), y1 = this.getY(a)
       let x3 = this.getX(this.hole), y3 = this.getY(this.hole)
       let x5 = this.getX(b), y5 = this.getY(b)
-      let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let l = this.controlLength
+      if (!(l > 0)) {
+        let endLength = this.edgePaths[this.sortedPair(a, this.hole)].length
+        let startLength = this.edgePaths[this.sortedPair(this.hole, b)].length
+        return {
+          d: `M${x1} ${y1}L${x3} ${y3}L${x5} ${y5}`,
+          endLength: endLength + 0.1 * (this.trophyReversed ? -1 : 1),
+          totalLength: endLength + startLength,
+        }
+      }
+
+      let [a1Prime, b1Prime] = this.getEdgePrimes(a, this.hole)
+      let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, b)
+      let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
+      let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x3 - x1, y3 - y1, l)
       let cx1 = x1 + tx1, cy1 = y1 + ty1
       let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
@@ -366,9 +400,9 @@ export default {
       return [dx3 * factor, dy3 * factor]
     },
     getEdgePrimes(a, b) {
-      return (
-        b < a ? this.edgePrimes[[b, a]]?.toReversed() : this.edgePrimes[[a, b]]
-      ) ?? [a, b]
+      let edge = this.sortedPair(a, b)
+      let [aPrime, bPrime] = this.edgePrimes[edge] ?? edge
+      return b < a ? [bPrime, aPrime] : [aPrime, bPrime]
     },
     getPrimeLength(edge, index) {
       return this.edgePaths[
@@ -410,9 +444,6 @@ export default {
     },
     sortedPair(a, b) {
       return b < a ? [b, a] : [a, b]
-    },
-    swapIf(condition, a, b) {
-      return condition ? [b, a] : [a, b]
     },
     toVisibility(hidden, delay) {
       return hidden ? (delay ? Visibility.DelayHidden : Visibility.Hidden) :

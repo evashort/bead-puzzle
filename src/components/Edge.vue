@@ -158,6 +158,7 @@ export default {
   stroke: var(--color-text);
   stroke-width: 4;
   stroke-linecap: round;
+  stroke-linejoin: round;
   stroke-dasharray: var(--dash-array);
 }
 
