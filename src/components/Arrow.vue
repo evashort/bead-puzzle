@@ -32,6 +32,10 @@ export default {
       return this.bArrow ||
         (this.bOldArrow && !this.aArrow && !this.suppressOldArrow)
     },
+    animationDuration() {
+      let seconds = 0.25 * 0.0045 * this.length + 0.75 * 0.45
+      return `${seconds}s`
+    },
   },
 }
 /*
@@ -84,6 +88,7 @@ visibility = aArrow || bArrow
       '--dash-length': dashLength,
       '--non-dash-length': length - dashLength - strokeRadius,
       '--dash-offset': -strokeRadius,
+      '--duration': animationDuration,
     }"
   />
 </template>
@@ -136,7 +141,7 @@ visibility = aArrow || bArrow
 }
 
 .canAnimate .tail {
-  animation-duration: 0.45s;
+  animation-duration: var(--duration);
 }
 
 .tail:not(.aShown, .bShown) {

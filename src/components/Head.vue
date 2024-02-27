@@ -94,6 +94,10 @@ export default {
       ].join(wsp)
       return new RegExp(curve)
     },
+    animationDuration() {
+      let seconds = 0.25 * 0.0045 * this.length + 0.75 * 0.45
+      return `${seconds}s`
+    },
   },
 }
 </script>
@@ -102,7 +106,8 @@ export default {
   <g
     :class="{ head: true, shown: shown, disappear: disappear }"
     :style="{
-      transform: `translate(${x}px, ${y}px) rotate(${angle}rad) translateX(${Math.abs(offset)}px)`
+      transform: `translate(${x}px, ${y}px) rotate(${angle}rad) translateX(${Math.abs(offset)}px)`,
+      '--duration': animationDuration,
     }"
   >
     <use v-if=shown href="#head-shadow"/>
@@ -131,7 +136,7 @@ export default {
   to { visibility: initial; }
 }
 .canAnimate .head.disappear {
-  animation-duration: 0.45s;
+  animation-duration: var(--duration);
 }
 .head:not(.shown) {
   visibility: hidden !important;
