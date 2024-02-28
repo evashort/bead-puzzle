@@ -46,11 +46,7 @@ export default {
         let a = this.loopHistory(i), b = this.loopHistory(i + 1)
         let aPrime = this.loopHistory(i - 1)
         let bPrime = this.loopHistory(i + 2)
-        let aTurn = i < this.history.length ?
-          (bPrime == b ? undefined : b < a) :
-          (aPrime == a ? undefined : b >= a)
-        result[this.sortedPair(a, b)] =
-          b < a ? [bPrime, aPrime, aTurn] : [aPrime, bPrime, aTurn]
+        result[this.sortedPair(a, b)] = this.swapIf(b < a, aPrime, bPrime)
       }
 
       return result
@@ -58,11 +54,12 @@ export default {
     edgePaths() {
       let result = {}
       for (let edge of SimpleGraph.edges(this.graph)) {
-        let x1 = this.getX(edge[0]), y1 = this.getY(edge[0])
-        let x2 = this.getX(edge[1]), y2 = this.getY(edge[1])
+        let [a, b] = edge
+        let x1 = this.getX(a), y1 = this.getY(a)
+        let x2 = this.getX(b), y2 = this.getY(b)
         let path = null
         let length = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
-        let [aPrime, bPrime, aTurn] = this.edgePrimes[edge] ?? edge
+        let [aPrime, bPrime] = this.edgePrimes[edge] ?? edge
         let l = this.controlLength
         if (l > 0) {
           let x0 = this.getX(aPrime), y0 = this.getY(aPrime)
@@ -73,18 +70,27 @@ export default {
             this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
           let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
           path = `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`
-        } else if (aTurn == undefined) {
-          path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
         } else {
-          let dx = aTurn ? this.getX(aPrime) - x1 : this.getX(bPrime) - x2
-          let dy = aTurn ? this.getY(aPrime) - y1 : this.getY(bPrime) - y2
-          let factor = 0.1 / Math.sqrt(dx * dx + dy *dy)
-          if (aTurn) {
-            let x0 = x1 + dx * factor, y0 = y1 + dy * factor
+          let aOrientation = this.beadOrientations[a]
+          let aBias = this.beadOrientationIndices[a]
+          let aBiased = aOrientation &&
+            aBias == 1 - aOrientation.indexOf(b) && aOrientation[aBias] != a
+          let bOrientation = this.beadOrientations[b]
+          let bBias = this.beadOrientationIndices[b]
+          let bBiased = bOrientation &&
+            bBias == 1 - bOrientation.indexOf(a) && bOrientation[bBias] != b
+          if (aBiased && bBiased) {
+            let [x0, y0] = this.getTurn(x1, y1, aOrientation[aBias])
+            let [x3, y3] = this.getTurn(x2, y2, bOrientation[bBias])
+            path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
+          } else if (aBiased) {
+            let [x0, y0] = this.getTurn(x1, y1, aOrientation[aBias])
             path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
-          } else {
-            let x3 = x2 + dx * factor, y3 = y2 + dy * factor
+          } else if (bBiased) {
+            let [x3, y3] = this.getTurn(x2, y2, bOrientation[bBias])
             path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
+          } else {
+            path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
           }
         }
         result[edge] = {
@@ -277,7 +283,7 @@ export default {
       return Permute.findZero(this.beads)
     },
     beadOrientations() {
-      let result = {}
+      let result = new Array(this.size).fill(null)
       for (let i = 0; i < this.altHistory.length; i++) {
         result[this.altHistory[i]] = [
           this.altHistory[Math.min(i + 1, this.altHistory.length - 1)],
@@ -298,6 +304,24 @@ export default {
       if (this.hasLoop && this.tail >= 0 && !this.hasForwardTail) {
         // indicate that going forward would reverse the loop
         result[this.tail].reverse()
+      }
+
+      return result
+    },
+    beadOrientationIndices() {
+      // for when the edges are straight and the beads have to pick a side,
+      // which side of beadOrientations do they pick?
+      let result = new Array(this.size).fill(-1)
+      for (let i of this.history) {
+        result[i] = 0
+      }
+
+      for (let i of this.extra) {
+        result[i] = 1
+      }
+
+      if (this.hasLoop) {
+        result[this.tail] = 1
       }
 
       return result
@@ -399,10 +423,15 @@ export default {
       let factor = len3 > 0 ? length / len3 : 0
       return [dx3 * factor, dy3 * factor]
     },
+    getTurn(x, y, c) {
+      // returns a point right next to (x, y) pointing towards c
+      let dx = this.getX(c) - x, dy = this.getY(c) - y
+      let factor = 0.1 / Math.sqrt(dx * dx + dy * dy)
+      return [x + dx * factor, y + dy * factor]
+    },
     getEdgePrimes(a, b) {
-      let edge = this.sortedPair(a, b)
-      let [aPrime, bPrime] = this.edgePrimes[edge] ?? edge
-      return b < a ? [bPrime, aPrime] : [aPrime, bPrime]
+      let [aPrime, bPrime] = this.edgePrimes[this.sortedPair(a, b)] ?? [a, b]
+      return this.swapIf(b < a, aPrime, bPrime)
     },
     getPrimeLength(edge, index) {
       return this.edgePaths[
@@ -444,6 +473,9 @@ export default {
     },
     sortedPair(a, b) {
       return b < a ? [b, a] : [a, b]
+    },
+    swapIf(condition, a, b) {
+      return condition ? [b, a] : [a, b]
     },
     toVisibility(hidden, delay) {
       return hidden ? (delay ? Visibility.DelayHidden : Visibility.Hidden) :
@@ -510,7 +542,7 @@ export default {
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge] ?? false"
-    :gap="gap"
+    :gap="Math.min(gap, activeEdges[edge] ? Infinity : 34)"
     :a="toVisibility(
       edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
       edge == aHiddenEdge ? beadStarts[0] == edge[0] :

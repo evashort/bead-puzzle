@@ -199,8 +199,8 @@ export default {
 }
 
 .canAnimate .edge {
-  animation-duration: var(--duration);
-  animation-delay: var(--delay);
+  animation-duration: var(--duration) !important;
+  animation-delay: var(--delay) !important;
 }
 
 @keyframes hideStart {
