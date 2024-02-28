@@ -79,8 +79,8 @@ visibility = aArrow || bArrow
       tail: true,
       aShown: aShown,
       bShown: bShown,
-      aDisappear: aOldArrow && !bShown,
-      bDisappear: bOldArrow && !aShown,
+      aDisappear: aOldArrow,
+      bDisappear: bOldArrow,
     }"
     :d="path"
     :pathLength="length"
@@ -142,6 +142,11 @@ visibility = aArrow || bArrow
 
 .canAnimate .tail {
   animation-duration: var(--duration);
+}
+
+.tail.bDisappear.aShown, .tail.aDisappear.bShown {
+  visibility: initial;
+  animation-duration: 0;
 }
 
 .tail:not(.aShown, .bShown) {
