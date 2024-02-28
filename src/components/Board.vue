@@ -238,20 +238,24 @@ export default {
     bOldArrowEdge() {
       return [this.hole, this.beadStarts[0]].toString()
     },
+    hiddenEdge() {
+      if (this.history.length <= 1) {
+        return null
+      }
+
+      let start = this.controlLength > 0 ? 0 : this.activeStart
+      return [this.history[start], this.history[start + 1]]
+    },
     aHiddenEdge() {
-      return this.history.length >= 2 ?
-        [this.history[0], this.history[1]].toString() : null
+      return this.hiddenEdge ? this.hiddenEdge.toString() : null
     },
     bHiddenEdge() {
-      return this.history.length >= 2 ?
-        [this.history[1], this.history[0]].toString() : null
+      return this.hiddenEdge ? this.hiddenEdge.toReversed().toString() : null
     },
     altHiddenEdge() {
-      let start = this.history.lastIndexOf(
-        this.altHistory[this.altHistory.length - 1],
-        -2,
-      )
-      return start >= 1 ? [this.history[start], this.history[start + 1]] : null
+      return this.activeStart >= 1 && this.controlLength > 0 ?
+        [this.history[this.activeStart], this.history[this.activeStart + 1]] :
+        null
     },
     aAltHiddenEdge() {
       return this.altHiddenEdge ? this.altHiddenEdge.toString() : null
@@ -277,22 +281,28 @@ export default {
       return Permute.findZero(this.beads)
     },
     beadOrientations() {
+      let start = this.controlLength > 0 ? 0 : this.activeStart
+      let stop = this.controlLength > 0 ? this.altHistory.length :
+        this.history.length + (
+          this.hasForwardTail &&
+          !(this.hasLoop && this.tail == this.history[1])
+        )
       let result = new Array(this.size).fill(null)
-      for (let i = 0; i < this.altHistory.length; i++) {
+      for (let i = start; i < stop; i++) {
         result[this.altHistory[i]] = [
-          this.altHistory[Math.min(i + 1, this.altHistory.length - 1)],
-          this.altHistory[Math.max(i - 1, 0)],
+          this.altHistory[Math.min(i + 1, stop - 1)],
+          this.altHistory[Math.max(i - 1, start)],
         ]
       }
 
       if (
-        this.altHistory.length >= 2 &&
-        this.altHistory[this.altHistory.length - 1] == this.history[0] &&
-        this.history.indexOf(this.history[0], 1) < 0
+        stop >= 2 &&
+        this.altHistory[stop - 1] == this.history[start] &&
+        this.history.indexOf(this.history[start], start + 1) < 0
       ) {
         // altHistory forms a simple loop (rather than a figure-8)
-        result[this.history[0]] =
-          [this.altHistory[1], this.altHistory[this.altHistory.length - 2]]
+        result[this.history[start]] =
+          [this.altHistory[start + 1], this.altHistory[stop - 2]]
       }
 
       if (this.hasLoop && this.tail >= 0 && !this.hasForwardTail) {
@@ -375,18 +385,20 @@ export default {
       return this.extra.length ? this.history.concat(this.extra) : this.history
     },
     activeEdges() {
-      let start = this.history.lastIndexOf(
-        this.altHistory[this.altHistory.length - 1],
-        -2,
-      )
       let stop = this.history.length + (this.hasLoop || this.hasForwardTail)
       let result = {}
-      for (let i = start; i < stop; i++) {
+      for (let i = this.activeStart + 1; i < stop; i++) {
         let a = this.altHistory[i - 1], b = this.altHistory[i]
         result[this.sortedPair(a, b)] = true
       }
 
       return result
+    },
+    activeStart() {
+      return this.history.lastIndexOf(
+        this.altHistory[this.altHistory.length - 1],
+        -2,
+      )
     },
     hasLoop() {
       return this.history.length >= 2 &&
@@ -536,7 +548,7 @@ export default {
     :path="edgePaths[edge].path"
     :length="edgePaths[edge].length"
     :onPath="activeEdges[edge] ?? false"
-    :gap="Math.min(gap, activeEdges[edge] ? Infinity : 34)"
+    :gap="gap"
     :a="toVisibility(
       edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
       edge == aHiddenEdge ? beadStarts[0] == edge[0] :
