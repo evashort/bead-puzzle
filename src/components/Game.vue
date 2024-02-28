@@ -20,7 +20,6 @@ export default {
       clickingButton: false,
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
-      oldBeads: [],
 
       oldHole: 0,
       reversed: false,
@@ -253,9 +252,7 @@ export default {
       }
     },
     goForwardHelp() {
-      let id = Permute.getValue(this.beads, this.tail) - 1
       this.beads = Permute.swap(this.beads, this.hole, this.tail)
-      this.oldBeads[id] = this.tail
       this.oldHole = this.hole
       this.reversed = false
       if (this.reversing) {
@@ -314,9 +311,7 @@ export default {
         this.oldHole = this.hole
         this.reversed = true
         this.tail = this.hole
-        let id = Permute.getValue(this.beads, newHole) - 1
         this.beads = Permute.swap(this.beads, newHole, this.tail)
-        this.oldBeads[id] = newHole
         this.history.pop()
         if (this.history[0] == this.tail) {
           // ensure the entire loop is represented
@@ -515,11 +510,6 @@ export default {
         this.hasWon = false
         this.showTail = false
         this.beads = newState.beads
-        this.oldBeads = new Array(this.size - 1)
-        for (let i = 0; i < this.size - 1; i++) {
-          this.oldBeads[i] = Permute.findValue(this.beads, i + 1)
-        }
-
         this.history = [...newState.history]
         this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
@@ -628,6 +618,7 @@ export default {
         :beads="beads"
         :history="history"
         :tail="showTail ? tail : -1"
+        :hasWon="won || hasWon"
         :controlLength="curvedPaths ? 30 : 0"
         :gap="curvedPaths ? 28 : 36"
         :radius="100"

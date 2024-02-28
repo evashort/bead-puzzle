@@ -11,10 +11,12 @@ export default {
       oldTotalLength: 0,
       oldHole: 0,
       oldReverse: false,
+      oldWon: false,
       exitViaStart: false,
     }
   },
   props: {
+    hasWon: Boolean,
     state: Object,
     offset: Number,
     size: Number,
@@ -23,7 +25,11 @@ export default {
   },
   computed: {
     trophies() {
-      return [this.oldTrophy, this.trophy, this.hiddenTrophy]
+      if (this.hasWon) {
+        return [this.oldTrophy, this.trophy, this.hiddenTrophy]
+      } else {
+        return [this.hiddenTrophy]
+      }
     },
     trophy() {
       return {
@@ -33,6 +39,7 @@ export default {
         totalLength: this.state.totalLength,
         reverse: this.state.reverse,
         hole: this.state.hole,
+        won: this.state.won,
         visible: true,
       }
     },
@@ -44,6 +51,7 @@ export default {
         totalLength: this.oldTotalLength,
         reverse: this.oldReverse,
         hole: this.oldHole,
+        won: this.oldWon,
         visible: this.oldPath ? true : false,
       }
     },
@@ -55,6 +63,7 @@ export default {
         totalLength: 0,
         reverse: false,
         hole: 0,
+        won: false,
         visible: false,
       }
     },
@@ -66,6 +75,7 @@ export default {
         this.oldPath = oldState.path
         this.oldTotalLength = oldState.totalLength
         this.oldReverse = oldState.reverse
+        this.oldWon = oldState.won
         this.exitViaStart = (newState.hole == oldState.end) != oldState.reverse
         this.firstKey += 1
         this.firstKey %= 6
@@ -84,6 +94,7 @@ export default {
     :totalLength="trophy.totalLength"
     :reverse="trophy.reverse"
     :hole="trophy.hole"
+    :won="trophy.won"
     :size="size"
     :radius="radius"
     :holeRadius="holeRadius"

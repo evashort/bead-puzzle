@@ -28,6 +28,7 @@ export default {
     beads: Number,
     history: Array,
     tail: Number,
+    hasWon: Boolean,
     controlLength: Number,
     gap: Number,
     radius: Number,
@@ -222,6 +223,7 @@ export default {
         hole: this.hole,
         reverse: this.trophyReversed,
         end: this.trophyEnd,
+        won: this.beads == 0,
       }
     },
     aArrowEdge() {
@@ -579,6 +581,7 @@ export default {
     :selected="bead.b == tail"
   />
   <Trophies
+    :hasWon="hasWon"
     :state="trophyState"
     :offset="trophyOffset"
     :size="size"

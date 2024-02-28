@@ -11,6 +11,7 @@ export default {
     totalLength: Number,
     reverse: Boolean,
     hole: Number,
+    won: Boolean,
     size: Number,
     radius: Number,
     holeRadius: Number,
@@ -25,7 +26,10 @@ export default {
     },
     transitionDuration() {
       return 0.75 * Math.pow(this.offsetChange / 150, 0.1)
-    }
+    },
+    imageId() {
+      return this.won ? '#star' : '#star-small'
+    },
   },
   watch: {
     offset(newOffset, oldOffset) {
@@ -51,7 +55,7 @@ export default {
   </mask>
   <g :mask="visible ? `url(#trophy-mask-${hole})` : 'none'">
     <use
-      href="#star-small"
+      :href="imageId"
       :class="{ trophy: true, reverse: reverse, hidden: !visible }"
       :style="{
         offsetPath: `path('${path}')`,
