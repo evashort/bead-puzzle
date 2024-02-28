@@ -381,9 +381,9 @@ export default {
       )
       let stop = this.history.length + (this.hasLoop || this.hasForwardTail)
       let result = {}
-      for (let i = 1; i < this.altHistory.length; i++) {
+      for (let i = start; i < stop; i++) {
         let a = this.altHistory[i - 1], b = this.altHistory[i]
-        result[this.sortedPair(a, b)] = i > start && i < stop
+        result[this.sortedPair(a, b)] = true
       }
 
       return result
@@ -575,7 +575,7 @@ export default {
     :pathLength="edgePaths[sortedPair(bead.a, bead.b)].length"
     :facingA="(bead.b < bead.a) != bead.reverse"
     :moveToA="bead.b < bead.a"
-    :onPath="Object.hasOwn(activeEdges, sortedPair(bead.a, bead.b))"
+    :onPath="beadOrientations[bead.b] != null"
     :moving="bead.moving"
     :bead="i"
     :selected="bead.b == tail"
