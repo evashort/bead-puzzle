@@ -69,29 +69,21 @@ export default {
           let [tx2, ty2] =
             this.getTangent(x2 - x1, y2 - y1, x3 - x2, y3 - y2, l)
           let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
-          path = `M${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`
+          path = `M${x1} ${y1}L${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}L${x2} ${y2}`
         } else {
           let aOrientation = this.beadOrientations[a]
           let aBias = this.beadOrientationIndices[a]
           let aBiased = aOrientation &&
             aBias == 1 - aOrientation.indexOf(b) && aOrientation[aBias] != a
+          let [x0, y0] = aBiased ? this.getTurn(x1, y1, aOrientation[aBias]) :
+            [x1, y1]
           let bOrientation = this.beadOrientations[b]
           let bBias = this.beadOrientationIndices[b]
           let bBiased = bOrientation &&
             bBias == 1 - bOrientation.indexOf(a) && bOrientation[bBias] != b
-          if (aBiased && bBiased) {
-            let [x0, y0] = this.getTurn(x1, y1, aOrientation[aBias])
-            let [x3, y3] = this.getTurn(x2, y2, bOrientation[bBias])
-            path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
-          } else if (aBiased) {
-            let [x0, y0] = this.getTurn(x1, y1, aOrientation[aBias])
-            path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
-          } else if (bBiased) {
-            let [x3, y3] = this.getTurn(x2, y2, bOrientation[bBias])
-            path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
-          } else {
-            path = `M${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}`
-          }
+          let [x3, y3] = bBiased ? this.getTurn(x2, y2, bOrientation[bBias]) :
+            [x2, y2]
+          path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
         }
         result[edge] = {
           path: path,
