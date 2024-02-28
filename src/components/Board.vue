@@ -283,10 +283,7 @@ export default {
     beadOrientations() {
       let start = this.controlLength > 0 ? 0 : this.activeStart
       let stop = this.controlLength > 0 ? this.altHistory.length :
-        this.history.length + (
-          this.hasForwardTail &&
-          !(this.hasLoop && this.tail == this.history[1])
-        )
+        Math.min(this.history.length + 1, this.altHistory.length)
       let result = new Array(this.size).fill(null)
       for (let i = start; i < stop; i++) {
         result[this.altHistory[i]] = [
@@ -338,7 +335,7 @@ export default {
         let start = this.beadStarts[bead]
         let reverse = start == c || a == b
         if (reverse) {
-          a = c
+          a = c // TODO: what if start == b == c but a != b
         }
 
         let moving = start == a || a == b
