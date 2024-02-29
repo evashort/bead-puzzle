@@ -333,20 +333,14 @@ export default {
         let b = Permute.findValue(this.beads, bead)
         let [a, c] = this.beadOrientations[b] ?? [b, b]
         let start = this.beadStarts[bead]
-        let reverse = start == c || a == b
-        if (reverse) {
-          a = c // TODO: what if start == b == c but a != b
-        }
-
-        let moving = start == a || a == b
-        if (moving) {
-          a = start
-        }
+        let moving =
+          start != b && (start == a || start == c || (a == b && b == c))
+        let reverse = a != c && b != c && (start == c || a == b)
         result.push({
-          a: a,
+          a: reverse ? c : (moving ? start : a),
           b: b,
-          reverse: reverse && a != b,
-          moving: moving && a != b,
+          reverse: reverse,
+          moving: moving,
         })
       }
 
