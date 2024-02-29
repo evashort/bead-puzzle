@@ -198,9 +198,9 @@ export default {
   animation: revealEnd 0s ease 0s backwards;
 }
 
-.canAnimate .edge {
-  animation-duration: var(--duration) !important;
-  animation-delay: var(--delay) !important;
+.canAnimate .edge.onPath {
+  animation-duration: var(--duration);
+  animation-delay: var(--delay);
 }
 
 @keyframes hideStart {

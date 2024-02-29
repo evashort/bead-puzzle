@@ -386,9 +386,12 @@ export default {
       return result
     },
     activeStart() {
-      return this.history.lastIndexOf(
-        this.altHistory[this.altHistory.length - 1],
-        -2,
+      return Math.max(
+        0,
+        this.history.lastIndexOf(
+          this.altHistory[this.altHistory.length - 1],
+          -2,
+        )
       )
     },
     hasLoop() {
