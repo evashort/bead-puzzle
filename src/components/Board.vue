@@ -116,7 +116,7 @@ export default {
         let startLength = this.edgePaths[this.sortedPair(this.hole, b)].length
         return {
           d: `M${x1} ${y1}L${x3} ${y3}L${x5} ${y5}`,
-          endLength: endLength + 0.1 * (this.trophyReversed ? -1 : 1),
+          endLength: endLength + 0.11 * (this.trophyReversed ? -1 : 1),
           totalLength: endLength + startLength,
         }
       }
@@ -129,7 +129,14 @@ export default {
       let cx1 = x1 + tx1, cy1 = y1 + ty1
       let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
       let cx5 = x5 - tx5, cy5 = y5 - ty5
-      if (b1Prime == b && a2Prime == a) {
+      if (a == b) {
+        let endLength = Bezier.length(x1, y1, cx1, cy1, x3, y3, x3, y3)
+        return {
+          d: `M${x1} ${y1}C${cx1} ${cy1},${x3} ${y3},${x3} ${y3}S${cx5} ${cy5},${x5} ${y5}`,
+          endLength: endLength + 0.11 * (this.trophyReversed ? -1 : 1),
+          totalLength: 2 * endLength
+        }
+      } else if (b1Prime == b && a2Prime == a) {
         let x4 = x5, y4 = y5
         let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
         let cx2 = x3 - tx2, cy2 = y3 - ty2, cx4 = x3 + tx2, cy4 = y3 + ty2
