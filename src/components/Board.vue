@@ -56,15 +56,15 @@ export default {
       let result = {}
       for (let edge of SimpleGraph.edges(this.graph)) {
         let [a, b] = edge
-        let x1 = this.getX[a], y1 = this.getY[a]
-        let x2 = this.getX[b], y2 = this.getY[b]
+        let x1 = this.getX(a), y1 = this.getY(a)
+        let x2 = this.getX(b), y2 = this.getY(b)
         let path = null
         let length = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
         let [aPrime, bPrime] = this.edgePrimes[edge] ?? edge
         let l = this.controlLength
         if (l > 0) {
-          let x0 = this.getX[aPrime], y0 = this.getY[aPrime]
-          let x3 = this.getX[bPrime], y3 = this.getY[bPrime]
+          let x0 = this.getX(aPrime), y0 = this.getY(aPrime)
+          let x3 = this.getX(bPrime), y3 = this.getY(bPrime)
           let [tx1, ty1] =
             this.getTangent(x1 - x0, y1 - y0, x2 - x1, y2 - y1, l)
           let [tx2, ty2] =
@@ -93,7 +93,7 @@ export default {
       }
 
       for (let a = 0; a < this.size; a++) {
-        let x = this.getX[a], y = this.getY[a]
+        let x = this.getX(a), y = this.getY(a)
         result[[a, a]] = {
           path: `M${x} ${y}`,
           // if this length is used it's a bug but possibly a minor one where
@@ -104,7 +104,7 @@ export default {
 
       return result
     },
-    getX() {
+    nodeXs() {
       let result = new Array(this.size)
       for (let i = 0; i < this.size; i++) {
         result[i] = this.radius * Math.sin(2 * Math.PI * i / this.size)
@@ -112,7 +112,7 @@ export default {
 
       return result
     },
-    getY() {
+    nodeYs() {
       let result = new Array(this.size)
       for (let i = 0; i < this.size; i++) {
         result[i] = -this.radius * Math.cos(2 * Math.PI * i / this.size)
@@ -126,9 +126,9 @@ export default {
     trophyPath() {
       let a = this.trophyReversed ? this.trophyStart : this.trophyEnd
       let b = this.trophyReversed ? this.trophyEnd : this.trophyStart
-      let x1 = this.getX[a], y1 = this.getY[a]
-      let x3 = this.getX[this.hole], y3 = this.getY[this.hole]
-      let x5 = this.getX[b], y5 = this.getY[b]
+      let x1 = this.getX(a), y1 = this.getY(a)
+      let x3 = this.getX(this.hole), y3 = this.getY(this.hole)
+      let x5 = this.getX(b), y5 = this.getY(b)
       let l = this.controlLength
       if (!(l > 0)) {
         let endLength = this.getEdgeLength(a, this.hole)
@@ -142,8 +142,8 @@ export default {
 
       let [a1Prime, b1Prime] = this.getEdgePrimes(a, this.hole)
       let [a2Prime, b2Prime] = this.getEdgePrimes(this.hole, b)
-      let x0 = this.getX[a1Prime], y0 = this.getY[a1Prime]
-      let x6 = this.getX[b2Prime], y6 = this.getY[b2Prime]
+      let x0 = this.getX(a1Prime), y0 = this.getY(a1Prime)
+      let x6 = this.getX(b2Prime), y6 = this.getY(b2Prime)
       let [tx1, ty1] = this.getTangent(x1 - x0, y1 - y0, x3 - x1, y3 - y1, l)
       let cx1 = x1 + tx1, cy1 = y1 + ty1
       let [tx5, ty5] = this.getTangent(x5 - x3, y5 - y3, x6 - x5, y6 - y5, l)
@@ -176,7 +176,7 @@ export default {
           b1Prime == this.hole ? 0 : length,
           aLength - spliceLength,
         )
-        let x4 = this.getX[b1Prime], y4 = this.getY[b1Prime]
+        let x4 = this.getX(b1Prime), y4 = this.getY(b1Prime)
         let [tx2, ty2] = this.getTangent(x3 - x1, y3 - y1, x4 - x3, y4 - y3, l)
         let cx2 = x3 - tx2, cy2 = y3 - ty2
         let [[ax1, ax2, ax3, ax4], axRemoved] =
@@ -193,7 +193,7 @@ export default {
           a2Prime == this.hole ? 0 : length,
           spliceLength,
         )
-        let x2 = this.getX[a2Prime], y2 = this.getY[a2Prime]
+        let x2 = this.getX(a2Prime), y2 = this.getY(a2Prime)
         let [tx4, ty4] = this.getTangent(x3 - x2, y3 - y2, x5 - x3, y5 - y3, l)
         let cx4 = x3 + tx4, cy4 = y3 + ty4
         let [bxRemoved, [bx1, bx2, bx3, bx4]] =
@@ -432,6 +432,12 @@ export default {
     },
   },
   methods: {
+    getX(i) {
+      return this.nodeXs[i] ?? 0
+    },
+    getY(i) {
+      return this.nodeYs[i] ?? 0
+    },
     getTangent(dx1, dy1, dx2, dy2, length) {
       // returns a vector with the given length, pointing in the average
       // direction of the two input vectors
@@ -445,7 +451,7 @@ export default {
     },
     getTurn(x, y, c) {
       // returns a point right next to (x, y) pointing towards c
-      let dx = this.getX[c] - x, dy = this.getY[c] - y
+      let dx = this.getX(c) - x, dy = this.getY(c) - y
       let factor = 0.1 / Math.sqrt(dx * dx + dy * dy)
       return [x + dx * factor, y + dy * factor]
     },
@@ -461,7 +467,7 @@ export default {
     },
     getBeadPath(a, b) {
       return (
-        this.edgePaths[this.sortedPair(a, b)] ?? this.edgePaths[[b, b]]
+        this.edgePaths[this.sortedPair(a, b)] ?? this.edgePaths[[b, b]] ?? ''
       ).path
     },
     getEdgeLength(a, b) {

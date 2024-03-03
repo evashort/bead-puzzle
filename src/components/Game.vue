@@ -325,9 +325,9 @@ export default {
       }
 
       // iterate counterclockwise and choose the first edge
-      for (let i = this.size - 1; i >= 0; i--) {
-        let newTail = (this.tail + i) % this.size
-        if (newTail != this.hole) {
+      for (let i = this.size; i >= 0; i--) {
+        let newTail = (this.tail + i) % (this.size + 1)
+        if (true) {
           this.tail = newTail
           return
         }
@@ -339,9 +339,9 @@ export default {
       }
 
       // iterate counterclockwise and choose the first edge
-      for (let i = 1; i <= this.size; i++) {
-        let newTail = (this.tail + i) % this.size
-        if (newTail != this.hole) {
+      for (let i = 1; i <= this.size + 1; i++) {
+        let newTail = (this.tail + i) % (this.size + 1)
+        if (true) {
           this.tail = newTail
           return
         }
@@ -631,7 +631,7 @@ export default {
         :radius="100"
       />
       <g
-        :transform="`translate(${nodeXs[hole]}, ${nodeYs[hole]})`"
+        :transform="`translate(${nodeXs[hole] ?? 0}, ${nodeYs[hole] ?? 0})`"
         :class="{crossGroup: true, ghost: !showCross}"
         :visibility="showCross ? 'initial' : 'hidden'"
       >

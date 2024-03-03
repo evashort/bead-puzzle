@@ -1,4 +1,4 @@
-export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1, depth=80) {
+export function length(ax, ay, bx, by, cx, cy, dx, dy, error=0.1, depth=10) {
     let abLength = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay))
     let bcLength = Math.sqrt((cx - bx) * (cx - bx) + (cy - by) * (cy - by))
     let cdLength = Math.sqrt((dx - cx) * (dx - cx) + (dy - cy) * (dy - cy))
