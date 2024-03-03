@@ -581,12 +581,12 @@ export default {
     :gap="gap"
     :a="toVisibility(
       edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
-      edge == aHiddenEdge ? beadStarts[0] == edge[0] :
+      edge == aHiddenEdge ? beadStarts[0] == edge[0] && hole == edge[1] :
         beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
     )"
     :b="toVisibility(
       edge == bHiddenEdge || edge == bAltHiddenEdge || edge == bEndEdge,
-      edge == bHiddenEdge ? beadStarts[0] == edge[1] :
+      edge == bHiddenEdge ? beadStarts[0] == edge[1] && hole == edge[0] :
         beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
     :aPrimeLength="getPrimeLength(edge, 0)"
