@@ -327,7 +327,7 @@ export default {
       // iterate counterclockwise and choose the first edge
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
-        if (SimpleGraph.hasEdge(this.graph, this.hole, newTail)) {
+        if (true) {
           this.tail = newTail
           return
         }
@@ -341,7 +341,7 @@ export default {
       // iterate counterclockwise and choose the first edge
       for (let i = 1; i <= this.size; i++) {
         let newTail = (this.tail + i) % this.size
-        if (SimpleGraph.hasEdge(this.graph, this.hole, newTail)) {
+        if (true) {
           this.tail = newTail
           return
         }
