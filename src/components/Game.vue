@@ -327,7 +327,7 @@ export default {
       // iterate counterclockwise and choose the first edge
       for (let i = this.size - 1; i >= 0; i--) {
         let newTail = (this.tail + i) % this.size
-        if (true) {
+        if (newTail != this.hole) {
           this.tail = newTail
           return
         }
@@ -341,7 +341,7 @@ export default {
       // iterate counterclockwise and choose the first edge
       for (let i = 1; i <= this.size; i++) {
         let newTail = (this.tail + i) % this.size
-        if (true) {
+        if (newTail != this.hole) {
           this.tail = newTail
           return
         }
@@ -375,7 +375,7 @@ export default {
           } else {
             this.showCross = true
           }
-        } else if (SimpleGraph.hasEdge(this.graph, target, this.hole)) {
+        } else if (true) {
           this.tail = target
           this.goForwardHelp()
         } else {
