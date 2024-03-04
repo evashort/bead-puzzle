@@ -171,7 +171,7 @@ export default {
   },
   mounted() {
     window.addEventListener('storage', this.storageChanged)
-    console.assert(this.loadSaveFile(localStorage.getItem('save')))
+    // console.assert(this.loadSaveFile(localStorage.getItem('save')))
   },
   computed: {
     graph() {
@@ -490,7 +490,7 @@ ${comment}
       if (event.key === null) {
         console.log('cleared')
       } else if (event.key == 'save') {
-        console.assert(this.loadSaveFile(event.newValue))
+        // console.assert(this.loadSaveFile(event.newValue))
       }
     },
     loadSaveFile(saveFile) {
@@ -743,6 +743,7 @@ ${comment}
           @update:won="wonChanged"
           @update:state="stateChanged"
           @update:tail="tailChanged"
+          @nextLevel="nextLevel"
         />
         <button
           class="next"

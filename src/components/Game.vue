@@ -34,7 +34,7 @@ export default {
     curvedPaths: Boolean,
     canAnimate: Boolean,
   },
-  emits: ['update:won', 'update:state', 'update:tail'],
+  emits: ['update:won', 'update:state', 'update:tail', 'nextLevel'],
   computed: {
     graph() {
       return SimpleGraph.fromString(this.graphId)
@@ -442,6 +442,13 @@ export default {
 
       return null
     },
+    nextLevel(event) {
+      if (this.won || this.hasWon) {
+        event.stopPropagation()
+        event.preventDefault()
+        this.$emit('nextLevel')
+      }
+    },
     buttonClicked() {
       if (!this.ensureTail()) {
         this.showTail = false
@@ -508,7 +515,8 @@ export default {
       handler(newState, oldState) {
         this.won = false
         this.hasWon = false
-        this.showTail = false
+        let gameView = document.getElementById('game-view')
+        this.showTail = gameView?.parentNode?.matches(':focus-within') ?? false
         this.beads = newState.beads
         this.history = [...newState.history]
         this.oldHole = this.hole
@@ -519,7 +527,8 @@ export default {
     graphId(newGraphId, oldGraphId) {
       this.won = false
       this.hasWon = false
-      this.showTail = false
+      let gameView = document.getElementById('game-view')
+      this.showTail = gameView?.parentNode?.matches(':focus-within') ?? false
     },
     initialTail: {
       handler(newInitialTail, oldInitialTail) {
@@ -563,6 +572,7 @@ export default {
     @keydown.s.stop.prevent="goBack()"
     @keydown.a.stop.prevent="selectLeft()"
     @keydown.d.stop.prevent="selectRight()"
+    @keydown.enter="nextLevel"
     @click="buttonClicked"
     @focus.native="onFocus"
     @blur.native="onBlur"

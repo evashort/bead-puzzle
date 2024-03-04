@@ -129,12 +129,15 @@ export default {
 
 <style scoped>
 .hole {
-  fill: var(--color-background);
+  fill: black;
   stroke: #444444;
   stroke-width: 1px;
 }
 .hole.glowing {
   stroke: var(--glow-color);
   stroke-width: 0.75;
+}
+button:focus-within .hole {
+  fill: var(--color-background);
 }
 </style>
