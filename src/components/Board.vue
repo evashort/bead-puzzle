@@ -606,12 +606,9 @@ export default {
     :bOldArrow="edge == bOldArrowEdge"
     :suppressOldArrow="tail >= 0"
   />
-  <!-- including bead.b in the key allows the slide animation to play again
-    when the bead moves. including i in the key allows the slide animation to
-    play again when a different bead moves into the old spot. -->
   <Bead
     v-for="(bead, i) in beadEdges"
-    :key="`${i}:${bead.b}`"
+    :key="i"
     :size="size"
     :path="getBeadPath(bead.a, bead.b)"
     :pathLength="getEdgeLength(bead.a, bead.b)"
@@ -620,6 +617,7 @@ export default {
     :onPath="beadOrientations[bead.b] != null"
     :moving="bead.moving"
     :bead="i"
+    :destination="bead.b"
     :selected="bead.b == tail"
   />
   <Trophies

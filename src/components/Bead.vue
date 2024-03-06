@@ -2,7 +2,7 @@
 export default {
   data() {
     return {
-      alreadyMoved: false,
+      animation: 0,
     }
   },
   props: {
@@ -14,6 +14,7 @@ export default {
     onPath: Boolean,
     moving: Boolean,
     bead: Number,
+    destination: Number,
     selected: Boolean,
   },
   computed: {
@@ -45,7 +46,8 @@ export default {
         facingA: this.facingA,
         moveToA: this.moveToA,
         onPath: this.onPath,
-        moving: this.moving && !this.alreadyMoved,
+        moving: this.animation,
+        alternate: this.animation == 2,
       }
     },
     duration() {
@@ -55,9 +57,14 @@ export default {
   },
   watch: {
     moving(newMoving, oldMoving) {
-      this.alreadyMoved = true
-    }
-  }
+      if (!newMoving) {
+        this.animation = 0
+      }
+    },
+    destination(newDestination, oldDestination) {
+      this.animation = 1 + (this.animation % 2)
+    },
+  },
 }
 </script>
 
@@ -103,20 +110,28 @@ moveToA moving offset-distance
 .bead.moving {
   animation: slide 0s ease forwards;
 }
-.canAnimate .bead.moving {
-  animation-duration: var(--duration);
-}
 @keyframes slide {
-  from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
+  from { offset-distance: 0%; } to { offset-distance: 100%; }
+}
+.bead.moving.alternate {
+  animation-name: slide-2;
+}
+@keyframes slide-2 {
+  from { offset-distance: 0%; } to { offset-distance: 100%; }
 }
 .bead.moving.moveToA {
-  /* use a different animation instead of "animation-direction: reverse" so
-     that the animation plays again when changing direction */
   animation-name: slide-back;
 }
 @keyframes slide-back {
-  from { offset-distance: 100%; }
-  to { offset-distance: 0%; }
+  from { offset-distance: 100%; } to { offset-distance: 0%; }
+}
+.bead.moving.alternate.moveToA {
+  animation-name: slide-back-2;
+}
+@keyframes slide-back-2 {
+  from { offset-distance: 100%; } to { offset-distance: 0%; }
+}
+.canAnimate .bead.moving {
+  animation-duration: var(--duration);
 }
 </style>

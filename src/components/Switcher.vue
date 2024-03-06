@@ -219,12 +219,12 @@ export default {
       let fullInstructions = {
         'VgA=': `
 ### Pointing device
-1. Select each bead to move it into the empty space.
+1. Select each bead to move it into the empty space. A star will appear when you win.
+1. Select the **Next** button to continue.
 ### Keyboard
 1. Navigate to the puzzle by selecting it with your pointing device or using the **Tab** key.
-1. Select **Up arrow** or **W** to move each bead into the empty space.
-### Winning
-When every bead is where it belongs, a star will appear in the empty space and the **Next** button will be enabled.
+1. Select **Up arrow** or **W** to move each bead into the empty space. A star will appear when you win.
+1. Select **Enter** to continue.
 `,
         'SwA=': `
 ### Pointing device
