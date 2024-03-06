@@ -613,6 +613,8 @@ export default {
           stroke-width="12"
         />
       </defs>
+      <rect class="active-indicator"/>
+      <rect class="active-indicator outline"/>
       <Holes
         :size="size"
         :beads="beads"
@@ -686,6 +688,29 @@ button {
   border: 2px solid #444444;
   border-radius: 2px;
   background-color: black;
+}
+button:focus-within .active-indicator {
+  x: calc(-50% / 1.2 + 1px);
+  y: calc(-50% / 1.2 + 1px);
+  width: calc(100% / 1.2 - 2px);
+  height: calc(100% / 1.2 - 2px);
+  rx: 5px;
+  ry: 5px;
+  fill: none;
+  stroke: #008cef; /* average of Firefox (#0060df) and Chrome/Edge (#00b8ff) */
+  stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+button:focus-within .active-indicator.outline {
+  x: calc(-50% / 1.2 + 0.25px);
+  y: calc(-50% / 1.2 + 0.25px);
+  width: calc(100% / 1.2 - 0.5px);
+  height: calc(100% / 1.2 - 0.5px);
+  rx: 5.75px;
+  ry: 5.75px;
+  stroke: white;
+  stroke-width: 0.5px;
 }
 .cross {
   stroke: var(--color-text);
