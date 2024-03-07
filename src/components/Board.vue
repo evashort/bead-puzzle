@@ -28,6 +28,8 @@ export default {
     beads: Number,
     history: Array,
     tail: Number,
+    altHistory: Array,
+    loopStart: Number,
     hasWon: Boolean,
     controlLength: Number,
     gap: Number,
@@ -222,14 +224,18 @@ export default {
     trophyStart() {
       if (this.history.length >= 2) {
         return this.hasLoop ? this.history[1] :
-          this.getOppositeEdge(this.history[this.history.length - 2], this.hole)
+          SimpleGraph.oppositeEdge(
+            this.graph, this.history[this.history.length - 2], this.hole,
+          )
       } else {
-        return this.getOppositeEdge(this.beadStarts[0], this.hole)
+        return SimpleGraph.oppositeEdge(
+          this.graph, this.beadStarts[0], this.hole,
+        )
       }
     },
     trophyEnd() {
       return this.history.length >= 2 ? this.history[this.history.length - 2] :
-        this.getOppositeEdge(this.trophyStart, this.hole)
+        SimpleGraph.oppositeEdge(this.graph, this.trophyStart, this.hole)
     },
     trophyOffset() {
       let pushDistance = 0.64 * this.gap
@@ -269,7 +275,7 @@ export default {
         return null
       }
 
-      let start = this.controlLength > 0 ? 0 : this.activeStart
+      let start = this.controlLength > 0 ? 0 : this.loopStart
       return [this.history[start], this.history[start + 1]]
     },
     aHiddenEdge() {
@@ -279,9 +285,8 @@ export default {
       return this.hiddenEdge ? this.hiddenEdge.toReversed().toString() : null
     },
     altHiddenEdge() {
-      return this.activeStart >= 1 && this.controlLength > 0 ?
-        [this.history[this.activeStart], this.history[this.activeStart + 1]] :
-        null
+      return this.loopStart >= 1 && this.controlLength > 0 ?
+        [this.history[this.loopStart], this.history[this.loopStart + 1]] : null
     },
     aAltHiddenEdge() {
       return this.altHiddenEdge ? this.altHiddenEdge.toString() : null
@@ -291,10 +296,12 @@ export default {
         null
     },
     endEdge() {
-      return this.extra.length >= 1 + this.hasForwardTail ? [
-        this.altHistory[this.altHistory.length - 1],
-        this.altHistory[this.altHistory.length - 2],
-      ] : null
+      return (
+        this.altHistory.length > this.history.length + this.hasForwardTail ? [
+          this.altHistory[this.altHistory.length - 1],
+          this.altHistory[this.altHistory.length - 2],
+        ] : null
+      )
     },
     aEndEdge() {
       return this.endEdge ? this.endEdge.toString() : null
@@ -307,7 +314,7 @@ export default {
       return Permute.findZero(this.beads)
     },
     beadOrientations() {
-      let start = this.controlLength > 0 ? 0 : this.activeStart
+      let start = this.controlLength > 0 ? 0 : this.loopStart
       let stop = this.controlLength > 0 ? this.altHistory.length :
         Math.min(this.history.length + 1, this.altHistory.length)
       let result = new Array(this.size).fill(null)
@@ -339,12 +346,12 @@ export default {
       // for when the edges are straight and the beads have to pick a side,
       // which side of beadOrientations do they pick?
       let result = new Array(this.size).fill(-1)
-      for (let i of this.history) {
-        result[i] = 0
+      for (let x of this.history) {
+        result[x] = 0
       }
 
-      for (let i of this.extra) {
-        result[i] = 1
+      for (let i = this.history.length; i < this.altHistory.length; i++) {
+        result[this.altHistory[i]] = 1
       }
 
       if (this.hasLoop) {
@@ -372,53 +379,15 @@ export default {
 
       return result
     },
-    extra() {
-      if (this.history.length <= 1) {
-        return this.hasForwardTail ? [this.tail] : []
-      } else if (
-        this.hasLoop && (this.tail == this.history[1] || !this.hasForwardTail)
-      ) {
-        return []
-      }
-
-      let last = this.history[this.history.length - 1]
-      let next = this.hasForwardTail ? this.tail :
-        this.getOnlyPath(this.history[this.history.length - 2], last)
-      let historySet = new Set(this.history)
-      let extra = []
-      while (next >= 0) {
-        extra.push(next)
-        if (historySet.has(next)) {
-          break
-        }
-
-        next = this.getOnlyPath(last, next)
-        last = extra[extra.length - 1]
-      }
-
-      return extra
-    },
-    altHistory() {
-      return this.extra.length ? this.history.concat(this.extra) : this.history
-    },
     activeEdges() {
       let stop = this.history.length + (this.hasLoop || this.hasForwardTail)
       let result = {}
-      for (let i = this.activeStart + 1; i < stop; i++) {
+      for (let i = this.loopStart + 1; i < stop; i++) {
         let a = this.altHistory[i - 1], b = this.altHistory[i]
         result[this.sortedPair(a, b)] = true
       }
 
       return result
-    },
-    activeStart() {
-      return Math.max(
-        0,
-        this.history.lastIndexOf(
-          this.altHistory[this.altHistory.length - 1],
-          -2,
-        )
-      )
     },
     hasLoop() {
       return this.history.length >= 2 &&
@@ -474,16 +443,6 @@ export default {
       let edgePath = this.edgePaths[this.sortedPair(a, b)]
       return edgePath ? edgePath.length : this.fallbackEdgeLength
     },
-    getOnlyPath(a, b) {
-      let result = -1
-      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
-        if (c == a) { continue }
-        if (result >= 0) { return -1 }
-        result = c
-      }
-
-      return result
-    },
     loopHistory(i) {
       if (i < 0) {
         let loopEnd = this.altHistory.indexOf(this.altHistory[0], 1)
@@ -516,40 +475,6 @@ export default {
     toVisibility(hidden, delay) {
       return hidden ? (delay ? Visibility.DelayHidden : Visibility.Hidden) :
         (delay ? Visibility.DelayShown : Visibility.Shown)
-    },
-    getOppositeEdge(a, b) {
-      let bestC = a
-      let bestDistance = -Infinity
-      // among the c with the highest distance, choose the lowest one greater
-      // than b or the lowest one if none are greater than b. we do it this way
-      // so that when this function is used to choose the next tail after a
-      // move, the player can press the right arrow key to cycle through all
-      // the edges without wrapping around to the other side of b.
-      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
-        let distance = this.getAngleDistance(a, b, c)
-        if (
-          distance == bestDistance ? (c > b) > (bestC > b) :
-          distance > bestDistance
-        ) {
-          bestC = c
-          bestDistance = distance
-        }
-      }
-
-      return bestC
-    },
-    getAngleDistance(a, b, c) {
-      if (a >= 0 && a != b) {
-        // distance from a to c around the perimeter of the circle without
-        // passing b
-        let aToC = (c - a + this.size) % this.size
-        let aToB = (b - a + this.size) % this.size
-        return aToB < aToC ? this.size - aToC : aToC
-      } else {
-        // so that getOppositeEdge returns the first c greater than b when a
-        // is null, see comment in getOppositeEdge
-        return -1
-      }
     },
   },
   watch: {

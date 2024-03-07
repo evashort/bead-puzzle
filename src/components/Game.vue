@@ -46,17 +46,16 @@ export default {
       return this.history[this.history.length - 1]
     },
     loopEnd() {
-      return this.extra.length - 1
+      return this.altHistory.length - 1
     },
     loopStart() {
-      let sentinel = this.extra[this.loopEnd]
-      for (let i = this.loopEnd - 2; i > 0; i--) {
-        if (this.extra[i] == sentinel) {
-          return i
-        }
-      }
-
-      return 0
+      return Math.max(
+        0,
+        this.history.lastIndexOf(
+          this.altHistory[this.altHistory.length - 1],
+          -2,
+        )
+      )
     },
     deadEnd() {
       let edges = 0
@@ -114,56 +113,50 @@ export default {
     smallSpinPath() {
       return this.getSpinPath(7, 9)
     },
+    altHistory() {
+      return this.extra.length ? this.history.concat(this.extra) : this.history
+    },
     extra() {
       // extrapolate history to the future if there's no choice of moves
       if (this.history.length <= 1) {
-        return this.showTail ? [this.hole, this.tail] : this.history
+        return this.showTail ? [this.tail] : []
       }
 
-      let loop = [...this.history]
-      loop.pop()
-      let seen = new Set(loop)
-      let prev = loop[loop.length - 1]
-      let node = this.hole
-      while (node >= 0) {
-        loop.push(node)
-        if (seen.has(node)) {
+      let hasForwardTail =
+        this.showTail && this.tail != this.history[this.history.length - 2]
+      if (
+        this.history[0] == this.history[this.history.length - 1] &&
+          (this.tail == this.history[1] || !hasForwardTail)
+      ) {
+        return []
+      }
+
+      let last = this.history[this.history.length - 1]
+      let next = hasForwardTail ? this.tail :
+        this.getOnlyPath(this.history[this.history.length - 2], last)
+      let historySet = new Set(this.history)
+      let extra = []
+      while (next >= 0) {
+        extra.push(next)
+        if (historySet.has(next)) {
           break
         }
 
-        let next = this.getForcedTail(prev, node)
-        prev = node
-        node = next
+        next = this.getOnlyPath(last, next)
+        last = extra[extra.length - 1]
       }
 
-      if (
-        loop.length == this.history.length &&
-        !this.reversing &&
-        this.showTail
-      ) {
-        loop.push(this.tail)
-      }
-
-      return loop
+      return extra
     },
     canSpin() {
-      return this.history.length >= 2 && ( // must be 2 and not 3
-        this.hole == this.history[0] || (
-          this.extra[this.loopStart] == this.extra[this.loopEnd] && (
-            this.extra.length > this.history.length + 1 ||
-            this.getForcedTail(
-              this.history[this.history.length - 2],
-              this.hole,
-            ) >= 0
-          )
-        )
-      )
+      return this.altHistory[this.altHistory.length - 1] ==
+        this.history[this.loopStart]
     },
     clockwise() {
       let minA = Infinity, minB = Infinity
       let clockwise = false
       for (let i = this.loopStart; i < this.loopEnd; i++) {
-        let node1 = this.extra[i], node2 = this.extra[i + 1]
+        let node1 = this.altHistory[i], node2 = this.altHistory[i + 1]
         let y1 = this.getHeightRank(node1)
         let y2 = this.getHeightRank(node2)
         let minY = Math.min(y1, y2)
@@ -174,7 +167,7 @@ export default {
           let x1 = this.getXRank(node1)
           let x2 = this.getXRank(node2)
           if (y1 < y2) {
-            let node0 = this.extra[
+            let node0 = this.altHistory[
               i <= this.loopStart ? this.loopEnd - 1 : i - 1
             ]
             let y0 = this.getHeightRank(node0)
@@ -185,7 +178,7 @@ export default {
               clockwise = x1 < x2
             }
           } else {
-            let node3 = this.extra[
+            let node3 = this.altHistory[
               i >= this.loopEnd - 1 ? this.loopStart + 1 : i + 2
             ]
             let y3 = this.getHeightRank(node3)
@@ -221,16 +214,15 @@ export default {
     getHeightRank(node) {
       return Math.abs((node + this.size/2) % this.size - this.size/2)
     },
-    getForcedTail(prev, hole) {
-      let tail = -1
-      for (let i = 0; i < this.size; i++) {
-        if (i != prev && SimpleGraph.hasEdge(this.graph, hole, i)) {
-          if (tail != -1) { return -1 }
-          tail = i
-        }
+    getOnlyPath(a, b) {
+      let result = -1
+      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
+        if (c == a) { continue }
+        if (result >= 0) { return -1 }
+        result = c
       }
 
-      return tail
+      return result
     },
     getXRank(node) {
       let a = (node + this.size/2) % this.size - this.size/2 // top half
@@ -296,7 +288,7 @@ export default {
 
       // second choice: keep going as straight as possible
       let oldHole = history[end - 1]
-      return this.getIngress(hole, oldHole)
+      return SimpleGraph.oppositeEdge(this.graph, oldHole, hole)
     },
     goBack() {
       if (this.history.length >= 2) {
@@ -387,7 +379,7 @@ export default {
         if (this.history[0] == this.hole) {
           this.tail = this.history[1]
         } else {
-          this.tail = this.getForcedTail(
+          this.tail = this.getOnlyPath(
             this.history[this.history.length - 2],
             this.hole,
           )
@@ -474,40 +466,6 @@ export default {
       this.showCross = false
       this.spinButtonClicked = false
       this.smallSpinButtonClicked = false
-    },
-    getIngress(b, a) {
-      let bestC = a
-      let bestDistance = -Infinity
-      // among the c with the highest distance, choose the lowest one greater
-      // than b or the lowest one if none are greater than b. we do it this way
-      // so that when this function is used to choose the next tail after a
-      // move, the player can press the right arrow key to cycle through all
-      // the edges without wrapping around to the other side of b.
-      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
-        let distance = this.getAngleDistance(a, b, c)
-        if (
-          distance == bestDistance ? (c > b) > (bestC > b) :
-          distance > bestDistance
-        ) {
-          bestC = c
-          bestDistance = distance
-        }
-      }
-
-      return bestC
-    },
-    getAngleDistance(a, b, c) {
-      if (a >= 0 && a != b) {
-        // distance from a to c around the perimeter of the circle without
-        // passing b
-        let aToC = (c - a + this.size) % this.size
-        let aToB = (b - a + this.size) % this.size
-        return aToB < aToC ? this.size - aToC : aToC
-      } else {
-        // so that getOppositeEdge returns the first c greater than b when a
-        // is null, see comment in getOppositeEdge
-        return -1
-      }
     },
   },
   watch: {
@@ -630,6 +588,8 @@ export default {
         :beads="beads"
         :history="history"
         :tail="showTail ? tail : -1"
+        :altHistory="altHistory"
+        :loopStart="loopStart"
         :hasWon="won || hasWon"
         :controlLength="curvedPaths ? 30 : 0"
         :gap="curvedPaths ? 28 : 36"

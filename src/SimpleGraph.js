@@ -93,6 +93,43 @@ export function toString(bytes) {
     return base64js.fromByteArray(bytes)
 }
 
+export function oppositeEdge(bytes, a, b) {
+  let n = bytesToNodeCount(bytes)
+  let bestC = a
+  let bestDistance = -Infinity
+  // among the c with the highest distance, choose the lowest one greater
+  // than b or the lowest one if none are greater than b. we do it this way
+  // so that when this function is used to choose the next tail after a
+  // move, the player can press the right arrow key to cycle through all
+  // the edges without wrapping around to the other side of b.
+  for (let c of nodeEdges(bytes, b)) {
+    let distance = angleDistance(n, a, b, c)
+    if (
+      distance == bestDistance ? (c > b) > (bestC > b) :
+      distance > bestDistance
+    ) {
+      bestC = c
+      bestDistance = distance
+    }
+  }
+
+  return bestC
+}
+
+function angleDistance(n, a, b, c) {
+  if (a >= 0 && a != b) {
+    // distance from a to c around the perimeter of the circle without
+    // passing b
+    let aToC = (c - a + n) % n
+    let aToB = (b - a + n) % n
+    return aToB < aToC ? n - aToC : aToC
+  } else {
+    // so that oppositeEdge returns the first c greater than b when a
+    // is null, see comment in oppositeEdge
+    return -1
+  }
+}
+
 var SimpleGraph = {
     bytesToNodeCount: bytesToNodeCount,
     applyLayout: applyLayout,
@@ -101,6 +138,7 @@ var SimpleGraph = {
     nodeEdges: nodeEdges,
     fromString: fromString,
     toString: toString,
+    oppositeEdge: oppositeEdge,
 }
 
 export default SimpleGraph
