@@ -122,8 +122,8 @@ export default {
         return this.showTail ? [this.tail] : []
       }
 
-      let hasForwardTail =
-        this.showTail && this.tail != this.history[this.history.length - 2]
+      let beforeHole = this.history[this.history.length - 2]
+      let hasForwardTail = this.showTail && this.tail != beforeHole
       if (
         this.history[0] == this.history[this.history.length - 1] &&
           (this.tail == this.history[1] || !hasForwardTail)
@@ -133,7 +133,7 @@ export default {
 
       let last = this.history[this.history.length - 1]
       let next = hasForwardTail ? this.tail :
-        this.getOnlyPath(this.history[this.history.length - 2], last)
+        SimpleGraph.onlyPath(this.graph, beforeHole, last)
       let historySet = new Set(this.history)
       let extra = []
       while (next >= 0) {
@@ -142,7 +142,7 @@ export default {
           break
         }
 
-        next = this.getOnlyPath(last, next)
+        next = SimpleGraph.onlyPath(this.graph, last, next)
         last = extra[extra.length - 1]
       }
 
@@ -213,16 +213,6 @@ export default {
     },
     getHeightRank(node) {
       return Math.abs((node + this.size/2) % this.size - this.size/2)
-    },
-    getOnlyPath(a, b) {
-      let result = -1
-      for (let c of SimpleGraph.nodeEdges(this.graph, b)) {
-        if (c == a) { continue }
-        if (result >= 0) { return -1 }
-        result = c
-      }
-
-      return result
     },
     getXRank(node) {
       let a = (node + this.size/2) % this.size - this.size/2 // top half
@@ -379,7 +369,8 @@ export default {
         if (this.history[0] == this.hole) {
           this.tail = this.history[1]
         } else {
-          this.tail = this.getOnlyPath(
+          this.tail = SimpleGraph.onlyPath(
+            this.graph,
             this.history[this.history.length - 2],
             this.hole,
           )
@@ -586,9 +577,9 @@ export default {
         :key="graphId"
         :graphId="graphId"
         :beads="beads"
-        :history="history"
-        :tail="showTail ? tail : -1"
         :altHistory="altHistory"
+        :historyLength="history.length"
+        :tail="showTail ? tail : -1"
         :loopStart="loopStart"
         :hasWon="won || hasWon"
         :controlLength="curvedPaths ? 30 : 0"

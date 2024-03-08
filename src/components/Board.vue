@@ -26,9 +26,9 @@ export default {
   props: {
     graphId: String,
     beads: Number,
-    history: Array,
-    tail: Number,
     altHistory: Array,
+    historyLength: Number,
+    tail: Number,
     loopStart: Number,
     hasWon: Boolean,
     controlLength: Number,
@@ -222,10 +222,10 @@ export default {
       return this.beadStarts[0] != this.trophyEnd
     },
     trophyStart() {
-      if (this.history.length >= 2) {
-        return this.hasLoop ? this.history[1] :
+      if (this.historyLength >= 2) {
+        return this.hasLoop ? this.altHistory[1] :
           SimpleGraph.oppositeEdge(
-            this.graph, this.history[this.history.length - 2], this.hole,
+            this.graph, this.altHistory[this.historyLength - 2], this.hole,
           )
       } else {
         return SimpleGraph.oppositeEdge(
@@ -234,7 +234,8 @@ export default {
       }
     },
     trophyEnd() {
-      return this.history.length >= 2 ? this.history[this.history.length - 2] :
+      return this.historyLength >= 2 ?
+        this.altHistory[this.historyLength - 2] :
         SimpleGraph.oppositeEdge(this.graph, this.trophyStart, this.hole)
     },
     trophyOffset() {
@@ -271,12 +272,12 @@ export default {
       return [this.hole, this.beadStarts[0]].toString()
     },
     hiddenEdge() {
-      if (this.history.length <= 1) {
+      if (this.historyLength <= 1) {
         return null
       }
 
       let start = this.controlLength > 0 ? 0 : this.loopStart
-      return [this.history[start], this.history[start + 1]]
+      return [this.altHistory[start], this.altHistory[start + 1]]
     },
     aHiddenEdge() {
       return this.hiddenEdge ? this.hiddenEdge.toString() : null
@@ -285,8 +286,10 @@ export default {
       return this.hiddenEdge ? this.hiddenEdge.toReversed().toString() : null
     },
     altHiddenEdge() {
-      return this.loopStart >= 1 && this.controlLength > 0 ?
-        [this.history[this.loopStart], this.history[this.loopStart + 1]] : null
+      return this.loopStart >= 1 && this.controlLength > 0 ? [
+        this.altHistory[this.loopStart],
+        this.altHistory[this.loopStart + 1],
+      ] : null
     },
     aAltHiddenEdge() {
       return this.altHiddenEdge ? this.altHiddenEdge.toString() : null
@@ -297,7 +300,7 @@ export default {
     },
     endEdge() {
       return (
-        this.altHistory.length > this.history.length + this.hasForwardTail ? [
+        this.altHistory.length > this.historyLength + this.hasForwardTail ? [
           this.altHistory[this.altHistory.length - 1],
           this.altHistory[this.altHistory.length - 2],
         ] : null
@@ -316,7 +319,7 @@ export default {
     beadOrientations() {
       let start = this.controlLength > 0 ? 0 : this.loopStart
       let stop = this.controlLength > 0 ? this.altHistory.length :
-        Math.min(this.history.length + 1, this.altHistory.length)
+        Math.min(this.historyLength + 1, this.altHistory.length)
       let result = new Array(this.size).fill(null)
       for (let i = start; i < stop; i++) {
         result[this.altHistory[i]] = [
@@ -326,13 +329,12 @@ export default {
       }
 
       if (
-        stop >= 2 &&
-        this.altHistory[stop - 1] == this.history[start] &&
-        this.history.indexOf(this.history[start], start + 1) < 0
+        this.historyLength >= 2 && this.loopStart == 0 &&
+        this.altHistory[this.altHistory.length - 1] == this.altHistory[0]
       ) {
         // altHistory forms a simple loop (rather than a figure-8)
-        result[this.history[start]] =
-          [this.altHistory[start + 1], this.altHistory[stop - 2]]
+        result[this.altHistory[0]] =
+          [this.altHistory[1], this.altHistory[this.altHistory.length - 2]]
       }
 
       if (this.hasLoop && this.tail >= 0 && !this.hasForwardTail) {
@@ -346,11 +348,12 @@ export default {
       // for when the edges are straight and the beads have to pick a side,
       // which side of beadOrientations do they pick?
       let result = new Array(this.size).fill(-1)
-      for (let x of this.history) {
-        result[x] = 0
+      for (let i = 0; i < this.historyLength; i++) {
+        result[this.altHistory[i]] = 0
       }
 
-      for (let i = this.history.length; i < this.altHistory.length; i++) {
+      let stop = Math.min(this.historyLength + 1, this.altHistory.length)
+      for (let i = this.historyLength; i < stop; i++) {
         result[this.altHistory[i]] = 1
       }
 
@@ -380,7 +383,7 @@ export default {
       return result
     },
     activeEdges() {
-      let stop = this.history.length + (this.hasLoop || this.hasForwardTail)
+      let stop = this.historyLength + (this.hasLoop || this.hasForwardTail)
       let result = {}
       for (let i = this.loopStart + 1; i < stop; i++) {
         let a = this.altHistory[i - 1], b = this.altHistory[i]
@@ -390,13 +393,13 @@ export default {
       return result
     },
     hasLoop() {
-      return this.history.length >= 2 &&
-        this.history[0] == this.history[this.history.length - 1]
+      return this.historyLength >= 2 &&
+        this.altHistory[0] == this.altHistory[this.historyLength - 1]
     },
     hasForwardTail() {
       return this.tail >= 0 && (
-        this.history.length <= 1 ||
-        this.tail != this.history[this.history.length - 2]
+        this.historyLength <= 1 ||
+        this.tail != this.altHistory[this.historyLength - 2]
       )
     },
   },
@@ -453,11 +456,9 @@ export default {
         }
       } else if (i >= this.altHistory.length) {
         let loopEnd = this.altHistory.length - 1
-        let loopStart =
-          this.altHistory.lastIndexOf(this.altHistory[loopEnd], -2)
-        if (loopStart >= 0) {
+        if (this.altHistory[this.loopStart] == this.altHistory[loopEnd]) {
           return this.altHistory[
-            (i - loopStart) % (loopEnd - loopStart) + loopStart
+            (i - this.loopStart) % (loopEnd - this.loopStart) + this.loopStart
           ]
         } else {
           return this.altHistory[loopEnd]
