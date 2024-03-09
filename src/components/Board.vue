@@ -1,11 +1,9 @@
 <script setup>
-import Arrow from './Arrow.vue'
-import Edge from './Edge.vue'
-import { Visibility } from '../Visibility'
 import Beads from './Beads.vue'
 import Bezier from '../Bezier.js'
-import SimpleGraph from '../SimpleGraph.js'
+import Edges from './Edges.vue'
 import Permute from '../Permute.js'
+import SimpleGraph from '../SimpleGraph.js'
 import Trophies from './Trophies.vue'
 </script>
 
@@ -250,60 +248,6 @@ export default {
         won: this.beads == 0,
       }
     },
-    aArrowEdge() {
-      return [this.hole, this.tail].toString()
-    },
-    bArrowEdge() {
-      return [this.tail, this.hole].toString()
-    },
-    aOldArrowEdge() {
-      return [this.beadStarts[0], this.hole].toString()
-    },
-    bOldArrowEdge() {
-      return [this.hole, this.beadStarts[0]].toString()
-    },
-    hiddenEdge() {
-      if (this.historyLength <= 1) {
-        return null
-      }
-
-      let start = this.controlLength > 0 ? 0 : this.loopStart
-      return [this.altHistory[start], this.altHistory[start + 1]]
-    },
-    aHiddenEdge() {
-      return this.hiddenEdge ? this.hiddenEdge.toString() : null
-    },
-    bHiddenEdge() {
-      return this.hiddenEdge ? this.hiddenEdge.toReversed().toString() : null
-    },
-    altHiddenEdge() {
-      return this.loopStart >= 1 && this.controlLength > 0 ? [
-        this.altHistory[this.loopStart],
-        this.altHistory[this.loopStart + 1],
-      ] : null
-    },
-    aAltHiddenEdge() {
-      return this.altHiddenEdge ? this.altHiddenEdge.toString() : null
-    },
-    bAltHiddenEdge() {
-      return this.altHiddenEdge ? this.altHiddenEdge.toReversed().toString() :
-        null
-    },
-    endEdge() {
-      return (
-        this.altHistory.length > this.historyLength + this.hasForwardTail ? [
-          this.altHistory[this.altHistory.length - 1],
-          this.altHistory[this.altHistory.length - 2],
-        ] : null
-      )
-    },
-    aEndEdge() {
-      return this.endEdge ? this.endEdge.toString() : null
-    },
-    bEndEdge() {
-      return this.endEdge ? this.endEdge.toReversed().toString() :
-        null
-    },
     hole() {
       return Permute.findZero(this.beads)
     },
@@ -325,25 +269,9 @@ export default {
 
       return result
     },
-    activeEdges() {
-      let stop = this.historyLength + (this.hasLoop || this.hasForwardTail)
-      let result = {}
-      for (let i = this.loopStart + 1; i < stop; i++) {
-        let a = this.altHistory[i - 1], b = this.altHistory[i]
-        result[this.sortedPair(a, b)] = true
-      }
-
-      return result
-    },
     hasLoop() {
       return this.historyLength >= 2 &&
         this.altHistory[0] == this.altHistory[this.historyLength - 1]
-    },
-    hasForwardTail() {
-      return this.tail >= 0 && (
-        this.historyLength <= 1 ||
-        this.tail != this.altHistory[this.historyLength - 2]
-      )
     },
   },
   methods: {
@@ -378,12 +306,6 @@ export default {
       let [aPrime, bPrime] = this.edgePrimes[this.sortedPair(a, b)] ?? [a, b]
       return this.swapIf(b < a, aPrime, bPrime)
     },
-    getPrimeLength(edge, index) {
-      return this.getEdgeLength(
-        edge[index],
-        (this.edgePrimes[edge] ?? edge)[index],
-      )
-    },
     getEdgeLength(a, b) {
       let edgePath = this.edgePaths[this.sortedPair(a, b)]
       return edgePath ? edgePath.length : this.fallbackEdgeLength
@@ -415,10 +337,6 @@ export default {
     swapIf(condition, a, b) {
       return condition ? [b, a] : [a, b]
     },
-    toVisibility(hidden, delay) {
-      return hidden ? (delay ? Visibility.DelayHidden : Visibility.Hidden) :
-        (delay ? Visibility.DelayShown : Visibility.Shown)
-    },
   },
   watch: {
     beads(newBeads, oldBeads) {
@@ -440,39 +358,17 @@ export default {
 </script>
 
 <template>
-  <Edge
-    v-for="edge in SimpleGraph.edges(graph)"
-    :key="edge.toString()"
-    :path="edgePaths[edge].path"
-    :length="edgePaths[edge].length"
-    :onPath="activeEdges[edge] ?? false"
+  <Edges
+    :graph="graph"
+    :holeStart="beadStarts[0]"
+    :altHistory="altHistory"
+    :historyLength="historyLength"
+    :tail="tail"
+    :loopStart="loopStart"
+    :curvedEdges="controlLength > 0"
     :gap="gap"
-    :a="toVisibility(
-      edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
-      edge == aHiddenEdge ? beadStarts[0] == edge[0] && loopStart == 0 :
-        beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
-    )"
-    :b="toVisibility(
-      edge == bHiddenEdge || edge == bAltHiddenEdge || edge == bEndEdge,
-      edge == bHiddenEdge ? beadStarts[0] == edge[1] && loopStart == 0 :
-        beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
-    )"
-    :aPrimeLength="getPrimeLength(edge, 0)"
-    :bPrimeLength="getPrimeLength(edge, 1)"
-    :masked="edge == aAltHiddenEdge || edge == bAltHiddenEdge"
-    :arrow="edge == aArrowEdge || edge == bArrowEdge"
-  />
-  <Arrow
-    v-for="edge in SimpleGraph.edges(graph)"
-    :key="edge.toString()"
-    :path="edgePaths[edge].path"
-    :length="edgePaths[edge].length"
-    :onPath="activeEdges[edge] ?? false"
-    :aArrow="edge == aArrowEdge"
-    :bArrow="edge == bArrowEdge"
-    :aOldArrow="edge == aOldArrowEdge"
-    :bOldArrow="edge == bOldArrowEdge"
-    :suppressOldArrow="tail >= 0"
+    :edgePaths="edgePaths"
+    :edgePrimes="edgePrimes"
   />
   <Beads
     :beads="beads"
