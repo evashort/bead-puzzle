@@ -74,18 +74,9 @@ export default {
           let cx1 = x1 + tx1, cy1 = y1 + ty1, cx2 = x2 - tx2, cy2 = y2 - ty2
           path = `M${x1} ${y1}L${x1} ${y1}C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}L${x2} ${y2}`
         } else {
-          let aOrientation = this.beadOrientations[a]
-          let aBias = this.beadOrientationIndices[a]
-          let aBiased = aOrientation &&
-            aBias == 1 - aOrientation.indexOf(b) && aOrientation[aBias] != a
-          let [x0, y0] = aBiased ? this.getTurn(x1, y1, aOrientation[aBias]) :
-            [x1, y1]
-          let bOrientation = this.beadOrientations[b]
-          let bBias = this.beadOrientationIndices[b]
-          let bBiased = bOrientation &&
-            bBias == 1 - bOrientation.indexOf(a) && bOrientation[bBias] != b
-          let [x3, y3] = bBiased ? this.getTurn(x2, y2, bOrientation[bBias]) :
-            [x2, y2]
+          let aTurn = this.beadTurns[a], bTurn = this.beadTurns[b]
+          let [x0, y0] = this.getTurn(x1, y1, aTurn == b ? -1 : aTurn)
+          let [x3, y3] = this.getTurn(x2, y2, bTurn == a ? -1 : bTurn)
           path = `M${x0} ${y0}L${x1} ${y1}C${x1} ${y1},${x2} ${y2},${x2} ${y2}L${x3} ${y3}`
         }
         result[edge] = {
@@ -344,21 +335,20 @@ export default {
 
       return result
     },
-    beadOrientationIndices() {
+    beadTurns() {
       // for when the edges are straight and the beads have to pick a side,
-      // which side of beadOrientations do they pick?
+      // which edge do they pick?
       let result = new Array(this.size).fill(-1)
-      for (let i = 0; i < this.historyLength; i++) {
-        result[this.altHistory[i]] = 0
+      for (let i = this.loopStart; i < this.historyLength - 1; i++) {
+        result[this.altHistory[i]] = this.altHistory[i + 1]
       }
 
-      let stop = Math.min(this.historyLength + 1, this.altHistory.length)
-      for (let i = this.historyLength; i < stop; i++) {
-        result[this.altHistory[i]] = 1
+      if (this.altHistory.length > this.historyLength) {
+        result[this.altHistory[this.historyLength]] = this.hole
       }
 
       if (this.hasLoop) {
-        result[this.tail] = 1
+        result[this.tail] = this.hole
       }
 
       return result
@@ -423,9 +413,13 @@ export default {
     },
     getTurn(x, y, c) {
       // returns a point right next to (x, y) pointing towards c
-      let dx = this.getX(c) - x, dy = this.getY(c) - y
-      let factor = 0.1 / Math.sqrt(dx * dx + dy * dy)
-      return [x + dx * factor, y + dy * factor]
+      if (c >= 0) {
+        let dx = this.getX(c) - x, dy = this.getY(c) - y
+        let factor = 0.1 / Math.sqrt(dx * dx + dy * dy)
+        return [x + dx * factor, y + dy * factor]
+      } else {
+        return [x, y]
+      }
     },
     getEdgePrimes(a, b) {
       let [aPrime, bPrime] = this.edgePrimes[this.sortedPair(a, b)] ?? [a, b]
@@ -507,12 +501,12 @@ export default {
     :gap="gap"
     :a="toVisibility(
       edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
-      edge == aHiddenEdge ? beadStarts[0] == edge[0] && hole == edge[1] :
+      edge == aHiddenEdge ? beadStarts[0] == edge[0] && loopStart == 0 :
         beadStarts[0] == edge[0] && hole != edge[1] && activeEdges[edge],
     )"
     :b="toVisibility(
       edge == bHiddenEdge || edge == bAltHiddenEdge || edge == bEndEdge,
-      edge == bHiddenEdge ? beadStarts[0] == edge[1] && hole == edge[0] :
+      edge == bHiddenEdge ? beadStarts[0] == edge[1] && loopStart == 0 :
         beadStarts[0] == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
     :aPrimeLength="getPrimeLength(edge, 0)"
