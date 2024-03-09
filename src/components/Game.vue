@@ -45,9 +45,6 @@ export default {
     hole() {
       return this.history[this.history.length - 1]
     },
-    loopEnd() {
-      return this.altHistory.length - 1
-    },
     loopStart() {
       return Math.max(
         0,
@@ -149,50 +146,27 @@ export default {
       return extra
     },
     canSpin() {
-      return this.altHistory[this.altHistory.length - 1] ==
-        this.history[this.loopStart]
+      return this.history.length >= 2 &&
+        this.altHistory[this.altHistory.length - 1] ==
+          this.history[this.loopStart]
     },
     clockwise() {
-      let minA = Infinity, minB = Infinity
-      let clockwise = false
-      for (let i = this.loopStart; i < this.loopEnd; i++) {
-        let node1 = this.altHistory[i], node2 = this.altHistory[i + 1]
-        let y1 = this.getHeightRank(node1)
-        let y2 = this.getHeightRank(node2)
-        let minY = Math.min(y1, y2)
-        let maxY = Math.max(y1, y2)
-        if (minY < minA || (minY == minA && maxY < minB)) {
-          minA = minY
-          minB = maxY
-          let x1 = this.getXRank(node1)
-          let x2 = this.getXRank(node2)
-          if (y1 < y2) {
-            let node0 = this.altHistory[
-              i <= this.loopStart ? this.loopEnd - 1 : i - 1
-            ]
-            let y0 = this.getHeightRank(node0)
-            if (y0 == y2) {
-              let x0 = this.getXRank(node0)
-              clockwise = x0 < x2
-            } else {
-              clockwise = x1 < x2
-            }
-          } else {
-            let node3 = this.altHistory[
-              i >= this.loopEnd - 1 ? this.loopStart + 1 : i + 2
-            ]
-            let y3 = this.getHeightRank(node3)
-            if (y3 == y1) {
-              let x3 = this.getXRank(node3)
-              clockwise = x1 < x3
-            } else {
-              clockwise = x1 < x2
-            }
-          }
+      let top = -Infinity
+      let topIndex = 0
+      let loopEnd = this.altHistory.length - 1
+      for (let i = this.loopStart; i < loopEnd; i++) {
+        let height = Math.abs(this.altHistory[i] - 0.5 * this.size)
+        if (height > top) {
+          top = height
+          topIndex = i
         }
       }
 
-      return clockwise
+      let prev =
+        this.altHistory[topIndex > this.loopStart ? topIndex - 1 : loopEnd - 1]
+      let next =
+        this.altHistory[topIndex < loopEnd ? topIndex + 1 : this.loopStart + 1]
+      return prev > next
     },
   },
   methods: {
@@ -210,14 +184,6 @@ export default {
       let dx1 = s * (0.5 * w * u + h * v), dy1 = s * (0.5 * w * v - h * u)
       let dx2 = s * (-.5 * w * u + h * v), dy2 = s * (-.5 * w * v - h * u)
       return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
-    },
-    getHeightRank(node) {
-      return Math.abs((node + this.size/2) % this.size - this.size/2)
-    },
-    getXRank(node) {
-      let a = (node + this.size/2) % this.size - this.size/2 // top half
-      let b = this.size/2 - node // bottom half
-      return Math.abs(a) < Math.abs(b) ? a : b
     },
     goForward() {
       if (this.ensureTail()) {
