@@ -4,6 +4,7 @@ import Goal from './Goal.vue'
 import Holes from './Holes.vue'
 import Permute from '../Permute.js'
 import SimpleGraph from '../SimpleGraph.js'
+import SpinButtons from './SpinButtons.vue'
 </script>
 
 <script>
@@ -150,41 +151,8 @@ export default {
         this.altHistory[this.altHistory.length - 1] ==
           this.history[this.loopStart]
     },
-    clockwise() {
-      let top = -Infinity
-      let topIndex = 0
-      let loopEnd = this.altHistory.length - 1
-      for (let i = this.loopStart; i < loopEnd; i++) {
-        let height = Math.abs(this.altHistory[i] - 0.5 * this.size)
-        if (height > top) {
-          top = height
-          topIndex = i
-        }
-      }
-
-      let prev =
-        this.altHistory[topIndex > this.loopStart ? topIndex - 1 : loopEnd - 1]
-      let next =
-        this.altHistory[topIndex < loopEnd ? topIndex + 1 : this.loopStart + 1]
-      return prev > next
-    },
   },
   methods: {
-    getSpinPath(r, w) {
-      let tailAngle = 160, headAngle = -30, sweep = 0, largeArc = 1
-      let s = -1 + 2 * sweep
-      let x1 = r * Math.sin(tailAngle * Math.PI / 180)
-      let y1 = -r * Math.cos(tailAngle * Math.PI / 180)
-      let u = Math.sin(headAngle * Math.PI / 180)
-      let v = -Math.cos(headAngle * Math.PI / 180)
-      let x2 = r * u, y2 = r * v
-      let h = w * Math.sqrt(0.375)
-      let neck = 4.5
-      let nx = s * -neck * v, ny = s * neck * u
-      let dx1 = s * (0.5 * w * u + h * v), dy1 = s * (0.5 * w * v - h * u)
-      let dx2 = s * (-.5 * w * u + h * v), dy2 = s * (-.5 * w * v - h * u)
-      return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} l ${nx} ${ny} m ${dx1} ${dy1} L ${x2 + nx} ${y2 + ny} l ${dx2} ${dy2}`
-    },
     goForward() {
       if (this.ensureTail()) {
         if (this.canSpin && !this.won) {
@@ -567,24 +535,16 @@ export default {
         <path :d="crossPath" class="cross shadow"/>
         <path :d="crossPath" class="cross"/>
       </g>
-      <template v-if="canSpin">
-        <g
-          :style="{transform: `translate(0,${spinButtonY}px) scale(${clockwise ? 1 : -1},1)`}"
-        >
-          <g :class="{spinGroup: true, clicked: spinButtonClicked, ghost: !spinButtonClicked}">
-            <path :d="spinPath" class="spinIcon shadow"/>
-            <path :d="spinPath" class="spinIcon"/>
-          </g>
-        </g>
-        <g
-          :style="{transform: `translate(0,${smallSpinButtonY}px) scale(${clockwise ? -1 : 1},1)`}"
-        >
-          <g :class="{spinGroup: true, clicked: smallSpinButtonClicked, ghost: !smallSpinButtonClicked}">
-            <path :d="smallSpinPath" class="spinIcon shadow"/>
-            <path :d="smallSpinPath" class="spinIcon"/>
-          </g>
-        </g>
-      </template>
+      <SpinButtons
+        v-if="canSpin"
+        :size="size"
+        :altHistory="altHistory"
+        :loopStart="loopStart"
+        :buttonY="spinButtonY"
+        :smallButtonY="smallSpinButtonY"
+        :buttonClicked="spinButtonClicked"
+        :smallButtonClicked="smallSpinButtonClicked"
+      />
     </svg>
   </button>
 </template>
@@ -642,37 +602,5 @@ button:focus-within .active-indicator.outline {
 }
 .canAnimate .crossGroup.ghost {
   transition: visibility 0s 0.35s;
-}
-.spinIcon {
-  stroke: var(--color-text);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-}
-.spinIcon.shadow {
-  stroke: var(--color-background);
-  stroke-width: 9;
-}
-.spinGroup.clicked {
-  transform: scale(calc(5/3));
-}
-.canAnimate .spinGroup.clicked {
-  animation: revert 1s 0.35s forwards;
-}
-@keyframes revert {
-  from { transform: scale(1); }
-  to { transform: scale(1); }
-}
-.canAnimate .spinGroup.ghost {
-  transition: transform 0s 0.05s;
-}
-@keyframes slide {
-  from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
-}
-@keyframes slide2 {
-  from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
 }
 </style>
