@@ -1,5 +1,6 @@
 <script setup>
 import Board from './Board.vue'
+import Cross from './Cross.vue'
 import Goal from './Goal.vue'
 import Holes from './Holes.vue'
 import Permute from '../Permute.js'
@@ -86,13 +87,6 @@ export default {
 
       return ys
     },
-    crossRadius() {
-      return 18
-    },
-    crossPath() {
-      let d = this.crossRadius * Math.sqrt(0.5)
-      return `M ${-d} ${-d} L ${d} ${d} M ${d} ${-d} L ${-d} ${d}`
-    },
     clickRadius() {
       return 42
     },
@@ -104,12 +98,6 @@ export default {
     },
     smallSpinButtonY() {
       return this.clickRadius - this.smallClickRadius - this.spinButtonY
-    },
-    spinPath() {
-      return this.getSpinPath(10, 11)
-    },
-    smallSpinPath() {
-      return this.getSpinPath(7, 9)
     },
     altHistory() {
       return this.extra.length ? this.history.concat(this.extra) : this.history
@@ -527,14 +515,12 @@ export default {
         :bead="i"
         :radius="100"
       />
-      <g
-        :transform="`translate(${nodeXs[hole] ?? 0}, ${nodeYs[hole] ?? 0})`"
-        :class="{crossGroup: true, ghost: !showCross}"
-        :visibility="showCross ? 'initial' : 'hidden'"
-      >
-        <path :d="crossPath" class="cross shadow"/>
-        <path :d="crossPath" class="cross"/>
-      </g>
+      <Cross
+        :size="size"
+        :hole="hole"
+        :shown="showCross"
+        :radius="100"
+      />
       <SpinButtons
         v-if="canSpin"
         :size="size"
@@ -588,19 +574,5 @@ button:focus-within .active-indicator.outline {
   ry: 5.75px;
   stroke: white;
   stroke-width: 0.5px;
-}
-.cross {
-  stroke: var(--color-text);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-}
-.cross.shadow {
-  stroke: var(--color-background);
-  stroke-width: 12;
-}
-.canAnimate .crossGroup.ghost {
-  transition: visibility 0s 0.35s;
 }
 </style>
