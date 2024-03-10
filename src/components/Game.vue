@@ -71,22 +71,6 @@ export default {
       return this.history.length >= 2 &&
         this.tail == this.history[this.history.length - 2]
     },
-    nodeXs() {
-      let xs = new Float64Array(this.size)
-      for (let i = 0; i < this.size; i++) {
-        xs[i] = 100 * Math.sin(2 * Math.PI * i / this.size)
-      }
-
-      return xs
-    },
-    nodeYs() {
-      let ys = new Float64Array(this.size)
-      for (let i = 0; i < this.size; i++) {
-        ys[i] = -100 * Math.cos(2 * Math.PI * i / this.size)
-      }
-
-      return ys
-    },
     clickRadius() {
       return 42
     },
@@ -269,43 +253,62 @@ export default {
         return
       }
 
-      let target = this.getClickTarget(event.offsetX, event.offsetY)
       this.resetButtons()
-      this.clickingButton = target != null
-      if (target != null && target >= 0) {
-        if (target == this.hole) {
-          if (this.history.length >= 2) {
-            this.goBack()
-          } else {
-            this.showCross = true
-          }
-        } else if (SimpleGraph.hasEdge(this.graph, target, this.hole)) {
-          this.tail = target
-          this.goForwardHelp()
+      this.clickingButton = false
+    },
+    onLeftButtonDown() {
+      this.focusIsClick = true
+      this.resetButtons()
+      this.clickingButton = true
+    },
+    onButtonDown(target) {
+      this.onLeftButtonDown()
+      if (target == this.hole) {
+        if (this.history.length >= 2) {
+          this.goBack()
         } else {
           this.showCross = true
         }
-
-        this.showTail = false
-      } else if (target == -2) {
-        if (this.history[0] == this.hole) {
-          this.tail = this.history[1]
-        } else {
-          this.tail = SimpleGraph.onlyPath(
-            this.graph,
-            this.history[this.history.length - 2],
-            this.hole,
-          )
-        }
-
+      } else if (SimpleGraph.hasEdge(this.graph, target, this.hole)) {
+        this.tail = target
         this.goForwardHelp()
-        this.showTail = false
-        this.spinButtonClicked = true
-      } else if (target == -3) {
-        this.goBack()
-        this.showTail = false
-        this.smallSpinButtonClicked = true
+      } else {
+        this.showCross = true
       }
+
+      this.showTail = false
+    },
+    onSpinButtonDown() {
+      this.onLeftButtonDown()
+      if (!this.canSpin) {
+        this.clickingButton = false
+        return
+      }
+
+      if (this.history[0] == this.hole) {
+        this.tail = this.history[1]
+      } else {
+        this.tail = SimpleGraph.onlyPath(
+          this.graph,
+          this.history[this.history.length - 2],
+          this.hole,
+        )
+      }
+
+      this.goForwardHelp()
+      this.showTail = false
+      this.spinButtonClicked = true
+    },
+    onSmallSpinButtonDown() {
+      this.onLeftButtonDown()
+      if (!this.canSpin) {
+        this.clickingButton = false
+        return
+      }
+
+      this.goBack()
+      this.showTail = false
+      this.smallSpinButtonClicked = true
     },
     clicked(event) {
       this.focusIsClick = false
@@ -315,37 +318,6 @@ export default {
           this.resetButtons()
         }
       }
-    },
-    getClickTarget(offsetX, offsetY) {
-      let gameView = document.getElementById('game-view')
-      let clientSize = Math.min(gameView.clientWidth, gameView.clientHeight)
-      let x = (offsetX - 0.5 * gameView.clientWidth) * 286 / clientSize
-      let y = (offsetY - 0.5 * gameView.clientHeight) * 286 / clientSize
-      for (let i = 0; i < this.size; i++) {
-        let dx = this.nodeXs[i] - x
-        let dy = this.nodeYs[i] - y
-        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-          return i
-        }
-      }
-
-      if (this.canSpin) {
-        let dx = 0 - x
-        let dy = this.smallSpinButtonY - y
-        if (
-          dx * dx + dy * dy < this.smallClickRadius * this.smallClickRadius
-        ) {
-          return -3
-        }
-
-        dx = 0 - x
-        dy = this.spinButtonY - y
-        if (dx * dx + dy * dy < this.clickRadius * this.clickRadius) {
-          return -2
-        }
-      }
-
-      return null
     },
     nextLevel(event) {
       if (this.won || this.hasWon) {
@@ -494,6 +466,9 @@ export default {
         :smallClickRadius="smallClickRadius"
         :buttonY="spinButtonY"
         :smallButtonY="smallSpinButtonY"
+        @buttonDown="onButtonDown"
+        @spinButtonDown="onSpinButtonDown"
+        @smallSpinButtonDown="onSmallSpinButtonDown"
       />
       <Board
         :key="graphId"

@@ -160,6 +160,7 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: var(--dash-array);
+  pointer-events: none;
 }
 
 .canAnimate .edge {

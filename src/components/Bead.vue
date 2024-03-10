@@ -97,6 +97,7 @@ moveToA moving offset-distance
   offset-distance: 100%;
   offset-rotate: -90deg;
   transform: rotate(90deg) scale(var(--scale));
+  pointer-events: none;
 }
 .bead.onPath {
   offset-rotate: auto;

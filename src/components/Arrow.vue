@@ -100,6 +100,7 @@ visibility = aArrow || bArrow
   stroke-width: 4;
   stroke-linecap: round;
   visibility: hidden;
+  pointer-events: none;
 }
 
 .canAnimate .tail {

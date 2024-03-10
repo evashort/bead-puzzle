@@ -39,6 +39,7 @@ export default {
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
+  pointer-events: none;
 }
 .cross.shadow {
   stroke: var(--color-background);

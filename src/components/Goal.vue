@@ -61,7 +61,7 @@ export default {
   <g :transform="`translate(${x},${y})`">
     <use
       :href="`#${name}-outline`"
-      :style="{ 'transform': `scale(${scale})` }"
+      :style="{ transform: `scale(${scale})`, pointerEvents: 'none' }"
     />
   </g>
 </template>

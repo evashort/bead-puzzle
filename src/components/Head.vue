@@ -118,6 +118,7 @@ export default {
 <style scoped>
 .head {
   visibility: hidden;
+  pointer-events: none;
 }
 .head.shown {
   visibility: initial;

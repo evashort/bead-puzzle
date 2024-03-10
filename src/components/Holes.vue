@@ -13,6 +13,7 @@ export default {
     buttonY: Number,
     smallButtonY: Number,
   },
+  emits: ['buttonDown', 'spinButtonDown', 'smallSpinButtonDown'],
   computed: {
     colorNames() {
       return [
@@ -91,6 +92,23 @@ export default {
       return result
     }
   },
+  methods: {
+    onButtonDown(event, target) {
+      if (event.button == 0) {
+        this.$emit('buttonDown', target)
+      }
+    },
+    onSpinButtonDown(event, target) {
+      if (event.button == 0) {
+        this.$emit('spinButtonDown', target)
+      }
+    },
+    onSmallSpinButtonDown(event, target) {
+      if (event.button == 0) {
+        this.$emit('smallSpinButtonDown', target)
+      }
+    },
+  }
 }
 </script>
 
@@ -114,17 +132,31 @@ export default {
     :r="clickRadius * glowRadius"
     :cx="centers[name].x"
     :cy="centers[name].y"
+    pointer-events="none"
   />
   <circle
-    v-for="name in colorNames"
+    v-for="(name, i) in colorNames"
+    @pointerdown.stop="onButtonDown($event, i)"
     :r="clickRadius"
     :cx="centers[name].x"
     :cy="centers[name].y"
     :class="{hole: true, glowing: shownColorNames.has(name)}"
     :style="{ '--glow-color': colors[name] }"
   />
-  <circle :r="clickRadius" :cx="0" :cy="buttonY" class="hole"/>
-  <circle :r="smallClickRadius" :cx="0" :cy="smallButtonY" class="hole"/>
+  <circle
+    :r="clickRadius"
+    :cx="0"
+    :cy="buttonY"
+    class="hole"
+    @pointerdown.stop="onSpinButtonDown"
+  />
+  <circle
+    :r="smallClickRadius"
+    :cx="0"
+    :cy="smallButtonY"
+    class="hole"
+    @pointerdown.stop="onSmallSpinButtonDown"
+  />
 </template>
 
 <style scoped>
