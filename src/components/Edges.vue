@@ -124,12 +124,14 @@ export default {
     :gap="gap"
     :a="toVisibility(
       edge == aHiddenEdge || edge == aAltHiddenEdge || edge == aEndEdge,
-      edge == aHiddenEdge ? holeStart == edge[0] && loopStart == 0 :
+      edge == aHiddenEdge ?
+        holeStart == edge[0] && hole == edge[1] && loopStart == 0 :
         holeStart == edge[0] && hole != edge[1] && activeEdges[edge],
     )"
     :b="toVisibility(
       edge == bHiddenEdge || edge == bAltHiddenEdge || edge == bEndEdge,
-      edge == bHiddenEdge ? holeStart == edge[1] && loopStart == 0 :
+      edge == bHiddenEdge ?
+        holeStart == edge[1] && hole == edge[0] && loopStart == 0 :
         holeStart == edge[1] && hole != edge[0] && activeEdges[edge],
     )"
     :aPrimeLength="getPrimeLength(edge, 0)"
