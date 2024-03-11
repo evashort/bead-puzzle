@@ -23,7 +23,6 @@ export default {
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
 
-      reversed: false,
       hasWon: false,
     }
   },
@@ -132,8 +131,8 @@ export default {
           this.goForwardHelp()
         }
       } else {
-        this.goForwardHelp()
-        if (!this.reversed && this.reversing) {
+        let reversed = this.goForwardHelp()
+        if (!reversed && this.reversing) {
           this.showTail = false // dead end
         }
       }
@@ -141,7 +140,6 @@ export default {
     goForwardHelp() {
       this.beads = Permute.swap(this.beads, this.hole, this.tail)
       let oldHole = this.hole
-      this.reversed = false
       if (this.reversing) {
         this.history.pop()
         if (this.history[0] == oldHole) {
@@ -150,14 +148,13 @@ export default {
           this.history.push(this.history[0])
         } else {
           // not a loop
-          this.reversed = true
           if (this.history.length >= 2) {
             this.tail = this.history[this.history.length - 2] // keep going back
           } else {
             this.tail = oldHole
           }
 
-          return
+          return true
         }
       } else {
         this.history.push(this.tail)
@@ -172,6 +169,7 @@ export default {
       }
 
       this.tail = this.getNextTail(this.history)
+      return false
     },
     getNextTail(history) {
       // first choice: continue the loop
@@ -195,7 +193,6 @@ export default {
         // doesn't cause the tail to be shown again.
         this.showTail = this.showTail || this.won || this.deadEnd
 
-        this.reversed = true
         this.tail = this.hole
         this.beads = Permute.swap(this.beads, newHole, this.tail)
         this.history.pop()
