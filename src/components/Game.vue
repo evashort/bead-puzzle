@@ -13,7 +13,6 @@ export default {
   data() {
     return {
       beads: 0,
-      won: false,
       history: [],
       tail: null,
       showTail: false,
@@ -22,7 +21,6 @@ export default {
       clickingButton: false,
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
-
       hasWon: false,
     }
   },
@@ -125,9 +123,9 @@ export default {
   methods: {
     goForward() {
       if (this.ensureTail()) {
-        if (this.canSpin && !this.won) {
+        if (this.canSpin && this.beads != 0) {
           // continue going around the loop with the tail hidden
-          this.showTail = this.won
+          this.showTail = false
           this.goForwardHelp()
         }
       } else {
@@ -191,7 +189,7 @@ export default {
         // tutorial levels have dead ends which cause the tail to be hidden
         // even when using the keyboard. it's confusing if going back
         // doesn't cause the tail to be shown again.
-        this.showTail = this.showTail || this.won || this.deadEnd
+        this.showTail = this.showTail || this.beads == 0 || this.deadEnd
 
         this.tail = this.hole
         this.beads = Permute.swap(this.beads, newHole, this.tail)
@@ -315,7 +313,7 @@ export default {
       }
     },
     nextLevel(event) {
-      if (this.won || this.hasWon) {
+      if (this.hasWon) {
         event.stopPropagation()
         event.preventDefault()
         this.$emit('nextLevel')
@@ -351,7 +349,6 @@ export default {
   watch: {
     state: {
       handler(newState, oldState) {
-        this.won = false
         this.hasWon = false
         let gameView = document.getElementById('game-view')
         this.showTail = gameView?.parentNode?.matches(':focus-within') ?? false
@@ -362,7 +359,6 @@ export default {
       immediate: true,
     },
     graphId(newGraphId, oldGraphId) {
-      this.won = false
       this.hasWon = false
       let gameView = document.getElementById('game-view')
       this.showTail = gameView?.parentNode?.matches(':focus-within') ?? false
@@ -376,15 +372,13 @@ export default {
       immediate: true,
     },
     beads(newBeads, oldBeads) {
-      let newWon = this.beads == 0
-      if (newWon != this.won) {
+      let oldWon = oldBeads == 0, newWon = newBeads == 0
+      if (newWon != oldWon) {
         if (newWon) {
           this.showTail = false
-        } else {
           this.hasWon = true
         }
 
-        this.won = newWon
         this.$emit('update:won', newWon)
       }
 
@@ -472,7 +466,7 @@ export default {
         :historyLength="history.length"
         :tail="showTail ? tail : -1"
         :loopStart="loopStart"
-        :hasWon="won || hasWon"
+        :hasWon="hasWon"
         :controlLength="curvedPaths ? 30 : 0"
         :gap="curvedPaths ? 28 : 36"
         :radius="100"
