@@ -23,7 +23,6 @@ export default {
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
 
-      oldHole: 0,
       reversed: false,
       hasWon: false,
     }
@@ -141,11 +140,11 @@ export default {
     },
     goForwardHelp() {
       this.beads = Permute.swap(this.beads, this.hole, this.tail)
-      this.oldHole = this.hole
+      let oldHole = this.hole
       this.reversed = false
       if (this.reversing) {
         this.history.pop()
-        if (this.history[0] == this.oldHole) {
+        if (this.history[0] == oldHole) {
           // reverse the loop
           this.history.reverse()
           this.history.push(this.history[0])
@@ -155,7 +154,7 @@ export default {
           if (this.history.length >= 2) {
             this.tail = this.history[this.history.length - 2] // keep going back
           } else {
-            this.tail = this.oldHole
+            this.tail = oldHole
           }
 
           return
@@ -196,7 +195,6 @@ export default {
         // doesn't cause the tail to be shown again.
         this.showTail = this.showTail || this.won || this.deadEnd
 
-        this.oldHole = this.hole
         this.reversed = true
         this.tail = this.hole
         this.beads = Permute.swap(this.beads, newHole, this.tail)
@@ -362,7 +360,6 @@ export default {
         this.showTail = gameView?.parentNode?.matches(':focus-within') ?? false
         this.beads = newState.beads
         this.history = [...newState.history]
-        this.oldHole = this.hole
         this.tail = this.getNextTail(this.history)
       },
       immediate: true,
