@@ -18,7 +18,6 @@ export default {
       showTail: false,
       showCross: false,
       focusIsClick: false,
-      clickingButton: false,
       spinButtonClicked: false,
       smallSpinButtonClicked: false,
       hasWon: false,
@@ -246,13 +245,15 @@ export default {
         return
       }
 
+      if (!event.target.parentNode.matches(':focus-within')) {
+        this.ensureTail()
+      }
+
       this.resetButtons()
-      this.clickingButton = false
     },
     onLeftButtonDown() {
       this.focusIsClick = true
       this.resetButtons()
-      this.clickingButton = true
     },
     onButtonDown(target) {
       this.onLeftButtonDown()
@@ -274,7 +275,11 @@ export default {
     onSpinButtonDown() {
       this.onLeftButtonDown()
       if (!this.canSpin) {
-        this.clickingButton = false
+        let button = document.getElementById('game-view').parentNode
+        if (!button.matches(':focus-within')) {
+          this.ensureTail()
+        }
+
         return
       }
 
@@ -295,7 +300,11 @@ export default {
     onSmallSpinButtonDown() {
       this.onLeftButtonDown()
       if (!this.canSpin) {
-        this.clickingButton = false
+        let button = document.getElementById('game-view').parentNode
+        if (!button.matches(':focus-within')) {
+          this.ensureTail()
+        }
+
         return
       }
 
@@ -305,11 +314,8 @@ export default {
     },
     clicked(event) {
       this.focusIsClick = false
-      if (event.button == 0) {
-        this.clickingButton = false
-        if (this.canAnimate) {
-          this.resetButtons()
-        }
+      if (event.button == 0 && this.canAnimate) {
+        this.resetButtons()
       }
     },
     nextLevel(event) {
@@ -327,12 +333,10 @@ export default {
     onFocus(event) {
       if (!this.focusIsClick) {
         event.target.scrollIntoView(false)
+        this.ensureTail()
       }
 
       this.focusIsClick = false
-      if (!this.clickingButton) {
-        this.ensureTail()
-      }
     },
     onBlur() {
       this.focusIsClick = false
@@ -340,7 +344,6 @@ export default {
       this.resetButtons()
     },
     resetButtons() {
-      this.clickingButton = false
       this.showCross = false
       this.spinButtonClicked = false
       this.smallSpinButtonClicked = false
