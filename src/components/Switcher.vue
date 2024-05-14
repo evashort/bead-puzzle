@@ -1,7 +1,8 @@
 <script setup>
 import Game from './Game.vue'
 import graphData from '../assets/graphs.json'
-import Markdown from 'vue3-markdown-it'
+import { VMarkdownView } from 'vue3-markdown'
+import 'vue3-markdown/dist/style.css'
 import HistoryNum from '../HistoryNum.js'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
@@ -491,7 +492,7 @@ ${comment}
         </button>
       </div>
       <div class="info">
-        <Markdown class="instructions" :source="instructions" />
+        <VMarkdownView class="instructions" mode="dark" :content="instructions"/>
         <div class="columns">
           <fieldset v-if="letters.length > 1">
             <legend>{{letters.length}} rotations</legend>
@@ -664,6 +665,11 @@ dialog {
 }
 .instructions {
   padding: 0rem 0.75rem;
+}
+.instructions {
+  padding: 0rem 0.75rem;
+  color: var(--color-text);
+  background-color: transparent;
 }
 .columns {
   display: grid;
