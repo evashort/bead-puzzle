@@ -2,11 +2,9 @@
 import Game from './Game.vue'
 import graphData from '../assets/graphs.json'
 import Markdown from 'vue3-markdown-it'
-import base64js from 'base64-js'
 import HistoryNum from '../HistoryNum.js'
 import SimpleGraph from '../SimpleGraph.js'
 import Permute from '../Permute.js'
-import pako from 'pako'
 </script>
 
 <script>
@@ -169,10 +167,6 @@ export default {
       curvedPaths: true,
     }
   },
-  mounted() {
-    window.addEventListener('storage', this.storageChanged)
-    // console.assert(this.loadSaveFile(localStorage.getItem('save')))
-  },
   computed: {
     graph() {
       return this.graphs[this.graphIndex]
@@ -327,119 +321,6 @@ State space: ${this.graph.states} states
 ${comment}
 `
     },
-    saveFile() {
-      let startedVariations = 0
-      let wonVariations = 0
-      let eitherVariations = 0
-      for (let graph of this.graphs) {
-        for (let rotationPuzzles of graph.puzzles) {
-          for (let puzzle of rotationPuzzles) {
-            startedVariations += puzzle.history.length > 1
-            wonVariations += puzzle.won
-            eitherVariations += puzzle.won || puzzle.history.length > 1
-          }
-        }
-      }
-
-      let buffer = new ArrayBuffer(21 + 8 * eitherVariations + 4 * startedVariations)
-      let view = new DataView(buffer)
-      let offset = 0
-      view.setUint16(offset, 0, true) // version = 0
-      view.setUint16(offset += 2, 3, true) // total settings length
-      view.setUint8(offset += 2, 0) // first setting type = flags
-      view.setUint8(offset += 1, 1) // first setting length = 1
-      view.setUint8(offset += 1, this.canAnimate + (this.curvedPaths << 1))
-      let lastPlayedId = SimpleGraph.fromString(this.graph.id)
-      let array = new Uint8Array(buffer)
-      array.set(lastPlayedId, offset += 1)
-      view.setUint16(offset += 4, this.graph.layouts[this.rotation], true)
-      view.setUint16(offset += 2, this.puzzle.start, true)
-      view.setUint16(offset += 2, eitherVariations, true)
-      offset += 2
-      let count = 0
-      for (let graph of this.graphs) {
-        let graphId = SimpleGraph.fromString(graph.id)
-        for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
-          let layout = graph.layouts[rotation]
-          for (let puzzle of rotationPuzzles) {
-            if (puzzle.history.length > 1 && !puzzle.won) {
-              array.set(graphId, offset + 8 * count)
-              view.setUint16(offset + 4 + 8 * count, layout, true)
-              view.setUint16(offset + 6 + 8 * count, puzzle.start, true)
-              count++
-            }
-          }
-        }
-      }
-
-      console.assert(count == eitherVariations - wonVariations)
-      for (let graph of this.graphs) {
-        let graphId = SimpleGraph.fromString(graph.id)
-        for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
-          let layout = graph.layouts[rotation]
-          for (let puzzle of rotationPuzzles) {
-            if (puzzle.won && puzzle.history.length > 1) {
-              array.set(graphId, offset + 8 * count)
-              view.setUint16(offset + 4 + 8 * count, layout, true)
-              view.setUint16(offset + 6 + 8 * count, puzzle.start, true)
-              count++
-            }
-          }
-        }
-      }
-
-      console.assert(count == startedVariations)
-      for (let graph of this.graphs) {
-        let graphId = SimpleGraph.fromString(graph.id)
-        for (let [rotation, rotationPuzzles] of graph.puzzles.entries()) {
-          let layout = graph.layouts[rotation]
-          for (let puzzle of rotationPuzzles) {
-            if (puzzle.won && puzzle.history.length <= 1) {
-              array.set(graphId, offset + 8 * count)
-              view.setUint16(offset + 4 + 8 * count, layout, true)
-              view.setUint16(offset + 6 + 8 * count, puzzle.start, true)
-              count++
-            }
-          }
-        }
-      }
-
-      console.assert(count == eitherVariations)
-      offset += 8 * eitherVariations
-      view.setUint16(offset, startedVariations, true)
-      offset += 2
-      count = 0
-      for (let graph of this.graphs) {
-        let graphId = SimpleGraph.fromString(graph.id)
-        let graphNodes = SimpleGraph.bytesToNodeCount(graphId)
-        for (let rotationPuzzles of graph.puzzles) {
-          for (let puzzle of rotationPuzzles) {
-            if (puzzle.history.length > 1) {
-              let historyLength = puzzle.history.length - 1
-              view.setUint16(offset + 4 * count, puzzle.beads * 8 + historyLength, true)
-              let historyNum = HistoryNum.historyToNumber(puzzle.history, graphNodes)
-              view.setUint16(offset + 2 + 4 * count, historyNum, true)
-              count++
-            }
-          }
-        }
-      }
-
-      console.assert(count == startedVariations)
-      offset += 4 * startedVariations
-      view.setUint16(offset, wonVariations, true)
-      offset += 2
-      console.assert(offset == buffer.byteLength)
-      return buffer
-    },
-    uncompressedSaveFile() {
-      let zipped = new Uint8Array(this.saveFile)
-      return base64js.fromByteArray(zipped).replaceAll('+', '-').replaceAll('/', '_')
-    },
-    compressedSaveFile() {
-      let zipped = pako.deflate(this.saveFile)
-      return base64js.fromByteArray(zipped).replaceAll('+', '-').replaceAll('/', '_')
-    },
   },
   methods: {
     focusGame() {
@@ -486,142 +367,6 @@ ${comment}
     tailChanged(tail) {
       this.puzzle.tail = tail
     },
-    storageChanged(event) {
-      if (event.key === null) {
-        console.log('cleared')
-      } else if (event.key == 'save') {
-        // console.assert(this.loadSaveFile(event.newValue))
-      }
-    },
-    loadSaveFile(saveFile) {
-      let zipped = base64js.toByteArray(saveFile)
-      let array = pako.inflate(zipped)
-      let buffer = array.buffer
-      let view = new DataView(buffer)
-      let offset = 0
-      if (buffer.byteLength < 4) { return false }
-      let version = view.getUint16(offset, true)
-      if (version > 0) { return false }
-      let settingsLength = view.getUint16(offset += 2, true)
-      let settingsStop = (offset += 2) + settingsLength
-      if (buffer.byteLength < settingsStop) { return false }
-      while (offset < settingsStop) {
-        let settingType = view.getUint8(offset)
-        if (offset + 1 >= settingsStop) { return false }
-        let settingLength = view.getUint8(offset += 1)
-        offset += 1
-        if (offset + settingLength > settingsStop) { return false }
-        if (settingType == 0) {
-          if (settingLength != 1) { return false }
-          let flags = view.getUint8(offset)
-          this.canAnimate = Boolean(flags & 0x1)
-          this.curvedPaths = Boolean(flags & 0x2)
-        }
-
-        offset += settingLength
-      }
-
-      console.assert(offset == settingsStop)
-      if (offset + 10 > buffer.byteLength) { return false }
-      let idLength = 4
-      for (; idLength > 0; idLength--) {
-        if (array[offset + idLength - 1]) { break }
-      }
-      let lastPlayedBytes = array.slice(offset, offset + 4)
-      let lastPlayedSize = SimpleGraph.bytesToNodeCount(lastPlayedBytes)
-      let lastPlayedByteCount = Math.ceil(lastPlayedSize * (lastPlayedSize - 1) * 0.5 * 0.125)
-      let lastPlayedId = SimpleGraph.toString(lastPlayedBytes.slice(0, lastPlayedByteCount))
-      let lastPlayedLayout = view.getUint16(offset += 4, true)
-      let lastPlayedStart = view.getUint16(offset += 2, true)
-      for (let [i, graph] of this.graphs.entries()) {
-        if (graph.id.split(".", 1)[0] != lastPlayedId) {
-          continue
-        }
-
-        let rotation = graph.layouts.indexOf(lastPlayedLayout)
-        if (rotation < 0) {
-          continue
-        }
-
-        let variation = -1
-        for (let [j, puzzle] of graph.puzzles[rotation].entries()) {
-          if (puzzle.start == lastPlayedStart) {
-            variation = j
-            break
-          }
-        }
-
-        if (variation < 0) {
-          continue
-        }
-
-        this.graphIndex = i
-        this.rotationIndex = this.rotations.indexOf(rotation)
-        this.variation = variation
-        break
-      }
-
-      let eitherVariations = view.getUint16(offset += 2, true)
-      let variationsStop = (offset += 2) + 8 * eitherVariations
-      if (buffer.byteLength < variationsStop) { return false }
-      let variationIndices = {}
-      for (let i = 0; i < eitherVariations; i++) {
-        let idBytes = array.slice(offset, offset + 4)
-        let idSize = SimpleGraph.bytesToNodeCount(idBytes)
-        let idByteCount = Math.ceil(idSize * (idSize - 1) * 0.5 * 0.125)
-        let id = SimpleGraph.toString(idBytes.slice(0, idByteCount))
-        let layout = view.getUint16(offset + 4, true)
-        let start = view.getUint16(offset + 6, true)
-        variationIndices[[id, layout, start].toString()] = i
-        offset += 8
-      }
-
-      console.assert(offset == variationsStop)
-      if (offset + 2 > buffer.byteLength) { return false }
-      let startedVariations = view.getUint16(offset, true)
-      variationsStop = (offset += 2) + 4 * startedVariations
-      if (buffer.byteLength < variationsStop) { return false }
-      let states = []
-      let histories = []
-      for (let i = 0; i < startedVariations; i++) {
-        states.push(view.getUint16(offset + 4 * i, true))
-        histories.push(view.getUint16(offset + 4 * i + 2, true))
-      }
-
-      offset = variationsStop
-      if (offset + 2 > buffer.byteLength) { return false }
-      let wonVariations = view.getUint16(offset, true)
-      for (let graph of this.graphs) {
-        let id = graph.id.split('.', 1)[0]
-        let nodes = SimpleGraph.bytesToNodeCount(SimpleGraph.fromString(id))
-        for (let [i, layout] of graph.layouts.entries()) {
-          for (let puzzle of graph.puzzles[i]) {
-            let key = [id, layout, puzzle.start].toString()
-            let index = variationIndices[key]
-            puzzle.won = index >= eitherVariations - wonVariations
-            if (index < states.length) {
-              let historyLength = states[index] % 8
-              puzzle.beads = (states[index] - historyLength) / 8
-              puzzle.history = HistoryNum.numberToHistory(
-                histories[index],
-                historyLength,
-                nodes,
-                Permute.findZero(puzzle.beads),
-              )
-            } else {
-              puzzle.beads = puzzle.start
-              puzzle.history = [Permute.findZero(puzzle.beads)]
-            }
-          }
-        }
-      }
-
-      this.initialState = {
-        beads: this.puzzle.beads,
-        history: this.puzzle.history,
-      }
-      return (offset += 2) == buffer.byteLength
-    },
   },
   watch: {
     graphIndex(newGraphIndex, oldGraphIndex) {
@@ -656,9 +401,6 @@ ${comment}
       } else {
         play.close()
       }
-    },
-    compressedSaveFile(newCompressedSaveFile, oldCompressedSaveFile) {
-      localStorage.setItem('save', newCompressedSaveFile)
     },
   },
 }
@@ -723,12 +465,6 @@ ${comment}
         <input type="checkbox" id="setting-1" name="settings" v-model="curvedPaths">
         &nbsp;
         <label for="setting-1">Curved paths</label>
-        <pre style="white-space: pre-wrap; overflow-wrap: break-word;">
-
-{{uncompressedSaveFile.replaceAll('-', '\u2011')}}
-
-{{compressedSaveFile.replaceAll('-', '\u2011')}}
-</pre>
       </div>
     </div>
     <dialog id="play">
