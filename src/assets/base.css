@@ -34,7 +34,7 @@
   --color-text: var(--vt-c-black);
 }
 
-@media (prefers-color-scheme: dark) {
+@media {
   :root {
     --color-background: var(--vt-c-black);
     --color-background-soft: var(--vt-c-black-soft);

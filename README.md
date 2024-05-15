@@ -1,4 +1,5 @@
-# bead-puzzle
+# Bead Puzzle
+A circle of beads with one empty space. You can move beads into the empty space but only along certain paths. Try to get every bead into the space where it belongs.
 
 ## Development instructions
 This repo is based on the following template: [vitodepi16/vite-hello-world](https://github.com/vitodepi16/vite-hello-world)
@@ -74,37 +75,49 @@ Normally you don't need to do this because the output is checked into the repo.
 
 To understand what `main.py` is doing, let's look at `graphs/ab_ac_ad_bc_cd.json` (a.k.a. the "Sandwich"). This graph includes the following layouts which are isomorphic to each other:
 ```
-  A     A
- /|\   /|\
-D | B D-+-B
- \|/    |/
-  C     C
+  A      A
+ /|\    /|\
+D | B  D-+-B
+ \|/     |/
+  C      C
 ```
-Specifically, the second layout can be created from the first layout by swapping nodes B and C. The first layout happens to minimize the sum of all ["edge lengths"](#edge-length), so that layout is used as the name of the JSON file (each pair of letters is an edge).
+Specifically, the second layout can be created from the first layout by swapping nodes B and C. The first layout happens to minimize the sum of all ["edge lengths"](#edge-length), so it's used as the name of the JSON file (each pair of letters is an edge).
 
-These two layouts are represented in binary form as `101111` and `011111` respectively. Each binary digit indicates the presence or an absence of an edge as shown in the following diagram. The digits are arranged into a triangle with the *least significant digit first*:
+These two layouts are represented in binary form as `101111` and `011111` respectively. Each binary digit indicates the presence or an absence of an edge as shown in the following diagram. The digits are arranged into an upper triangular matrix in *row-major order* with the *least-significant digit first*:
 ```
-A      A
-B 1    B 1
-C 11   C 11
-D 101  D 110
-  ABCD   ABCD
+           ABCD
+          A 111
+101111 -> B  10
+          C   1
+          D
+
+           ABCD
+          A 111
+011111 -> B  11
+          C   0
+          D
 ```
 
-Since `011111` is the lowest possible binary representation for this graph, its base64 representation is chosen as the graph's `id`. The other binary representation is chosen as the graph's `layout` because it has the lowest total ["edge length"](#edge-length).
+The general pattern is like this (note the little-endian byte order):
+```
+                     1247b
+                      358c
+87654321 0fedcba9 ->   69d
+                        ae
+                         f
+```
+
+Since `011111` is the lowest possible binary representation of the graph, its base64 representation is chosen as the graph's unique `id`. `101111` is chosen as the graph's `layout` because it has the lowest total ["edge length"](#edge-length).
 ```python
-# length is the number of bytes including leading zeros.
-# 2 to 4 nodes: length=1
-# 5 to 6 nodes: length=2
-# 7 nodes: length=3
-
 base64.b64encode(int('011111', base=2).to_bytes(length=1, byteorder='little'))
 # Result: Hw==
 
 base64.b64encode(int('101111', base=2).to_bytes(length=1, byteorder='little'))
 # Result: Lw==
 ```
-Let's check this against the contents of `graphs/ab_ac_ad_bc_cd.json`:
+Note: The `length` argument must be 1 for 2- to 4-node graphs and 2 for 5- to 6-node graphs.
+
+Let's check the results against the contents of `graphs/ab_ac_ad_bc_cd.json`:
 ```json
 {
     "puzzles": [
@@ -123,10 +136,80 @@ Let's check this against the contents of `graphs/ab_ac_ad_bc_cd.json`:
 }
 ```
 ### "Edge length"
-Instead of calculating actual edge lengths we use distance around the perimiter as a rough approximation. For example in the following graph, edge AD has "length" 3 and edge BF has "length" 2.
+We don't calculate actual edge lengths when we choose a layout. Instead we use distance around the perimiter as a rough approximation. For example in the following graph, edge AD has "length" 3 and edge BF has "length" 2.
 ```
    A
 F--+--B
 E  |  C
    D
+```
+Minimizing "edge length" can make graphs less tangled and more comprehensible, but it's only a starting point. Later in the puzzle generation process there's a way to customize the layout of each graph.
+### Puzzles
+`distance` is the maximum distance (number of moves) between any two game states for a graph. We compute the [distance matrix](https://en.wikipedia.org/wiki/Distance_matrix) not for the graph itself but for its [state space](https://en.wikipedia.org/wiki/State_space_%28computer_science%29) graph, using repeated [min-plus matrix multiplication](https://en.wikipedia.org/wiki/Min-plus_matrix_multiplication). The state space of a 7-node graph is a 5040-node graph (7! = 5040).
+
+The "Sandwich" graph has a maximum distance of 7, so to make the puzzles challenging we only choose start and goal states that are 7 moves apart. Here are two such puzzles (0 represents the empty space):
+
+```
+  0        0
+ /|\      /|\
+1 | 3 -> 3 | 1
+ \|/      \|/
+  2        2
+
+  3        3
+ /|\      /|\
+0 | 2 -> 2 | 0
+ \|/      \|/
+  1        1
+```
+The first puzzle happens to have a goal state where the beads are in clockwise order. We can always force the goal state to be in clockwise order by "repainting" the beads, as long as we repaint the initial state to match. Therefore we don't lose anything important by eliminating puzzles whose goal states are not in clockwise order.
+
+However, the empty space has special meaning and cannot be repainted. To get it in the topmost position we rotate the entire graph, edges and all. We do this before eliminating puzzles with non-clockwise goal states. Now we have a standard goal state for all puzzles:
+```
+  0        0
+ /|\      /|\
+1 | 3 -> 3 | 1
+ \|/      \|/
+  2        2
+
+  2        0
+ / \      / \
+3---1 -> 3---1
+ \ /      \ /
+  0        2
+```
+The remaining puzzles are uniquely determined by an initial state and a rotation of the graph's `layout`. The first puzzle has initial state `0321` and rotation 0. The second puzzle has initial state `2103` and rotation 1 (counter-clockwise).
+
+Finally, we encode the initial state based in its index in the sorted list of all permutations (we treat the first value of each permutation as least significant and sort the permutations in descending order):
+```
+0  0123
+1  1023
+2  0213
+3  2013
+4  1203
+5  2103 (second puzzle)
+6  0132
+7  1032
+8  0312
+9  3012
+10 1302
+11 3102
+12 0231
+13 2031
+14 0321 (first puzzle)
+   ...
+```
+
+These permutation indices and rotations are stored in the `puzzles` array of `graphs/ab_ac_ad_bc_cd.json`:
+```json
+[
+    {
+        "rotation": 0,
+        "start": 14
+    },
+    {
+        "rotation": 1,
+        "start": 5
+    }
+]
 ```
