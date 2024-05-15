@@ -339,9 +339,9 @@ def get_max_distance_and_puzzles_help(n, distances, distinct_rotations):
         start = tuple(index_to_permutation(n, start_index))
         rotation = distinct_rotations[rotation_index]
         # shift everything right. greater rotation means greater right shift.
-        # note that successive final permutations e.g. 0123, 1230, 2301... are
+        # note that successive goal permutations e.g. 0123, 1230, 2301... are
         # increasingly left shifted. the rightward shift cancels that out and
-        # puts the final permutation in standard position 0123
+        # puts the goal permutation in standard position 0123
         start = start[n - rotation :] + start[: n - rotation]
         puzzles.append((start, rotation))
 

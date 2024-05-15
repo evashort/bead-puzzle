@@ -1,5 +1,5 @@
 # Bead Puzzle
-A circle of beads with one empty space. You can move beads into the empty space but only along certain paths. Try to get every bead into the space where it belongs.
+A circle of beads with one empty space. You can move beads into the empty space but only along certain paths. Try to get every bead into the space where it belongs: https://evashort.com/beads/
 
 ## Development instructions
 This repo is based on the following template: [vitodepi16/vite-hello-world](https://github.com/vitodepi16/vite-hello-world)
@@ -156,11 +156,11 @@ The "Sandwich" graph has a maximum distance of 7, so to make the puzzles challen
  \|/      \|/
   2        2
 
-  3        3
- /|\      /|\
-0 | 2 -> 2 | 0
- \|/      \|/
   1        1
+ /|\      /|\
+2 | 0 -> 0 | 2
+ \|/      \|/
+  3        3
 ```
 The first puzzle happens to have a goal state where the beads are in clockwise order. We can always force the goal state to be in clockwise order by "repainting" the beads, as long as we repaint the initial state to match. Therefore we don't lose anything important by eliminating puzzles whose goal states are not in clockwise order.
 
@@ -178,7 +178,7 @@ However, the empty space has special meaning and cannot be repainted. To get it 
  \ /      \ /
   0        2
 ```
-The remaining puzzles are uniquely determined by an initial state and a rotation of the graph's `layout`. The first puzzle has initial state `0321` and rotation 0. The second puzzle has initial state `2103` and rotation 1 (counter-clockwise).
+The remaining puzzles are uniquely determined by an initial state and a rotation of the graph's `layout`. The first puzzle has initial state `0321` and rotation 0. The second puzzle has initial state `2103` and rotation 1 (meaning the `layout` edges are rotated one space clockwise before putting the beads in their initial position).
 
 Finally, we encode the initial state based in its index in the sorted list of all permutations (we treat the first value of each permutation as least significant and sort the permutations in descending order):
 ```
