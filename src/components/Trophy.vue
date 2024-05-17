@@ -71,6 +71,7 @@ export default {
   transition-property: none;
   transform: scale(2.7) rotate(90deg);
   offset-rotate: reverse;
+  pointer-events: none;
 }
 .canAnimate .trophy {
   transition-property: offset-distance;
