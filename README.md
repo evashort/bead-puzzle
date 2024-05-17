@@ -1,6 +1,21 @@
 # Bead Puzzle
 A circle of beads with one empty space. You can move beads into the empty space but only along certain paths. Try to get every bead into the space where it belongs: https://evashort.com/beads/
 
+Contents:
+1. [Development instructions](#development-instructions)
+    1. [Recommended IDE Setup](#recommended-ide-setup)
+    1. [Customize configuration](#customize-configuration)
+    1. [Project Setup](#project-setup)
+    1. [Compile and Hot-Reload for Development](#compile-and-hot-reload-for-development)
+    1. [Compile and Minify for Production](#compile-and-minify-for-production)
+1. [Generating the puzzles](#generating-the-puzzles)
+    1. [Generating the graphs](#generating-the-graphs)
+    1. [Interpreting the graphs](#interpreting-the-graphs)
+        1. [`id` and `layout`](#id-and-layout)
+        1. ["Edge length"](#edge-length)
+        1. [Puzzles](#puzzles)
+    1. [Generating levels](#generating-levels)
+
 ## Development instructions
 This repo is based on the following template: [vitodepi16/vite-hello-world](https://github.com/vitodepi16/vite-hello-world)
 
@@ -69,9 +84,9 @@ Normally you don't need to do this because the output is checked into the repo.
     python main.py 6 5
     ```
 
-## Interpreting the graphs
+### Interpreting the graphs
 
-### `id` and `layout`
+#### `id` and `layout`
 
 To understand what `main.py` is doing, let's look at `graphs/ab_ac_ad_bc_cd.json` (a.k.a. the "Sandwich"). This graph includes the following layouts which are isomorphic to each other:
 ```
@@ -117,6 +132,23 @@ base64.b64encode(int('101111', base=2).to_bytes(length=1, byteorder='little'))
 ```
 Note: The `length` argument must be 1 for 2- to 4-node graphs and 2 for 5- to 6-node graphs.
 
+To summarize, here is the whole process of generating `id` and `layout`:
+```
+The layout with minimum binary representation:
+  A       ABCD
+ /|\     A 111
+D-+-B -> B  10 -> 011111 -> Hw== (id)
+  |/     C   1
+  C      D
+
+A layout that minimizes total "edge length":
+  A       ABCD
+ /|\     A 111
+D | B -> B  11 -> 101111 -> Lw== (layout)
+ \|/     C   0
+  C      D
+```
+
 Let's check the results against the contents of `graphs/ab_ac_ad_bc_cd.json`:
 ```json
 {
@@ -135,7 +167,7 @@ Let's check the results against the contents of `graphs/ab_ac_ad_bc_cd.json`:
     "layout": "Lw=="
 }
 ```
-### "Edge length"
+#### "Edge length"
 We don't calculate actual edge lengths when we choose a layout. Instead we use distance around the perimiter as a rough approximation. For example in the following graph, edge AD has "length" 3 and edge BF has "length" 2.
 ```
    A
@@ -144,7 +176,7 @@ E  |  C
    D
 ```
 Minimizing "edge length" can make graphs less tangled and more comprehensible, but it's only a starting point. Later in the puzzle generation process there's a way to customize the layout of each graph.
-### Puzzles
+#### Puzzles
 `distance` is the maximum distance (number of moves) between any two game states for a graph. We compute the [distance matrix](https://en.wikipedia.org/wiki/Distance_matrix) not for the graph itself but for its [state space](https://en.wikipedia.org/wiki/State_space_%28computer_science%29) graph, using repeated [min-plus matrix multiplication](https://en.wikipedia.org/wiki/Min-plus_matrix_multiplication). The state space of a 7-node graph is a 5040-node graph (7! = 5040).
 
 The "Sandwich" graph has a maximum distance of 7, so to make the puzzles challenging we only choose start and goal states that are 7 moves apart. Here are two such puzzles (0 represents the empty space):
@@ -213,3 +245,7 @@ These permutation indices and rotations are stored in the `puzzles` array of `gr
     }
 ]
 ```
+
+### Generating levels
+
+TODO: Explain `difficulty_test.py`
