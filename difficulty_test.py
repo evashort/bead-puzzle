@@ -119,6 +119,40 @@ for i, src_path in enumerate(src_folder.iterdir()):
 
 graphs.sort(key=lambda graph: graph['difficulty'])
 
+# add second sandwich
+(sandwich_index, sandwich), = (
+    (i, dict(graph)) for i, graph in enumerate(graphs)
+    if graph['id'] == 'Hw=='
+)
+sandwich['id'] = 'Hw==.2'
+graphs.insert(sandwich_index + 1, sandwich)
+
+names_path = 'graph_names.json'
+id_names = None
+try:
+    f = open(names_path, encoding='utf-8')
+except FileNotFoundError:
+    id_names = {}
+else:
+    with f:
+        id_names = json.load(f)
+
+id_layouts = {}
+
+# sort by difficulty and add new graphs
+for graph in graphs:
+    name = id_names.pop(graph['id'], graph['id'])
+    if isinstance(name, dict):
+        id_layouts[graph['id']] = name['layout']
+        name = name['name']
+
+    if name.startswith(graph['id']):
+        name = graph['id']
+    elif name.startswith('#' + graph['id']):
+        name = '#' + graph['id']
+
+    id_names[graph['id']] = name
+
 size_graphs = {}
 for graph in graphs:
     node_count = simple_graph.base64_to_nodes(graph['id'])
@@ -141,32 +175,9 @@ for size, graph_list in size_graphs.items():
     ).reshape(-1, size * size)
     size_permutations[size] = permutations
 
-# find easier subgraphs with higher distance and more states because they
-# are better
-# x is a subgraph of y <=> not any(x & ~y) <=> x dot ~y == 0
 for size, matrices in size_matrices.items():
     permutations = size_permutations[size]
     graph_list = size_graphs[size]
-    for i, matrix in enumerate(matrices):
-        superior = np.logical_not(
-            np.all(
-                np.matmul(
-                    matrices[:i],
-                    np.logical_not(matrix)[permutations].T,
-                ),
-                axis=1,
-            ),
-        )
-        graph = graph_list[i]
-        distance = graph['distance']
-        states = graph['states']
-        superior_ids = [
-            graph_list[j]['id'] for j in np.nonzero(superior)[0]
-            if graph_list[j]['distance'] >= distance \
-                and graph_list[j]['states'] >= states
-        ]
-        if superior_ids:
-            graph['superior'] = superior_ids
 
     # flag graphs with a loop containing all nodes and an edge between two
     # consecutive nodes because they can be solved with a boring algorithm
@@ -190,27 +201,71 @@ for size, matrices in size_matrices.items():
         if bool(loop):
             graph['loop'] = True
 
-# add second sandwich
-(sandwich_index, sandwich), = (
-    (i, dict(graph)) for i, graph in enumerate(graphs)
-    if graph['id'] == 'Hw=='
-)
-sandwich['id'] = 'Hw==.2'
-graphs.insert(sandwich_index + 1, sandwich)
+        if bool(loop) and id_names[graph['id']] \
+            in [graph['id'], '#' + graph['id']]:
+            id_names[graph['id']] += ' loop'
 
-names_path = 'graph_names.json'
-id_names = None
-try:
-    f = open(names_path, encoding='utf-8')
-except FileNotFoundError:
-    id_names = {}
-else:
-    with f:
-        id_names = json.load(f)
+    # find easier subgraphs with higher distance and more states because they
+    # are better
+    # x is a subgraph of y <=> not any(x & ~y) <=> x dot ~y == 0
+    for i, matrix in enumerate(matrices):
+        superior = np.logical_not(
+            np.all(
+                np.matmul(
+                    matrices[:i],
+                    np.logical_not(matrix)[permutations].T,
+                ),
+                axis=1,
+            ),
+        )
+        graph = graph_list[i]
+        distance = graph['distance']
+        states = graph['states']
+        superior_ids = [
+            graph_list[j]['id'] for j in np.nonzero(superior)[0]
+            if graph_list[j]['distance'] >= distance \
+                and graph_list[j]['states'] >= states
+        ]
+        if superior_ids:
+            graph['superior'] = superior_ids
 
-# sort by difficulty and add new graphs
+        if superior_ids and (
+            id_names[graph['id']].startswith(graph['id']) \
+                or id_names[graph['id']].startswith('#' + graph['id'])
+        ):
+            superior_names = [
+                other_id if id_names[other_id].startswith(other_id)
+                else id_names[other_id]
+                for other_id in superior_ids
+                if not id_names[other_id].startswith('#')
+            ]
+            all_hidden = ''
+            if not superior_names:
+                superior_names = [
+                    '#' + other_id if id_names[other_id].startswith('#' + other_id)
+                    else id_names[other_id]
+                    for other_id in superior_ids
+                ]
+                all_hidden = ' hidden'
+
+            if len(superior_names) > 7:
+                id_names[graph['id']] \
+                    += f' like {len(superior_ids)}{all_hidden} graphs'
+            else:
+                id_names[graph['id']] += f' like ' + ', '.join(superior_names)
+
+            hidden_count = len(superior_ids) - len(superior_names)
+            if hidden_count > 0:
+                id_names[graph['id']] += f' + {hidden_count} hidden'
+
 for graph in graphs:
-    id_names[graph['id']] = id_names.pop(graph['id'], '')
+    graph['name'] = id_names[graph['id']]
+
+for layout_id, layout in id_layouts.items():
+    id_names[layout_id] = {
+        'name': id_names[layout_id],
+        'layout': layout,
+    }
 
 with open(names_path, mode='w', encoding='utf-8', newline='\n') as f:
     json.dump(id_names, f, indent=2)
@@ -231,14 +286,13 @@ for graph in graphs:
 
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-    name = id_names[graph['id']]
-    if isinstance(name, dict):
+    if graph['id'] in id_layouts:
+        layout = id_layouts[graph['id']]
         permutation = np.fromiter(
-            map(letters.index, name['layout']),
+            map(letters.index, layout),
             dtype=int,
-            count=len(name['layout']),
+            count=len(layout),
         )
-        name = name['name']
         matrix = simple_graph.permute_matrix(matrix, permutation)
         # if nodes = 3,
         # puzzles[0] is all the puzzles where the hole is at index 0 in the original matrix
@@ -347,7 +401,9 @@ for graph in graphs:
 
         graph['puzzles'] = new_puzzles
 
-    if name is not None and not name.startswith('#'):
+    name = graph['name']
+    if name and not name.startswith(graph['id']) \
+        and not name.startswith('#'):
         # make sure it starts with A
         empty_rotations = 0
         for i, rotation_puzzles in enumerate(graph['puzzles']):
@@ -361,7 +417,6 @@ for graph in graphs:
                 f'not A'
             )
 
-    graph['name'] = name
     layouts = list(permute.matrix_pair_to_indices(id_matrix, matrix))
     rotation_layouts = [0] * nodes
     rotation_layouts[0] = layouts[0]
@@ -376,7 +431,7 @@ for graph in graphs:
 
 graphs = [
     graph for graph in graphs
-    if graph['name'] is not None and not graph['name'].startswith('#')
+    if not graph['name'].startswith('#')
 ]
 
 with open(final_path, mode='w', encoding='utf-8', newline='\n') as f:

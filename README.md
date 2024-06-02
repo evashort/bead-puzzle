@@ -210,7 +210,7 @@ However, the empty space has special meaning and cannot be repainted. To get it 
  \ /      \ /
   0        2
 ```
-The remaining puzzles are uniquely determined by an initial state and a rotation of the graph's `layout`. The first puzzle has initial state `0321` and rotation 0. The second puzzle has initial state `2103` and rotation 1 (meaning the `layout` edges are rotated one space clockwise before putting the beads in their initial position).
+The puzzles that are not eliminated are uniquely determined by an initial state and a rotation of the graph's `layout`. The first puzzle shown above has initial state `0321` and rotation 0. The second puzzle has initial state `2103` and rotation 1 (meaning the `layout` edges are rotated one space clockwise before putting the beads in their initial position).
 
 Finally, we encode the initial state based in its index in the sorted list of all permutations (we treat the first value of each permutation as least significant and sort the permutations in descending order):
 ```
@@ -248,4 +248,6 @@ These permutation indices and rotations are stored in the `puzzles` array of `gr
 
 ### Generating levels
 
-TODO: Explain `difficulty_test.py`
+`src/assets/graphs.json` is the data file used by the game to populate the list of levels. To generate it, run `difficulty_test.py`.
+
+If any files are missing from the `difficulty` folder, `difficulty_test.py` will generate those too. It does this by trying to solve the puzzles by making random moves, but prioritizing game states it has seen fewer times and choosing the winning move if there is one. It solves each puzzle 1000 times to improve accuracy, but even so the difficulty for each graph may be slightly different if you delete `difficulty/*.json` and re-run `difficulty_test.py`
